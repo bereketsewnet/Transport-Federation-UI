@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
 import { cn } from '@utils/helpers';
 import styles from './Sidebar.module.css';
 
@@ -19,6 +18,16 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const location = useLocation();
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1024);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const menuItems: MenuItem[] = [
     {
@@ -106,22 +115,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Overlay for mobile */}
-      {isOpen && (
-        <motion.div
+      {isOpen && isMobile && (
+        <div
           className={styles.overlay}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
-      <motion.aside
+      <aside
         className={cn(styles.sidebar, isOpen && styles.open)}
-        initial={false}
-        animate={{ x: isOpen ? 0 : -280 }}
-        transition={{ duration: 0.3 }}
       >
         <div className={styles.header}>
           <h2 className={styles.title}>Admin Panel</h2>
@@ -145,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </Link>
           ))}
         </nav>
-      </motion.aside>
+      </aside>
     </>
   );
 };
