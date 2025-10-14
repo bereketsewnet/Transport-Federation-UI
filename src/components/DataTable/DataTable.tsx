@@ -139,6 +139,28 @@ export const DataTable = <T extends { id: number | string }>({
         </table>
       </div>
 
+      {/* Mobile Card View */}
+      <div className={styles.mobileCard}>
+        {data.map((row) => (
+          <div key={row.id} className={styles.mobileCardItem}>
+            {columns.map((column) => {
+              const value = (row as Record<string, unknown>)[column.key];
+              return (
+                <div key={column.key} className={styles.mobileCardRow}>
+                  <span className={styles.mobileCardLabel}>{column.label}</span>
+                  <span className={styles.mobileCardValue}>
+                    {column.render ? column.render(value, row) : String(value ?? '')}
+                  </span>
+                </div>
+              );
+            })}
+            {actions && (
+              <div className={styles.mobileCardActions}>{actions(row)}</div>
+            )}
+          </div>
+        ))}
+      </div>
+
       {/* Pagination */}
       {totalPages > 1 && (
         <div className={styles.pagination}>

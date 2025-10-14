@@ -55,22 +55,43 @@
   font-weight: 500;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
+  .container {
+    padding: 0;
+  }
+
   .header {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--spacing-3);
   }
 
   .searchBox {
     max-width: none;
   }
+}
+
+@media (max-width: 767px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--text-sm);
+  }
 
   .rowActions {
     flex-direction: column;
+    width: 100%;
+  }
+
+  .rowActions button {
+    width: 100%;
   }
 }
 

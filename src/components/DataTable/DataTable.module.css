@@ -5,6 +5,12 @@
   overflow: hidden;
 }
 
+@media (max-width: 1023px) {
+  .container {
+    border-radius: var(--radius);
+  }
+}
+
 .tableWrapper {
   overflow-x: auto;
 }
@@ -157,11 +163,70 @@
   border-color: var(--primary);
 }
 
-@media (max-width: 767px) {
-  .th,
-  .td {
-    padding: var(--spacing-3);
-    font-size: var(--text-xs);
+/* Mobile Card View */
+.mobileCard {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  /* Hide table, show cards on tablet/mobile */
+  .tableWrapper {
+    display: none;
+  }
+
+  .mobileCard {
+    display: block;
+    padding: var(--spacing-4);
+  }
+
+  .mobileCardItem {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-3);
+    transition: all var(--transition-base);
+  }
+
+  .mobileCardItem:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary-subtle);
+  }
+
+  .mobileCardItem:last-child {
+    margin-bottom: 0;
+  }
+
+  .mobileCardRow {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-3) 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .mobileCardRow:last-child {
+    border-bottom: none;
+  }
+
+  .mobileCardLabel {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .mobileCardValue {
+    font-size: var(--text-sm);
+    color: var(--text);
+    text-align: right;
+  }
+
+  .mobileCardActions {
+    margin-top: var(--spacing-3);
+    padding-top: var(--spacing-3);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
   }
 
   .pagination {
@@ -180,6 +245,19 @@
 
   .pageNumbers {
     display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .th,
+  .td {
+    padding: var(--spacing-3);
+    font-size: var(--text-xs);
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: var(--spacing-1);
   }
 }
 
