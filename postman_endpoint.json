@@ -1,0 +1,789 @@
+{
+    "info": {
+      "name": "TCWF API - Full Collection",
+      "_postman_id": "tcwf-api-full-collection-0001",
+      "description": "Postman collection with all endpoints for Transport & Communication Federation API (auth + CRUD + reports). Set env variable base_url and jwt_token before protected calls.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Auth",
+        "description": "Authentication endpoints",
+        "item": [
+          {
+            "name": "Login (get JWT)",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/auth/login",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "login"
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Unions",
+        "item": [
+          {
+            "name": "List unions (search & pagination)",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/unions?q=telecom&sector=Communication&page=1&per_page=10",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "unions"
+                ],
+                "query": [
+                  {
+                    "key": "q",
+                    "value": "telecom"
+                  },
+                  {
+                    "key": "sector",
+                    "value": "Communication"
+                  },
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "per_page",
+                    "value": "10"
+                  }
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Create union",
+            "request": {
+              "method": "POST",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"union_code\": \"ET01\",\n  \"name_en\": \"Ethio Telecom Workers Union\",\n  \"name_am\": \"የኢትዮ ቴሌኮም ሠራተኞች ህብረት\",\n  \"sector\": \"Communication\",\n  \"organization\": \"Ethio Telecom\",\n  \"established_date\": \"2010-01-01\",\n  \"terms_of_election\": 3,\n  \"strategic_plan_in_place\": true\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/unions",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "unions"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Get union by id",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/unions/1",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "unions",
+                  "1"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Update union",
+            "request": {
+              "method": "PUT",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name_en\": \"Updated Ethio Telecom Union\",\n  \"terms_of_election\": 4\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/unions/1",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "unions",
+                  "1"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Delete union (confirm)",
+            "request": {
+              "method": "DELETE",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/unions/1?confirm=true",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "unions",
+                  "1"
+                ],
+                "query": [
+                  {
+                    "key": "confirm",
+                    "value": "true"
+                  }
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Members",
+        "item": [
+          {
+            "name": "List members",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/members?q=abebe&union_id=1&page=1&per_page=20",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "members"
+                ],
+                "query": [
+                  {
+                    "key": "q",
+                    "value": "abebe"
+                  },
+                  {
+                    "key": "union_id",
+                    "value": "1"
+                  },
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "per_page",
+                    "value": "20"
+                  }
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Create member",
+            "request": {
+              "method": "POST",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"union_id\": 1,\n  \"member_code\": \"M-1001\",\n  \"first_name\": \"Abebe\",\n  \"father_name\": \"Kebede\",\n  \"surname\": \"Tadesse\",\n  \"sex\": \"Male\",\n  \"birthdate\": \"1990-05-10\",\n  \"education\": \"Degree\",\n  \"phone\": \"+251911000000\",\n  \"email\": \"abebe@example.com\",\n  \"salary\": 3500.00,\n  \"registry_date\": \"2021-06-15\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/members",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "members"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Get member by id",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/members/1",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "members",
+                  "1"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Update member",
+            "request": {
+              "method": "PUT",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"phone\": \"+251911111111\",\n  \"email\": \"abebe.new@example.com\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/members/1",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "members",
+                  "1"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Archive member (move to archives)",
+            "request": {
+              "method": "DELETE",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"reason\": \"Left union\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/members/1?archive=true",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "members",
+                  "1"
+                ],
+                "query": [
+                  {
+                    "key": "archive",
+                    "value": "true"
+                  }
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Delete member (hard delete confirm)",
+            "request": {
+              "method": "DELETE",
+              "auth": {
+                "type": "bearer",
+                "bearer": [
+                  {
+                    "key": "token",
+                    "value": "{{jwt_token}}",
+                    "type": "string"
+                  }
+                ]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/members/1?confirm=true",
+                "host": [
+                  "{{base_url}}"
+                ],
+                "path": [
+                  "api",
+                  "members",
+                  "1"
+                ],
+                "query": [
+                  {
+                    "key": "confirm",
+                    "value": "true"
+                  }
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Union Executives",
+        "item": [
+          {
+            "name": "List union executives",
+            "request": {
+              "method": "GET",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "url": { "raw": "{{base_url}}/api/union-executives?union_id=1", "host": ["{{base_url}}"], "path": ["api","union-executives"], "query":[{"key":"union_id","value":"1"}] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create union executive",
+            "request": {
+              "method": "POST",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": { "mode": "raw", "raw": "{\n  \"union_id\": 1,\n  \"mem_id\": 1,\n  \"position\": \"Vice Chairman\",\n  \"appointed_date\": \"2023-01-01\",\n  \"term_length_years\": 3\n}" },
+              "url": { "raw": "{{base_url}}/api/union-executives", "host": ["{{base_url}}"], "path": ["api","union-executives"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Delete union executive (confirm)",
+            "request": {
+              "method": "DELETE",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "url": { "raw": "{{base_url}}/api/union-executives/1?confirm=true", "host": ["{{base_url}}"], "path": ["api","union-executives","1"], "query": [{"key":"confirm","value":"true"}] }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "CBAs",
+        "item": [
+          {
+            "name": "List CBAs",
+            "request": {
+              "method": "GET",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "url": { "raw": "{{base_url}}/api/cbas?union_id=1&status=signed", "host": ["{{base_url}}"], "path": ["api","cbas"], "query": [{"key":"union_id","value":"1"},{"key":"status","value":"signed"}] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create CBA",
+            "request": {
+              "method": "POST",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body": { "mode":"raw", "raw": "{\n  \"union_id\": 1,\n  \"duration_years\": 3,\n  \"status\": \"signed\",\n  \"registration_date\": \"2022-07-01\",\n  \"next_end_date\": \"2025-07-01\",\n  \"round\": \"1st\"\n}" },
+              "url": { "raw":"{{base_url}}/api/cbas","host":["{{base_url}}"],"path":["api","cbas"] }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Terminated Unions",
+        "item": [
+          {
+            "name": "List terminated unions",
+            "request": {
+              "method": "GET",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url": { "raw":"{{base_url}}/api/terminated-unions", "host":["{{base_url}}"], "path":["api","terminated-unions"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create terminated union (archive)",
+            "request": {
+              "method":"POST",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"union_id\": 1,\n  \"name_en\": \"Old Union\",\n  \"terminated_date\": \"2025-09-01\",\n  \"termination_reason\": \"Merged\"\n}"},
+              "url":{"raw":"{{base_url}}/api/terminated-unions","host":["{{base_url}}"],"path":["api","terminated-unions"]}
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Login Accounts (admin)",
+        "item": [
+          {
+            "name": "List accounts (admin)",
+            "request": {
+              "method": "GET",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url": { "raw": "{{base_url}}/api/login-accounts", "host": ["{{base_url}}"], "path": ["api","login-accounts"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create account (admin)",
+            "request": {
+              "method": "POST",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"username\": \"user1\",\n  \"password\": \"User1Pass!\",\n  \"role\": \"member\"\n}"},
+              "url":{"raw":"{{base_url}}/api/login-accounts","host":["{{base_url}}"],"path":["api","login-accounts"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Reset password (admin)",
+            "request": {
+              "method": "POST",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{ \"password\": \"NewPass123!\" }"},
+              "url": { "raw": "{{base_url}}/api/login-accounts/reset/admin", "host": ["{{base_url}}"], "path": ["api","login-accounts","reset","admin"] }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Organization Leaders",
+        "item": [
+          {
+            "name": "List org leaders",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{ "raw":"{{base_url}}/api/org-leaders", "host":["{{base_url}}"], "path":["api","org-leaders"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create org leader",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"union_id\": 1,\n  \"title\": \"Mr\",\n  \"first_name\": \"Yared\",\n  \"position\": \"CEO\",\n  \"phone\": \"+251911222333\",\n  \"email\": \"yared@org.com\"\n}"},
+              "url":{"raw":"{{base_url}}/api/org-leaders","host":["{{base_url}}"],"path":["api","org-leaders"]}
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Archives",
+        "item": [
+          {
+            "name": "List archives",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{ "raw":"{{base_url}}/api/archives", "host":["{{base_url}}"], "path":["api","archives"] }
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Visitors",
+        "item": [
+          {
+            "name": "List visitors (range)",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{ "raw":"{{base_url}}/api/visitors?from=2025-09-01&to=2025-09-30", "host":["{{base_url}}"], "path":["api","visitors"], "query":[{"key":"from","value":"2025-09-01"},{"key":"to","value":"2025-09-30"}] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create/Increment visitor",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"visit_date\": \"2025-10-02\",\n  \"increment\": 1\n}"},
+              "url":{"raw":"{{base_url}}/api/visitors","host":["{{base_url}}"],"path":["api","visitors"]}
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Contacts",
+        "item": [
+          {
+            "name": "Submit contact message (public)",
+            "request": {
+              "method":"POST",
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"name\": \"User\",\n  \"email_or_phone\": \"user@example.com\",\n  \"subject\": \"Inquiry\",\n  \"message\": \"I need help with membership.\"\n}"},
+              "url":{"raw":"{{base_url}}/api/contacts","host":["{{base_url}}"],"path":["api","contacts"]}
+            },
+            "response": []
+          },
+          {
+            "name": "List contact messages (admin)",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/contacts","host":["{{base_url}}"],"path":["api","contacts"]}
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "News",
+        "item": [
+          {
+            "name": "List news",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/news?is_published=true","host":["{{base_url}}"],"path":["api","news"],"query":[{"key":"is_published","value":"true"}]}
+            },
+            "response": []
+          },
+          {
+            "name": "Create news (admin)",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"title\": \"Federation Annual Report\",\n  \"body\": \"Detailed report content...\",\n  \"summary\": \"Annual summary\",\n  \"published_at\": \"2025-10-02T08:00:00Z\",\n  \"is_published\": true\n}"},
+              "url":{"raw":"{{base_url}}/api/news","host":["{{base_url}}"],"path":["api","news"]}
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Galleries & Photos",
+        "item": [
+          {
+            "name": "List galleries",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/galleries","host":["{{base_url}}"],"path":["api","galleries"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Create gallery",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"title\": \"Conference 2025\",\n  \"description\": \"Photos from the annual conference\"\n}"},
+              "url":{"raw":"{{base_url}}/api/galleries","host":["{{base_url}}"],"path":["api","galleries"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Add photo metadata (admin) - upload separately",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"gallery_id\": 1,\n  \"filename\": \"conference-01.jpg\",\n  \"caption\": \"Opening ceremony\",\n  \"taken_at\": \"2025-09-20\"\n}"},
+              "url":{"raw":"{{base_url}}/api/photos","host":["{{base_url}}"],"path":["api","photos"]}
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Reports",
+        "item": [
+          {
+            "name": "Members summary (admin report)",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/reports/members-summary","host":["{{base_url}}"],"path":["api","reports","members-summary"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Unions with expired CBA (admin report)",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/reports/unions-cba-expired","host":["{{base_url}}"],"path":["api","reports","unions-cba-expired"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Save report cache (admin)",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"report_name\": \"members_by_year\",\n  \"payload\": { \"2021\": 120, \"2022\": 140 }\n}"},
+              "url":{"raw":"{{base_url}}/api/reports/cache","host":["{{base_url}}"],"path":["api","reports","cache"]}
+            },
+            "response": []
+          }
+        ]
+      }
+    ],
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:4000",
+        "type": "string"
+      },
+      {
+        "key": "jwt_token",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "admin_username",
+        "value": "admin",
+        "type": "string"
+      },
+      {
+        "key": "admin_password",
+        "value": "ChangeThisStrongAdminPass!",
+        "type": "string"
+      }
+    ]
+  }
+  

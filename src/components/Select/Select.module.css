@@ -1,0 +1,68 @@
+.selectField {
+  margin-bottom: var(--spacing-5);
+}
+
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: var(--spacing-2);
+}
+
+.required {
+  color: var(--accent);
+  margin-left: var(--spacing-1);
+}
+
+.select {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--text-base);
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
+}
+
+.select:disabled {
+  background: var(--bg-subtle);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.selectError {
+  border-color: var(--error);
+}
+
+.selectError:focus {
+  box-shadow: 0 0 0 3px var(--error-bg);
+}
+
+.error {
+  display: block;
+  margin-top: var(--spacing-2);
+  font-size: var(--text-sm);
+  color: var(--error);
+}
+
+.helper {
+  display: block;
+  margin-top: var(--spacing-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+

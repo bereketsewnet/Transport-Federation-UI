@@ -1,0 +1,241 @@
+.home {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-12);
+  align-items: center;
+  padding: var(--spacing-16) var(--spacing-6);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  min-height: calc(100vh - var(--header-height));
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.heroTitle {
+  font-size: var(--text-5xl);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.heroSubtitle {
+  font-size: var(--text-xl);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.heroActions {
+  display: flex;
+  gap: var(--spacing-4);
+}
+
+.heroImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroImagePlaceholder {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-xl);
+}
+
+/* Stats Section */
+.stats {
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-16) var(--spacing-6);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-8);
+}
+
+.statCard {
+  text-align: center;
+}
+
+.statNumber {
+  font-size: var(--text-5xl);
+  font-weight: 700;
+  margin: 0 0 var(--spacing-2) 0;
+  color: white;
+}
+
+.statLabel {
+  font-size: var(--text-lg);
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Features Section */
+.features {
+  padding: var(--spacing-16) var(--spacing-6);
+  background: var(--bg);
+}
+
+.sectionTitle {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 var(--spacing-12) 0;
+  color: var(--text);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-8);
+}
+
+.featureCard {
+  text-align: center;
+  padding: var(--spacing-8);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-base);
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+}
+
+.featureIcon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-subtle);
+  color: var(--primary);
+  border-radius: var(--radius-xl);
+}
+
+.featureTitle {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin: 0 0 var(--spacing-3) 0;
+  color: var(--text);
+}
+
+.featureDescription {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* CTA Section */
+.cta {
+  padding: var(--spacing-16) var(--spacing-6);
+  background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--bg) 100%);
+}
+
+.ctaContent {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ctaTitle {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  margin: 0 0 var(--spacing-4) 0;
+  color: var(--text);
+}
+
+.ctaDescription {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-6) 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 1023px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-12) var(--spacing-6);
+    text-align: center;
+  }
+
+  .heroActions {
+    justify-content: center;
+  }
+
+  .heroTitle {
+    font-size: var(--text-4xl);
+  }
+}
+
+@media (max-width: 767px) {
+  .heroTitle {
+    font-size: var(--text-3xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--text-lg);
+  }
+
+  .heroActions {
+    flex-direction: column;
+  }
+
+  .stats {
+    padding: var(--spacing-12) var(--spacing-4);
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-6);
+  }
+
+  .statNumber {
+    font-size: var(--text-4xl);
+  }
+
+  .features {
+    padding: var(--spacing-12) var(--spacing-4);
+  }
+
+  .sectionTitle {
+    font-size: var(--text-3xl);
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta {
+    padding: var(--spacing-12) var(--spacing-4);
+  }
+
+  .ctaTitle {
+    font-size: var(--text-3xl);
+  }
+}
+
