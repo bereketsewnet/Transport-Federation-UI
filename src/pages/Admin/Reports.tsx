@@ -145,7 +145,7 @@ export const Reports: React.FC = () => {
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value)}
           />
-          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <Button fullWidth onClick={() => {}}>
               {t('reports.generateReport')}
             </Button>
