@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from '@components/Toast';
 import { ProtectedRoute } from '@components/ProtectedRoute';
@@ -11,49 +10,31 @@ import ChangePassword from '@pages/Auth/ChangePassword';
 
 // Public Pages
 import Home from '@pages/Public/Home';
+import About from '@pages/Public/About';
+import NewsList from '@pages/Public/NewsList';
+import NewsDetail from '@pages/Public/NewsDetail';
+import Gallery from '@pages/Public/Gallery';
+import Contact from '@pages/Public/Contact';
 
 // Admin Pages
 import Dashboard from '@pages/Admin/Dashboard';
 import Reports from '@pages/Admin/Reports';
 import MembersList from '@pages/Admin/Members/MembersList';
 
-// Simple placeholder pages for routes not yet fully implemented
-const NewsPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>News</h1>
-      <p>News listing will be displayed here.</p>
-    </div>
-  </div>
-);
+// Admin News
+import AdminNewsList from '@pages/Admin/News/NewsList';
+import AdminNewsForm from '@pages/Admin/News/NewsForm';
 
-const GalleryPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>Gallery</h1>
-      <p>Photo galleries will be displayed here.</p>
-    </div>
-  </div>
-);
+// Admin Gallery
+import AdminGalleryList from '@pages/Admin/Gallery/GalleryList';
+import AdminGalleryForm from '@pages/Admin/Gallery/GalleryForm';
+import PhotoManager from '@pages/Admin/Gallery/PhotoManager';
 
-const AboutPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>About Us</h1>
-      <p>Information about the Transport & Communication Workers Federation.</p>
-    </div>
-  </div>
-);
+// Admin Other
+import ContactManager from '@pages/Admin/ContactManager';
+import AboutEditor from '@pages/Admin/AboutEditor';
 
-const ContactPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>Contact Us</h1>
-      <p>Get in touch with us.</p>
-    </div>
-  </div>
-);
-
+// Placeholder pages for routes not yet fully implemented
 const UnionsPage = () => (
   <div className="page">
     <div className="container">
@@ -113,10 +94,11 @@ function App() {
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/news" element={<NewsPage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/news" element={<NewsList />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/contact" element={<Contact />} />
         </Route>
 
         {/* Auth Routes - Standalone (no layout) */}
@@ -136,6 +118,23 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="reports" element={<Reports />} />
           <Route path="members" element={<MembersList />} />
+          
+          {/* News Management */}
+          <Route path="news" element={<AdminNewsList />} />
+          <Route path="news/new" element={<AdminNewsForm />} />
+          <Route path="news/:id/edit" element={<AdminNewsForm />} />
+          
+          {/* Gallery Management */}
+          <Route path="gallery" element={<AdminGalleryList />} />
+          <Route path="gallery/new" element={<AdminGalleryForm />} />
+          <Route path="gallery/:id/edit" element={<AdminGalleryForm />} />
+          <Route path="gallery/:galleryId/photos" element={<PhotoManager />} />
+          
+          {/* Contact & About */}
+          <Route path="contacts" element={<ContactManager />} />
+          <Route path="about-editor" element={<AboutEditor />} />
+          
+          {/* Placeholders - not yet implemented */}
           <Route path="unions" element={<UnionsPage />} />
           <Route path="executives" element={<ExecutivesPage />} />
           <Route path="cbas" element={<CBAsPage />} />

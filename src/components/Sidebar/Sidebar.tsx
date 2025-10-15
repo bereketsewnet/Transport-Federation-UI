@@ -108,6 +108,64 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </svg>
       ),
     },
+    {
+      path: '/admin/news',
+      label: t('nav.news'),
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z"
+            fill="currentColor"
+          />
+          <path
+            d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+    {
+      path: '/admin/gallery',
+      label: t('nav.gallery'),
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+    {
+      path: '/admin/contacts',
+      label: 'Contact Forms',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
+            fill="currentColor"
+          />
+          <path
+            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+    {
+      path: '/admin/about-editor',
+      label: 'About Editor',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
   ];
 
   const isActive = (path: string) => location.pathname === path;
