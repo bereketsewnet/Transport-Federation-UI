@@ -1,0 +1,186 @@
+.container {
+  padding: var(--spacing-6);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-8);
+  gap: var(--spacing-4);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 var(--spacing-2);
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.rowActions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.form {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--border);
+}
+
+/* Photo Manager */
+.photoForm {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  margin-bottom: var(--spacing-8);
+}
+
+.photoForm h3 {
+  margin: 0 0 var(--spacing-4);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.photoFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: var(--spacing-4);
+  align-items: end;
+}
+
+.photosSection {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+}
+
+.photosSection h3 {
+  margin: 0 0 var(--spacing-6);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.photosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.photoCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.photoCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.photoPlaceholder {
+  aspect-ratio: 4 / 3;
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.photoInfo {
+  padding: var(--spacing-3);
+}
+
+.photoFilename {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-1);
+  word-break: break-word;
+}
+
+.photoCaption {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-1);
+}
+
+.photoDate {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-12);
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+  .container {
+    padding: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .photoFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .photosGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .rowActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .rowActions button {
+    width: 100%;
+  }
+}
+

@@ -268,7 +268,7 @@ export const createPhoto = (data: Partial<Photo>): Promise<AxiosResponse<Photo>>
 // ==================== CONTACTS ====================
 
 export interface Contact {
-  id: number;
+  id: number
   name: string;
   email_or_phone: string;
   subject: string;

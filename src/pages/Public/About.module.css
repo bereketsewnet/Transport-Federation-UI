@@ -1,0 +1,234 @@
+.container {
+  min-height: 100vh;
+}
+
+.hero {
+  position: relative;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  padding: 0 var(--spacing-6);
+}
+
+.heroTitle {
+  font-size: var(--text-5xl);
+  font-weight: 800;
+  margin: 0 0 var(--spacing-4);
+}
+
+.heroSubtitle {
+  font-size: var(--text-xl);
+  opacity: 0.95;
+  margin: 0;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-12) var(--spacing-6);
+}
+
+.section {
+  margin-bottom: var(--spacing-16);
+}
+
+.sectionGrid {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: var(--spacing-8);
+  align-items: start;
+}
+
+.sectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: var(--primary-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--primary);
+}
+
+.sectionContent {
+  flex: 1;
+}
+
+.sectionTitle {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 var(--spacing-4);
+}
+
+.sectionText {
+  font-size: var(--text-lg);
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.valuesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-6);
+}
+
+.valueCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+  transition: all var(--transition-base);
+}
+
+.valueCard:hover {
+  border-color: var(--primary);
+  background: var(--primary-subtle);
+  transform: translateY(-2px);
+}
+
+.valueIcon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.valueText {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.objectivesList {
+  display: grid;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-6);
+}
+
+.objectiveCard {
+  display: flex;
+  gap: var(--spacing-4);
+  padding: var(--spacing-5);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.objectiveCard:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+  transform: translateX(4px);
+}
+
+.objectiveNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.objectiveText {
+  flex: 1;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+  padding-top: var(--spacing-2);
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+  .hero {
+    height: 300px;
+  }
+
+  .heroTitle {
+    font-size: var(--text-4xl);
+  }
+
+  .sectionGrid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .sectionIcon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .sectionIcon svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    height: 250px;
+  }
+
+  .heroTitle {
+    font-size: var(--text-3xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--text-base);
+  }
+
+  .content {
+    padding: var(--spacing-8) var(--spacing-4);
+  }
+
+  .sectionTitle {
+    font-size: var(--text-2xl);
+  }
+
+  .sectionText {
+    font-size: var(--text-base);
+  }
+
+  .valuesList {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -28,6 +28,7 @@
       "@components/*": ["./src/components/*"],
       "@pages/*": ["./src/pages/*"],
       "@api/*": ["./src/api/*"],
+      "@config/*": ["./src/config/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"],
       "@styles/*": ["./src/styles/*"],

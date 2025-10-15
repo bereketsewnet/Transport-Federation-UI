@@ -1,0 +1,134 @@
+.container {
+  padding: var(--spacing-6);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-8);
+  gap: var(--spacing-4);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 var(--spacing-2);
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.infoBox {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+  display: flex;
+  gap: var(--spacing-4);
+}
+
+.infoIcon {
+  font-size: var(--text-2xl);
+  flex-shrink: 0;
+}
+
+.infoBox h3 {
+  margin: 0 0 var(--spacing-3);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.infoBox p {
+  margin: 0 0 var(--spacing-3);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.codeBlock {
+  background: #1F2937;
+  color: #10B981;
+  padding: var(--spacing-4);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  overflow-x: auto;
+  margin: var(--spacing-3) 0;
+}
+
+.contactDetail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.detailRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detailRow strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.detailRow span {
+  color: var(--text-secondary);
+}
+
+.messageSection {
+  padding-top: var(--spacing-3);
+}
+
+.messageSection strong {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.messageText {
+  background: var(--bg-subtle);
+  padding: var(--spacing-4);
+  border-radius: var(--radius);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+  .container {
+    padding: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .detailRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .infoBox {
+    flex-direction: column;
+  }
+}
+

@@ -38,7 +38,11 @@
     "total": "ጠቅላላ",
     "page": "ገጽ",
     "perPage": "በገጽ",
-    "showing": "በማሳየት ላይ"
+    "showing": "በማሳየት ላይ",
+    "of": "ከ",
+    "viewAll": "ሁሉንም ይመልከቱ",
+    "management": "አስተዳደር",
+    "manage": "አስተዳደር"
   },
   "nav": {
     "home": "መነሻ",
@@ -198,7 +202,8 @@
     "photos": "ፎቶዎች",
     "addPhoto": "ፎቶ ጨምር",
     "caption": "መግለጫ",
-    "takenAt": "የተነሳበት ቀን"
+    "takenAt": "የተነሳበት ቀን",
+    "filename": "የፋይል ስም"
   },
   "contact": {
     "title": "አግኙን",
@@ -211,14 +216,18 @@
     "messageSent": "መልእክት በተሳካ ሁኔታ ተልኳል!",
     "address": "አድራሻ",
     "phone": "ስልክ",
-    "email": "ኢሜል"
+    "email": "ኢሜል",
+    "followUs": "ይከተሉን",
+    "description": "ያግኙን",
+    "noPhotos": "በዚህ ምስል ስብስብ ውስጥ ምንም ፎቶዎች የሉም"
   },
   "about": {
     "title": "ስለ እኛ",
     "mission": "ተልእኮአችን",
     "vision": "ራዕያችን",
     "values": "እሴቶቻችን",
-    "history": "ታሪካችን"
+    "history": "ታሪካችን",
+    "objectives": "አላማዎቻችን"
   },
   "profile": {
     "title": "የእኔ መገለጫ",
@@ -248,6 +257,13 @@
     "notFound": "ግብአት አልተገኘም።",
     "serverError": "የአገልጋይ ስህተት። እባክዎ ቆይተው ይሞክሩ።",
     "noLongerMember": "አሁን አባል አይደሉም። እባክዎ ፌዴሬሽንዎን ያነጋግሩ።"
+  },
+  "home": {
+    "whatWeDo": "የምናደርገው",
+    "whatWeDoDesc": "በትራንስፖርት እና ኮሙኒኬሽን ዘርፎች ውስጥ የሠራተኞች መብቶችን ለመጠበቅ እና ለማሳደግ ተወስነናል",
+    "joinUs": "በእያደገ ማህበረሰባችን ውስጥ ይቀላቀሉ",
+    "joinUsDesc": "ለሠራተኞች መብቶች፣ ፍትሃዊ አያያዝ እና ለተሻለ ወደፊት የቆመ ፌዴሬሽን አካል ይሁኑ",
+    "viewAll": "ሁሉንም ይመልከቱ"
   }
 }
 
