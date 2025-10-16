@@ -85,10 +85,16 @@ export const MemberForm: React.FC = () => {
   useEffect(() => {
     const loadUnions = async () => {
       try {
-        const response = await getUnions({ per_page: 100 });
-        setUnions(response.data.data || []);
+        console.log('🔄 Loading unions for dropdown...');
+        const response = await getUnions({ per_page: 1000 }); // Fetch more unions
+        console.log('✅ Unions response:', response);
+        const unionsData = response.data.data || [];
+        console.log('📊 Unions loaded:', unionsData.length, 'unions');
+        console.log('📋 First union:', unionsData[0]);
+        setUnions(unionsData);
       } catch (err) {
-        console.error('Error loading unions:', err);
+        console.error('💥 Error loading unions:', err);
+        toast.error('Failed to load unions');
       }
     };
     loadUnions();
@@ -237,6 +243,7 @@ export const MemberForm: React.FC = () => {
                 value={watchedValues.union_id?.toString() || ''}
                 onChange={(e) => {
                   const val = e.target.value;
+                  console.log('🔄 Union selected:', val);
                   if (val) {
                     setValue('union_id', parseInt(val));
                   }
@@ -244,13 +251,19 @@ export const MemberForm: React.FC = () => {
                 error={errors.union_id?.message}
                 required
                 className={styles.formField}
-                options={[
-                  { value: '', label: t('members.selectUnion') },
-                  ...unions.filter(u => u && u.id && u.name_en).map(union => ({
-                    value: union.id.toString(),
-                    label: union.name_en
-                  }))
-                ]}
+                options={(() => {
+                  const options = [
+                    { value: '', label: t('members.selectUnion') },
+                    ...unions
+                      .filter(u => u && (u.id || (u as any).union_id) && u.name_en)
+                      .map(union => ({
+                        value: (union.id || (union as any).union_id).toString(),
+                        label: union.name_en
+                      }))
+                  ];
+                  console.log('📋 Union dropdown options:', options);
+                  return options;
+                })()}
               />
               <FormField
                 label={t('members.memberCode')}
