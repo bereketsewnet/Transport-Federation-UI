@@ -38,8 +38,8 @@ import TestForm from '@pages/Admin/TestForm';
 import SimpleTest from '@pages/Admin/SimpleTest';
 
 // Admin Unions
-import { UnionsList } from '@pages/Admin/Unions';
-import UnionsFormFixed from '@pages/Admin/Unions/UnionsFormFixed';
+import UnionsListComplete from '@pages/Admin/Unions/UnionsListComplete';
+import UnionFormComplete from '@pages/Admin/Unions/UnionFormComplete';
 
 // Admin Executives
 import { ExecutivesForm } from '@pages/Admin/Executives';
@@ -155,9 +155,9 @@ function App() {
           <Route path="simple-test" element={<SimpleTest />} />
           
           {/* Unions Management */}
-          <Route path="unions" element={<UnionsList />} />
-          <Route path="unions/new" element={<UnionsFormFixed />} />
-          <Route path="unions/:id/edit" element={<UnionsFormFixed />} />
+          <Route path="unions" element={<UnionsListComplete />} />
+          <Route path="unions/new" element={<UnionFormComplete />} />
+          <Route path="unions/:id/edit" element={<UnionFormComplete />} />
           
           {/* Executives Management */}
           <Route path="executives" element={<ExecutivesListFixed />} />
