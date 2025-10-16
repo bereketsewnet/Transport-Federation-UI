@@ -13,6 +13,8 @@ import { formatDate } from '@utils/formatters';
 import { toast } from 'react-hot-toast';
 import styles from './MembersList.module.css';
 
+type MemberRow = Member & { id: number };
+
 export const MembersList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -28,8 +30,18 @@ export const MembersList: React.FC = () => {
     queryFn: () => getMembers({ page, per_page, q: search }),
   });
 
-  const members = data?.data?.data || [];
+  const rawMembers = data?.data?.data || [];
   const meta = data?.data?.meta;
+
+  // Transform members to add 'id' field from 'mem_id' for DataTable compatibility
+  const members: MemberRow[] = rawMembers.map(m => ({
+    ...m,
+    id: m.mem_id // DataTable needs 'id' field
+  }));
+
+  // Debug: Check if members have IDs
+  console.log('📊 Members data:', members);
+  console.log('📊 First member:', members[0]);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -70,7 +82,7 @@ export const MembersList: React.FC = () => {
     ]);
   };
 
-  const columns: Column<Member>[] = [
+  const columns: Column<MemberRow>[] = [
     {
       key: 'member_code',
       label: t('members.memberCode'),
@@ -107,19 +119,48 @@ export const MembersList: React.FC = () => {
     },
   ];
 
-  const renderActions = (row: Member) => (
-    <div className={styles.rowActions}>
-      <Button size="sm" variant="ghost" onClick={() => navigate(`/admin/members/${row.id}`)}>
-        {t('common.view')}
-      </Button>
-      <Button size="sm" variant="ghost" onClick={() => setArchiveId(row.id)}>
-        Archive
-      </Button>
-      <Button size="sm" variant="danger" onClick={() => setDeleteId(row.id)}>
-        {t('common.delete')}
-      </Button>
-    </div>
-  );
+  const renderActions = (row: MemberRow) => {
+    console.log('🔧 Rendering actions for member:', row);
+    console.log('🆔 Member ID:', row.id, 'Type:', typeof row.id);
+    
+    return (
+      <div className={styles.rowActions}>
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('👁️ View clicked for member ID:', row.mem_id);
+            navigate(`/admin/members/${row.mem_id}`);
+          }}
+        >
+          {t('common.view')}
+        </Button>
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('📦 Archive clicked for member ID:', row.mem_id);
+            setArchiveId(row.mem_id);
+          }}
+        >
+          Archive
+        </Button>
+        <Button 
+          size="sm" 
+          variant="danger" 
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('🗑️ Delete clicked for member ID:', row.mem_id);
+            setDeleteId(row.mem_id);
+          }}
+        >
+          {t('common.delete')}
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>

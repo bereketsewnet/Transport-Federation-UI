@@ -226,7 +226,7 @@ export const TerminatedUnionsList: React.FC = () => {
 
         <div className={styles.filtersSection}>
           <Select
-            value={filters.union_id || ''}
+            value={filters?.union_id || ''}
             onChange={(e) => handleFilterChange('union_id', e.target.value)}
             placeholder={t('terminatedUnions.filterByUnion')}
             className={styles.filterSelect}
@@ -240,7 +240,7 @@ export const TerminatedUnionsList: React.FC = () => {
           />
 
           <Select
-            value={filters.termination_reason || ''}
+            value={filters?.termination_reason || ''}
             onChange={(e) => handleFilterChange('termination_reason', e.target.value)}
             placeholder={t('terminatedUnions.filterByReason')}
             className={styles.filterSelect}
@@ -259,14 +259,14 @@ export const TerminatedUnionsList: React.FC = () => {
             <FormField
               type="date"
               placeholder={t('terminatedUnions.dateFrom')}
-              value={filters.date_from || ''}
+              value={filters?.date_from || ''}
               onChange={(e) => handleFilterChange('date_from', e.target.value)}
               className={styles.dateFilter}
             />
             <FormField
               type="date"
               placeholder={t('terminatedUnions.dateTo')}
-              value={filters.date_to || ''}
+              value={filters?.date_to || ''}
               onChange={(e) => handleFilterChange('date_to', e.target.value)}
               className={styles.dateFilter}
             />

@@ -237,7 +237,7 @@ export const ArchivesList: React.FC = () => {
 
         <div className={styles.filtersSection}>
           <Select
-            value={filters.category || ''}
+            value={filters?.category || ''}
             onChange={(e) => handleFilterChange('category', e.target.value)}
             placeholder={t('archives.filterByCategory')}
             className={styles.filterSelect}
@@ -253,7 +253,7 @@ export const ArchivesList: React.FC = () => {
           />
 
           <Select
-            value={filters.document_type || ''}
+            value={filters?.document_type || ''}
             onChange={(e) => handleFilterChange('document_type', e.target.value)}
             placeholder={t('archives.filterByType')}
             className={styles.filterSelect}
@@ -270,7 +270,7 @@ export const ArchivesList: React.FC = () => {
           />
 
           <Select
-            value={filters.is_public || ''}
+            value={filters?.is_public || ''}
             onChange={(e) => handleFilterChange('is_public', e.target.value)}
             placeholder={t('archives.filterByVisibility')}
             className={styles.filterSelect}

@@ -88,7 +88,9 @@ export const deleteUnion = (id: number, confirm = true): Promise<AxiosResponse> 
 // ==================== MEMBERS ====================
 
 export interface Member {
-  id: number;
+  mem_id: number;  // Backend uses mem_id, not id
+  id?: number;      // Alias for compatibility
+  mem_uuid?: string;
   union_id: number;
   member_code: string;
   first_name: string;
@@ -116,30 +118,30 @@ export const getMembers = (
   return apiClient.get('/api/members', { params });
 };
 
-export const getMember = (id: number): Promise<AxiosResponse<Member>> => {
-  return apiClient.get(`/api/members/${id}`);
+export const getMember = (mem_id: number): Promise<AxiosResponse<Member>> => {
+  return apiClient.get(`/api/members/${mem_id}`);
 };
 
 export const createMember = (data: Partial<Member>): Promise<AxiosResponse<Member>> => {
   return apiClient.post('/api/members', data);
 };
 
-export const updateMember = (id: number, data: Partial<Member>): Promise<AxiosResponse<Member>> => {
-  return apiClient.put(`/api/members/${id}`, data);
+export const updateMember = (mem_id: number, data: Partial<Member>): Promise<AxiosResponse<Member>> => {
+  return apiClient.put(`/api/members/${mem_id}`, data);
 };
 
 export const archiveMember = (
-  id: number,
+  mem_id: number,
   reason?: string
 ): Promise<AxiosResponse<{ message: string }>> => {
-  return apiClient.delete(`/api/members/${id}`, {
+  return apiClient.delete(`/api/members/${mem_id}`, {
     params: { archive: true },
     data: { reason },
   });
 };
 
-export const deleteMember = (id: number): Promise<AxiosResponse> => {
-  return apiClient.delete(`/api/members/${id}`, { params: { confirm: true } });
+export const deleteMember = (mem_id: number): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/members/${mem_id}`, { params: { confirm: true } });
 };
 
 // ==================== UNION EXECUTIVES ====================

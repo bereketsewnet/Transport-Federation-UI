@@ -1,5 +1,8 @@
 .container {
+  width: 100%;
   max-width: 100%;
+  overflow-x: hidden;
+  padding: var(--spacing-4);
 }
 
 .header {

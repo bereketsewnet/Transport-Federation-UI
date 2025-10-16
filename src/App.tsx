@@ -19,7 +19,8 @@ import Contact from '@pages/Public/Contact';
 // Admin Pages
 import Dashboard from '@pages/Admin/Dashboard';
 import Reports from '@pages/Admin/Reports';
-import MembersList from '@pages/Admin/Members/MembersList';
+import { MembersList, MemberForm, MemberView } from '@pages/Admin/Members';
+import { ErrorBoundary } from '@components/ErrorBoundary';
 
 // Admin News
 import AdminNewsList from '@pages/Admin/News/NewsList';
@@ -37,15 +38,15 @@ import TestForm from '@pages/Admin/TestForm';
 import SimpleTest from '@pages/Admin/SimpleTest';
 
 // Admin Unions
-import { UnionsList, UnionsForm } from '@pages/Admin/Unions';
+import { UnionsList } from '@pages/Admin/Unions';
 import UnionsFormFixed from '@pages/Admin/Unions/UnionsFormFixed';
 
 // Admin Executives
-import { ExecutivesList, ExecutivesForm } from '@pages/Admin/Executives';
+import { ExecutivesForm } from '@pages/Admin/Executives';
 import ExecutivesListFixed from '@pages/Admin/Executives/ExecutivesListFixed';
 
 // Admin CBAs
-import { CBAsList, CBAsForm } from '@pages/Admin/CBAs';
+import { CBAsForm } from '@pages/Admin/CBAs';
 import CBAsListFixed from '@pages/Admin/CBAs/CBAsListFixed';
 
 // Admin Archives
@@ -111,7 +112,28 @@ function App() {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="reports" element={<Reports />} />
-          <Route path="members" element={<MembersList />} />
+          
+          {/* Members Management */}
+          <Route path="members" element={
+            <ErrorBoundary>
+              <MembersList />
+            </ErrorBoundary>
+          } />
+          <Route path="members/new" element={
+            <ErrorBoundary>
+              <MemberForm />
+            </ErrorBoundary>
+          } />
+          <Route path="members/:id" element={
+            <ErrorBoundary>
+              <MemberView />
+            </ErrorBoundary>
+          } />
+          <Route path="members/:id/edit" element={
+            <ErrorBoundary>
+              <MemberForm />
+            </ErrorBoundary>
+          } />
           
           {/* News Management */}
           <Route path="news" element={<AdminNewsList />} />

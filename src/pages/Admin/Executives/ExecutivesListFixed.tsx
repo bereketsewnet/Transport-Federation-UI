@@ -33,23 +33,46 @@ export const ExecutivesListFixed: React.FC = () => {
     executive: UnionExecutive | null;
   }>({ isOpen: false, executive: null });
 
-  // Table state
-  const {
-    currentPage,
-    pageSize,
-    totalItems,
-    totalPages,
-    sortField,
-    sortDirection,
-    searchTerm,
-    filters,
-    handlePageChange,
-    handlePageSizeChange,
-    handleSort,
-    handleSearch,
-    handleFilterChange,
-    resetFilters
-  } = useTable();
+  // Local filter state
+  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [sortField, setSortField] = useState('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Filter handlers
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  const handleSort = (field: string, direction: 'asc' | 'desc') => {
+    setSortField(field);
+    setSortDirection(direction);
+  };
+
+  const resetFilters = () => {
+    setFilters({});
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
 
   // Load executives data
   const loadExecutives = async () => {
@@ -214,7 +237,7 @@ export const ExecutivesListFixed: React.FC = () => {
           />
 
           <Select
-            value={filters.union_id || ''}
+            value={filters?.union_id || ''}
             onChange={(e) => handleFilterChange('union_id', e.target.value)}
             placeholder={t('executives.filterByUnion')}
             className={styles.filterSelect}
@@ -228,7 +251,7 @@ export const ExecutivesListFixed: React.FC = () => {
           />
 
           <Select
-            value={filters.position || ''}
+            value={filters?.position || ''}
             onChange={(e) => handleFilterChange('position', e.target.value)}
             placeholder={t('executives.filterByPosition')}
             className={styles.filterSelect}

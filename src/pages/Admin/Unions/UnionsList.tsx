@@ -194,7 +194,7 @@ export const UnionsList: React.FC = () => {
         
         <div className={styles.filtersSection}>
           <Select
-            value={filters.sector || ''}
+            value={filters?.sector || ''}
             onChange={(e) => handleFilterChange('sector', e.target.value)}
             placeholder={t('unions.filterBySector')}
             className={styles.filterSelect}
@@ -207,7 +207,7 @@ export const UnionsList: React.FC = () => {
           />
 
           <Select
-            value={filters.status || ''}
+            value={filters?.status || ''}
             onChange={(e) => handleFilterChange('status', e.target.value)}
             placeholder={t('unions.filterByStatus')}
             className={styles.filterSelect}

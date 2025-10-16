@@ -264,7 +264,7 @@ export const CBAsList: React.FC = () => {
         
         <div className={styles.filtersSection}>
           <Select
-            value={filters.union_id || ''}
+            value={filters?.union_id || ''}
             onChange={(e) => handleFilterChange('union_id', e.target.value)}
             placeholder={t('cbas.filterByUnion')}
             className={styles.filterSelect}
@@ -278,7 +278,7 @@ export const CBAsList: React.FC = () => {
           />
 
           <Select
-            value={filters.status || ''}
+            value={filters?.status || ''}
             onChange={(e) => handleFilterChange('status', e.target.value)}
             placeholder={t('cbas.filterByStatus')}
             className={styles.filterSelect}

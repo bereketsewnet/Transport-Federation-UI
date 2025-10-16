@@ -236,7 +236,7 @@ export const ExecutivesList: React.FC = () => {
         
         <div className={styles.filtersSection}>
           <Select
-            value={filters.union_id || ''}
+            value={filters?.union_id || ''}
             onChange={(e) => handleFilterChange('union_id', e.target.value)}
             placeholder={t('executives.filterByUnion')}
             className={styles.filterSelect}
@@ -250,7 +250,7 @@ export const ExecutivesList: React.FC = () => {
           />
 
           <Select
-            value={filters.position || ''}
+            value={filters?.position || ''}
             onChange={(e) => handleFilterChange('position', e.target.value)}
             placeholder={t('executives.filterByPosition')}
             className={styles.filterSelect}

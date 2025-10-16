@@ -13,6 +13,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Allow flex item to shrink below content size */
+  overflow-x: hidden;
 }
 
 .menuToggle {
@@ -45,7 +47,10 @@
 
 .content {
   padding: var(--spacing-6);
+  width: 100%;
   max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1023px) {
