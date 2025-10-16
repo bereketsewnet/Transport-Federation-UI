@@ -1,2 +1,2 @@
-export { ArchivesList } from './ArchivesList';
-export { ArchivesForm } from './ArchivesForm';
+export { default as ArchivesList } from './ArchivesList';
+export { default as ArchivesForm } from './ArchivesForm';

@@ -198,6 +198,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </svg>
       ),
     },
+    {
+      path: '/admin/test-form',
+      label: '🧪 Test Form',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
   ];
 
   const isActive = (path: string) => location.pathname === path;
