@@ -34,15 +34,19 @@ import PhotoManager from '@pages/Admin/Gallery/PhotoManager';
 import ContactManager from '@pages/Admin/ContactManager';
 import AboutEditor from '@pages/Admin/AboutEditor';
 import TestForm from '@pages/Admin/TestForm';
+import SimpleTest from '@pages/Admin/SimpleTest';
 
 // Admin Unions
 import { UnionsList, UnionsForm } from '@pages/Admin/Unions';
+import UnionsFormFixed from '@pages/Admin/Unions/UnionsFormFixed';
 
 // Admin Executives
 import { ExecutivesList, ExecutivesForm } from '@pages/Admin/Executives';
+import ExecutivesListFixed from '@pages/Admin/Executives/ExecutivesListFixed';
 
 // Admin CBAs
 import { CBAsList, CBAsForm } from '@pages/Admin/CBAs';
+import CBAsListFixed from '@pages/Admin/CBAs/CBAsListFixed';
 
 // Admin Archives
 import { ArchivesList, ArchivesForm } from '@pages/Admin/Archives';
@@ -126,19 +130,20 @@ function App() {
           
           {/* Test Form */}
           <Route path="test-form" element={<TestForm />} />
+          <Route path="simple-test" element={<SimpleTest />} />
           
           {/* Unions Management */}
           <Route path="unions" element={<UnionsList />} />
-          <Route path="unions/new" element={<UnionsForm />} />
-          <Route path="unions/:id/edit" element={<UnionsForm />} />
+          <Route path="unions/new" element={<UnionsFormFixed />} />
+          <Route path="unions/:id/edit" element={<UnionsFormFixed />} />
           
           {/* Executives Management */}
-          <Route path="executives" element={<ExecutivesList />} />
+          <Route path="executives" element={<ExecutivesListFixed />} />
           <Route path="executives/new" element={<ExecutivesForm />} />
           <Route path="executives/:id/edit" element={<ExecutivesForm />} />
           
               {/* CBAs Management */}
-              <Route path="cbas" element={<CBAsList />} />
+              <Route path="cbas" element={<CBAsListFixed />} />
               <Route path="cbas/new" element={<CBAsForm />} />
               <Route path="cbas/:id/edit" element={<CBAsForm />} />
               <Route path="cbas/:id/view" element={<CBAsForm />} />

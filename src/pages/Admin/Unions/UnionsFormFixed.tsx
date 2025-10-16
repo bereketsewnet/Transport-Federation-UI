@@ -39,7 +39,7 @@ const unionSchema = yup.object({
   strategic_plan_in_place: yup.boolean().required('Strategic plan status is required'),
 });
 
-export const UnionsForm: React.FC = () => {
+export const UnionsFormFixed: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -54,7 +54,8 @@ export const UnionsForm: React.FC = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    watch
+    watch,
+    setValue
   } = useForm<UnionFormData>({
     resolver: yupResolver(unionSchema),
     defaultValues: {
@@ -108,6 +109,13 @@ export const UnionsForm: React.FC = () => {
     console.log('❌ Form errors:', errors);
     console.log('⏳ Is submitting:', isSubmitting);
     
+    // Validate form data
+    if (Object.keys(errors).length > 0) {
+      console.error('❌ Form has validation errors:', errors);
+      setError('Please fix the form errors before submitting');
+      return;
+    }
+    
     try {
       setError('');
       setLoading(true);
@@ -134,7 +142,7 @@ export const UnionsForm: React.FC = () => {
     } catch (err: any) {
       console.error('💥 Error saving union:', err);
       console.error('💥 Error details:', err.response?.data);
-      setError(t('messages.errorSavingData'));
+      setError(err.response?.data?.message || t('messages.errorSavingData'));
     } finally {
       setLoading(false);
     }
@@ -199,6 +207,7 @@ export const UnionsForm: React.FC = () => {
                 error={errors.name_en?.message}
                 required
                 className={styles.formField}
+                placeholder="Enter union name in English"
               />
               <FormField
                 label={t('unions.nameAm')}
@@ -206,6 +215,7 @@ export const UnionsForm: React.FC = () => {
                 error={errors.name_am?.message}
                 required
                 className={styles.formField}
+                placeholder="Enter union name in Amharic"
               />
             </div>
 
@@ -226,14 +236,15 @@ export const UnionsForm: React.FC = () => {
                 required
                 className={styles.formField}
                 min="1"
-                max="10"
+                placeholder="4"
               />
             </div>
 
             <div className={styles.formRow}>
               <Select
                 label={t('unions.sector')}
-                {...register('sector')}
+                value={watchedValues.sector || ''}
+                onChange={(e) => setValue('sector', e.target.value)}
                 error={errors.sector?.message}
                 required
                 className={styles.formField}
@@ -241,42 +252,45 @@ export const UnionsForm: React.FC = () => {
                   { value: '', label: t('unions.selectSector') },
                   { value: 'transport', label: t('unions.sectors.transport') },
                   { value: 'communication', label: t('unions.sectors.communication') },
-                  { value: 'logistics', label: t('unions.sectors.logistics') },
-                  { value: 'aviation', label: t('unions.sectors.aviation') },
-                  { value: 'maritime', label: t('unions.sectors.maritime') }
+                  { value: 'logistics', label: t('unions.sectors.logistics') }
                 ]}
               />
-
               <FormField
                 label={t('unions.organization')}
                 {...register('organization')}
                 error={errors.organization?.message}
                 required
                 className={styles.formField}
+                placeholder="Enter organization name"
               />
             </div>
 
-            <FormField
-              label={t('unions.establishedDate')}
-              type="date"
-              {...register('established_date')}
-              error={errors.established_date?.message}
-              required
-              className={styles.formField}
-            />
-
             <div className={styles.formRow}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  {...register('strategic_plan_in_place')}
-                  className={styles.checkbox}
-                />
-                <span className={styles.checkboxText}>{t('unions.strategicPlan')}</span>
-              </label>
+              <FormField
+                label={t('unions.establishedDate')}
+                type="date"
+                {...register('established_date')}
+                error={errors.established_date?.message}
+                required
+                className={styles.formField}
+              />
+              <div className={styles.formField}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    {...register('strategic_plan_in_place')}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkboxText}>
+                    {t('unions.strategicPlanInPlace')}
+                  </span>
+                </label>
+                {errors.strategic_plan_in_place && (
+                  <span className={styles.error}>{errors.strategic_plan_in_place.message}</span>
+                )}
+              </div>
             </div>
           </div>
-
         </div>
 
         {/* Form Actions */}
@@ -292,12 +306,9 @@ export const UnionsForm: React.FC = () => {
           <Button
             type="submit"
             disabled={isSubmitting}
-            isLoading={isSubmitting}
+            className={styles.submitButton}
           >
-            {isSubmitting 
-              ? t('common.saving') 
-              : (isEdit ? t('common.update') : t('common.create'))
-            }
+            {isSubmitting ? t('common.saving') : (isEdit ? t('common.update') : t('common.create'))}
           </Button>
         </div>
       </form>
@@ -305,4 +316,4 @@ export const UnionsForm: React.FC = () => {
   );
 };
 
-export default UnionsForm;
+export default UnionsFormFixed;
