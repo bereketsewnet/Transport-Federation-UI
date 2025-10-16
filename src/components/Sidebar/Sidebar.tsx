@@ -109,6 +109,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       ),
     },
     {
+      path: '/admin/archives',
+      label: t('nav.archives'),
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"
+            fill="currentColor"
+          />
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+    {
+      path: '/admin/terminated-unions',
+      label: t('nav.terminatedUnions'),
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+    {
       path: '/admin/news',
       label: t('nav.news'),
       icon: (

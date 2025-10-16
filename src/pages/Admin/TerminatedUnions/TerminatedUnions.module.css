@@ -1,0 +1,244 @@
+.container {
+  padding: var(--spacing-6);
+  background-color: var(--bg-page);
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-1);
+}
+
+.errorMessage {
+  background-color: var(--danger-extra-light);
+  color: var(--danger);
+  padding: var(--spacing-3);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-4);
+  border: 1px solid var(--danger-light);
+}
+
+/* Toolbar for search and filters */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  flex-grow: 1;
+  max-width: 300px;
+}
+
+.filtersSection {
+  display: flex;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filterSelect {
+  min-width: 180px;
+}
+
+.dateFilters {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: flex-end;
+}
+
+.dateFilter {
+  min-width: 150px;
+}
+
+.resetButton {
+  align-self: flex-end;
+}
+
+/* Table specific styles */
+.unionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.unionName {
+  font-weight: 600;
+  color: var(--text);
+  font-size: var(--text-base);
+}
+
+.unionCode {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.reasonBadge {
+  display: inline-flex;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  background-color: var(--danger-extra-light);
+  color: var(--danger);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.notes {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.rowActions {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+/* Form styles */
+.form {
+  background-color: var(--bg-card);
+  padding: var(--spacing-6);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+}
+
+@media (min-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.formSection .sectionTitle {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-2) 0;
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.formField {
+  width: 100%;
+}
+
+/* Form Actions */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+  .container {
+    padding: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-3);
+  }
+
+  .searchBox {
+    max-width: none;
+  }
+
+  .filtersSection {
+    width: 100%;
+    justify-content: stretch;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filterSelect {
+    flex-grow: 1;
+  }
+
+  .dateFilters {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .dateFilter {
+    flex-grow: 1;
+  }
+
+  .resetButton {
+    width: 100%;
+  }
+
+  .form {
+    padding: var(--spacing-4);
+  }
+}
+
+@media (max-width: 767px) {
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--text-sm);
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rowActions {
+    flex-direction: column;
+  }
+
+  .dateFilters {
+    flex-direction: column;
+  }
+}

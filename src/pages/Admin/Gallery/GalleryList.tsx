@@ -12,16 +12,18 @@ export const AdminGalleryList: React.FC = () => {
   const { t } = useTranslation();
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { page, perPage, setPage, setPerPage, totalPages, setTotalPages, totalItems, setTotalItems } = useTable();
+  const { page, per_page, setPage, setPerPage } = useTable();
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     loadGalleries();
-  }, [page, perPage]);
+  }, [page, per_page]);
 
   const loadGalleries = async () => {
     setIsLoading(true);
     try {
-      const response = await getGalleries({ page, per_page: perPage });
+      const response = await getGalleries({ page, per_page });
       setGalleries(response.data.data);
       setTotalPages(response.data.meta?.total_pages || 1);
       setTotalItems(response.data.meta?.total || 0);
@@ -96,7 +98,7 @@ export const AdminGalleryList: React.FC = () => {
           currentPage={page}
           totalPages={totalPages}
           totalItems={totalItems}
-          perPage={perPage}
+          perPage={per_page}
           onPageChange={setPage}
           onPerPageChange={setPerPage}
           emptyMessage={t('common.noData')}

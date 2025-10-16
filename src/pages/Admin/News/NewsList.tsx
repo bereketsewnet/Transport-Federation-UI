@@ -14,16 +14,18 @@ export const AdminNewsList: React.FC = () => {
   const [news, setNews] = useState<News[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const { page, perPage, setPage, setPerPage, totalPages, setTotalPages, totalItems, setTotalItems } = useTable();
+  const { page, per_page, setPage, setPerPage } = useTable();
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     loadNews();
-  }, [page, perPage]);
+  }, [page, per_page]);
 
   const loadNews = async () => {
     setIsLoading(true);
     try {
-      const response = await getNews({ page, per_page: perPage });
+      const response = await getNews({ page, per_page });
       setNews(response.data.data);
       setTotalPages(response.data.meta?.total_pages || 1);
       setTotalItems(response.data.meta?.total || 0);
@@ -124,7 +126,7 @@ export const AdminNewsList: React.FC = () => {
           currentPage={page}
           totalPages={totalPages}
           totalItems={totalItems}
-          perPage={perPage}
+          perPage={per_page}
           onPageChange={setPage}
           onPerPageChange={setPerPage}
           emptyMessage={t('common.noData')}
@@ -135,10 +137,10 @@ export const AdminNewsList: React.FC = () => {
         isOpen={deleteId !== null}
         title={t('common.confirm')}
         message={`${t('common.delete')} ${t('news.title').toLowerCase()}?`}
-        confirmLabel={t('common.delete')}
-        cancelLabel={t('common.cancel')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         onConfirm={handleDelete}
-        onCancel={() => setDeleteId(null)}
+        onClose={() => setDeleteId(null)}
         variant="danger"
       />
     </div>

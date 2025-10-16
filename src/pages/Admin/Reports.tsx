@@ -232,7 +232,7 @@ export const Reports: React.FC = () => {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {youthVsElders.map((entry, index) => (
+                    {youthVsElders.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -256,7 +256,7 @@ export const Reports: React.FC = () => {
                     fill="#8884d8"
                     dataKey="count"
                   >
-                    {cbaStatus.map((entry, index) => (
+                    {cbaStatus.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

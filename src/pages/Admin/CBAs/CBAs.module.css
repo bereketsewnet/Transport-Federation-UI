@@ -1,0 +1,465 @@
+/* CBAs Management Styles */
+.container {
+  padding: var(--spacing-6);
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 var(--spacing-2) 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.searchSection {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+.searchBox {
+  flex: 1;
+  max-width: 400px;
+}
+
+.filtersSection {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterSelect {
+  min-width: 180px;
+}
+
+.resetButton {
+  white-space: nowrap;
+}
+
+/* Error Message */
+.errorMessage {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  padding: var(--spacing-4);
+  border-radius: var(--radius);
+  border: 1px solid var(--danger-border);
+  margin-bottom: var(--spacing-4);
+  font-weight: 500;
+}
+
+/* Table Container */
+.tableContainer {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Union Info in Table */
+.unionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.unionName {
+  font-weight: 600;
+  color: var(--text);
+  font-size: var(--text-base);
+}
+
+.cbaId {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Title Info */
+.titleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.titleText {
+  font-weight: 500;
+  color: var(--text);
+  font-size: var(--text-base);
+  line-height: 1.4;
+}
+
+/* Date Info */
+.dateInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.endDate {
+  font-weight: 500;
+  color: var(--text);
+  font-size: var(--text-base);
+}
+
+/* Status Badge */
+.statusBadge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.statusBadge.active {
+  background: var(--success-subtle);
+  color: var(--success);
+}
+
+.statusBadge.expired {
+  background: var(--danger-subtle);
+  color: var(--danger);
+}
+
+.statusBadge.pending {
+  background: var(--warning-subtle);
+  color: var(--warning);
+}
+
+.statusBadge.negotiating {
+  background: var(--primary-subtle);
+  color: var(--primary);
+}
+
+/* Row Actions */
+.rowActions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+/* Form Container */
+.formContainer {
+  padding: var(--spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* Form Header */
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Form */
+.form {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.formGrid {
+  display: grid;
+  gap: var(--spacing-6);
+  padding: var(--spacing-6);
+}
+
+/* Form Section */
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+
+.sectionTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--spacing-2) 0;
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Form Rows */
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+.formField {
+  width: 100%;
+}
+
+/* Info Card */
+.infoCard {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.infoItem:last-child {
+  border-bottom: none;
+}
+
+.infoLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.infoValue {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Form Actions */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding: var(--spacing-6);
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border);
+}
+
+/* Responsive Design */
+@media (max-width: 1023px) {
+  .container,
+  .formContainer {
+    padding: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-4);
+  }
+
+  .headerActions {
+    justify-content: flex-start;
+  }
+
+  .toolbar {
+    padding: var(--spacing-3);
+  }
+
+  .filtersSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filterSelect {
+    min-width: auto;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .rowActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .rowActions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .container,
+  .formContainer {
+    padding: var(--spacing-3);
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+  }
+
+  .formGrid {
+    padding: var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  .formSection {
+    padding: var(--spacing-3);
+  }
+
+  .formActions {
+    padding: var(--spacing-4);
+  }
+}
+
+/* Animation Classes */
+.fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Loading States */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-8);
+  color: var(--text-secondary);
+}
+
+.emptyStateIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--spacing-4);
+  opacity: 0.5;
+}
+
+.emptyStateTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-2);
+}
+
+.emptyStateDescription {
+  font-size: var(--text-base);
+  margin-bottom: var(--spacing-4);
+}
+
+/* Hover Effects */
+.unionInfo:hover .unionName {
+  color: var(--primary);
+  transition: color var(--transition-base);
+}
+
+.titleInfo:hover .titleText {
+  color: var(--primary);
+  transition: color var(--transition-base);
+}
+
+/* Focus States */
+.formField:focus-within {
+  transform: translateY(-1px);
+  transition: transform var(--transition-base);
+}
+
+/* Print Styles */
+@media print {
+  .headerActions,
+  .toolbar,
+  .rowActions,
+  .formActions {
+    display: none;
+  }
+  
+  .container,
+  .formContainer {
+    padding: 0;
+    box-shadow: none;
+    border: none;
+  }
+}

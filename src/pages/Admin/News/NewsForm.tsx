@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { getNewsItem, createNews, updateNews, News } from '@api/endpoints';
+import { getNewsItem, createNews, updateNews } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { TextArea } from '@components/TextArea/TextArea';
@@ -25,7 +25,7 @@ const schema = yup.object({
   summary: yup.string().required('Summary is required'),
   body: yup.string().required('Body is required'),
   published_at: yup.string().required('Published date is required'),
-  is_published: yup.boolean(),
+  is_published: yup.boolean().required(),
 });
 
 export const AdminNewsForm: React.FC = () => {

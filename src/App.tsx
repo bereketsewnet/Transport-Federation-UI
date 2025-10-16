@@ -34,33 +34,22 @@ import PhotoManager from '@pages/Admin/Gallery/PhotoManager';
 import ContactManager from '@pages/Admin/ContactManager';
 import AboutEditor from '@pages/Admin/AboutEditor';
 
+// Admin Unions
+import { UnionsList, UnionsForm } from '@pages/Admin/Unions';
+
+// Admin Executives
+import { ExecutivesList, ExecutivesForm } from '@pages/Admin/Executives';
+
+// Admin CBAs
+import { CBAsList, CBAsForm } from '@pages/Admin/CBAs';
+
+// Admin Archives
+import { ArchivesList, ArchivesForm } from '@pages/Admin/Archives';
+
+// Admin Terminated Unions
+import { TerminatedUnionsList, TerminatedUnionsForm } from '@pages/Admin/TerminatedUnions';
+
 // Placeholder pages for routes not yet fully implemented
-const UnionsPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>Unions Management</h1>
-      <p>Manage all worker unions here.</p>
-    </div>
-  </div>
-);
-
-const ExecutivesPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>Union Executives</h1>
-      <p>Manage union executive members here.</p>
-    </div>
-  </div>
-);
-
-const CBAsPage = () => (
-  <div className="page">
-    <div className="container">
-      <h1>Collective Bargaining Agreements</h1>
-      <p>Manage CBAs here.</p>
-    </div>
-  </div>
-);
 
 const NotFoundPage = () => (
   <div className="page">
@@ -134,10 +123,31 @@ function App() {
           <Route path="contacts" element={<ContactManager />} />
           <Route path="about-editor" element={<AboutEditor />} />
           
-          {/* Placeholders - not yet implemented */}
-          <Route path="unions" element={<UnionsPage />} />
-          <Route path="executives" element={<ExecutivesPage />} />
-          <Route path="cbas" element={<CBAsPage />} />
+          {/* Unions Management */}
+          <Route path="unions" element={<UnionsList />} />
+          <Route path="unions/new" element={<UnionsForm />} />
+          <Route path="unions/:id/edit" element={<UnionsForm />} />
+          
+          {/* Executives Management */}
+          <Route path="executives" element={<ExecutivesList />} />
+          <Route path="executives/new" element={<ExecutivesForm />} />
+          <Route path="executives/:id/edit" element={<ExecutivesForm />} />
+          
+              {/* CBAs Management */}
+              <Route path="cbas" element={<CBAsList />} />
+              <Route path="cbas/new" element={<CBAsForm />} />
+              <Route path="cbas/:id/edit" element={<CBAsForm />} />
+              <Route path="cbas/:id/view" element={<CBAsForm />} />
+
+              {/* Archives Management */}
+              <Route path="archives" element={<ArchivesList />} />
+              <Route path="archives/new" element={<ArchivesForm />} />
+              <Route path="archives/:id/edit" element={<ArchivesForm />} />
+
+              {/* Terminated Unions Management */}
+              <Route path="terminated-unions" element={<TerminatedUnionsList />} />
+              <Route path="terminated-unions/new" element={<TerminatedUnionsForm />} />
+              <Route path="terminated-unions/:id/edit" element={<TerminatedUnionsForm />} />
         </Route>
 
         {/* Error Routes */}

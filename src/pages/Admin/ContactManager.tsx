@@ -13,16 +13,18 @@ export const ContactManager: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const { page, perPage, setPage, setPerPage, totalPages, setTotalPages, totalItems, setTotalItems } = useTable();
+  const { page, per_page, setPage, setPerPage } = useTable();
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     loadContacts();
-  }, [page, perPage]);
+  }, [page, per_page]);
 
   const loadContacts = async () => {
     setIsLoading(true);
     try {
-      const response = await getContacts({ page, per_page: perPage });
+      const response = await getContacts({ page, per_page });
       setContacts(response.data.data);
       setTotalPages(response.data.meta?.total_pages || 1);
       setTotalItems(response.data.meta?.total || 0);
@@ -117,7 +119,7 @@ VITE_CONTACT_MAP_URL=https://...`}
           currentPage={page}
           totalPages={totalPages}
           totalItems={totalItems}
-          perPage={perPage}
+          perPage={per_page}
           onPageChange={setPage}
           onPerPageChange={setPerPage}
           emptyMessage="No contact submissions yet"

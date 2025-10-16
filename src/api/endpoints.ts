@@ -175,8 +175,14 @@ export const deleteUnionExecutive = (id: number): Promise<AxiosResponse> => {
 export interface CBA {
   id: number;
   union_id: number;
+  title: string;
+  description?: string;
+  start_date: string;
+  end_date: string;
   duration_years: number;
   status: string;
+  document_url?: string;
+  notes?: string;
   registration_date: string;
   next_end_date: string;
   round: string;
@@ -189,8 +195,20 @@ export const getCBAs = (
   return apiClient.get('/api/cbas', { params });
 };
 
+export const getCBA = (id: number): Promise<AxiosResponse<CBA>> => {
+  return apiClient.get(`/api/cbas/${id}`);
+};
+
 export const createCBA = (data: Partial<CBA>): Promise<AxiosResponse<CBA>> => {
   return apiClient.post('/api/cbas', data);
+};
+
+export const updateCBA = (id: number, data: Partial<CBA>): Promise<AxiosResponse<CBA>> => {
+  return apiClient.put(`/api/cbas/${id}`, data);
+};
+
+export const deleteCBA = (id: number): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/cbas/${id}`);
 };
 
 // ==================== NEWS ====================
@@ -265,6 +283,112 @@ export const createPhoto = (data: Partial<Photo>): Promise<AxiosResponse<Photo>>
   return apiClient.post('/api/photos', data);
 };
 
+// ==================== ARCHIVES ====================
+
+export interface Archive {
+  id: number;
+  title: string;
+  description?: string;
+  category: string;
+  document_type: string;
+  file_url: string;
+  file_size?: number;
+  file_name?: string;
+  tags?: string[];
+  is_public: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: number;
+}
+
+export interface ArchiveFilters extends SearchParams {
+  category?: string;
+  document_type?: string;
+  is_public?: boolean;
+  tags?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export const getArchives = (params?: ArchiveFilters): Promise<AxiosResponse<ApiResponse<Archive[]>>> => {
+  return apiClient.get('/api/archives', { params });
+};
+
+export const getArchive = (id: number): Promise<AxiosResponse<Archive>> => {
+  return apiClient.get(`/api/archives/${id}`);
+};
+
+export const createArchive = (data: Partial<Archive>): Promise<AxiosResponse<Archive>> => {
+  return apiClient.post('/api/archives', data);
+};
+
+export const updateArchive = (id: number, data: Partial<Archive>): Promise<AxiosResponse<Archive>> => {
+  return apiClient.put(`/api/archives/${id}`, data);
+};
+
+export const deleteArchive = (id: number): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/archives/${id}`);
+};
+
+export const uploadArchiveFile = (file: File, onProgress?: (progress: number) => void): Promise<AxiosResponse<{ file_url: string; file_name: string; file_size: number }>> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  return apiClient.post('/api/archives/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    onUploadProgress: (progressEvent) => {
+      if (onProgress && progressEvent.total) {
+        const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(progress);
+      }
+    },
+  });
+};
+
+// ==================== TERMINATED UNIONS ====================
+
+export interface TerminatedUnion {
+  id: number;
+  union_id: number;
+  termination_date: string;
+  termination_reason: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+  union?: Union; // For display purposes
+}
+
+export interface TerminatedUnionFilters extends SearchParams {
+  union_id?: number;
+  termination_reason?: string;
+  date_from?: string;
+  date_to?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export const getTerminatedUnions = (params?: TerminatedUnionFilters): Promise<AxiosResponse<ApiResponse<TerminatedUnion[]>>> => {
+  return apiClient.get('/api/terminated-unions', { params });
+};
+
+export const getTerminatedUnion = (id: number): Promise<AxiosResponse<TerminatedUnion>> => {
+  return apiClient.get(`/api/terminated-unions/${id}`);
+};
+
+export const createTerminatedUnion = (data: Partial<TerminatedUnion>): Promise<AxiosResponse<TerminatedUnion>> => {
+  return apiClient.post('/api/terminated-unions', data);
+};
+
+export const updateTerminatedUnion = (id: number, data: Partial<TerminatedUnion>): Promise<AxiosResponse<TerminatedUnion>> => {
+  return apiClient.put(`/api/terminated-unions/${id}`, data);
+};
+
+export const deleteTerminatedUnion = (id: number): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/terminated-unions/${id}`);
+};
+
 // ==================== CONTACTS ====================
 
 export interface Contact {
@@ -308,43 +432,6 @@ export const incrementVisitor = (data: {
   return apiClient.post('/api/visitors', data);
 };
 
-// ==================== ARCHIVES ====================
-
-export interface Archive {
-  id: number;
-  mem_id: number;
-  archive_date: string;
-  reason: string;
-  created_at?: string;
-}
-
-export const getArchives = (
-  params?: PaginationParams
-): Promise<AxiosResponse<ApiResponse<Archive[]>>> => {
-  return apiClient.get('/api/archives', { params });
-};
-
-// ==================== TERMINATED UNIONS ====================
-
-export interface TerminatedUnion {
-  id: number;
-  union_id: number;
-  name_en: string;
-  terminated_date: string;
-  termination_reason: string;
-}
-
-export const getTerminatedUnions = (
-  params?: PaginationParams
-): Promise<AxiosResponse<ApiResponse<TerminatedUnion[]>>> => {
-  return apiClient.get('/api/terminated-unions', { params });
-};
-
-export const createTerminatedUnion = (
-  data: Partial<TerminatedUnion>
-): Promise<AxiosResponse<TerminatedUnion>> => {
-  return apiClient.post('/api/terminated-unions', data);
-};
 
 // ==================== REPORTS ====================
 
