@@ -332,7 +332,7 @@ export const updateArchive = (id: number, data: Partial<Archive>): Promise<Axios
 };
 
 export const deleteArchive = (id: number): Promise<AxiosResponse> => {
-  return apiClient.delete(`/api/archives/${id}`);
+  return apiClient.delete(`/api/archives/${id}`, { params: { confirm: true } });
 };
 
 export const uploadArchiveFile = (file: File, onProgress?: (progress: number) => void): Promise<AxiosResponse<{ file_url: string; file_name: string; file_size: number }>> => {
@@ -391,7 +391,7 @@ export const updateTerminatedUnion = (id: number, data: Partial<TerminatedUnion>
 };
 
 export const deleteTerminatedUnion = (id: number): Promise<AxiosResponse> => {
-  return apiClient.delete(`/api/terminated-unions/${id}`);
+  return apiClient.delete(`/api/terminated-unions/${id}`, { params: { confirm: true } });
 };
 
 // ==================== CONTACTS ====================

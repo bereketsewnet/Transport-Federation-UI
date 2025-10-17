@@ -35,44 +35,27 @@
   border: 1px solid var(--danger-light);
 }
 
-/* Toolbar for search and filters */
+/* Toolbar - Single Row */
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  gap: var(--spacing-3);
   align-items: center;
-  gap: var(--spacing-4);
   margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
 .searchBox {
-  flex-grow: 1;
-  max-width: 300px;
-}
-
-.filtersSection {
-  display: flex;
-  gap: var(--spacing-3);
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.filterSelect {
-  min-width: 180px;
-}
-
-.dateFilters {
-  display: flex;
-  gap: var(--spacing-2);
-  align-items: flex-end;
-}
-
-.dateFilter {
-  min-width: 150px;
+  flex: 1;
+  min-width: 250px;
 }
 
 .resetButton {
-  align-self: flex-end;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Table specific styles */
@@ -119,6 +102,25 @@
   display: flex;
   gap: var(--spacing-2);
   flex-wrap: wrap;
+}
+
+/* Reason Badge */
+.reasonBadge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Notes */
+.notes {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 /* Form styles */

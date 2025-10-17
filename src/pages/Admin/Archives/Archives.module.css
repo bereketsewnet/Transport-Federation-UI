@@ -35,33 +35,27 @@
   border: 1px solid var(--danger-light);
 }
 
-/* Toolbar for search and filters */
+/* Toolbar - Single Row */
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  gap: var(--spacing-3);
   align-items: center;
-  gap: var(--spacing-4);
   margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
 .searchBox {
-  flex-grow: 1;
-  max-width: 300px;
-}
-
-.filtersSection {
-  display: flex;
-  gap: var(--spacing-3);
-  flex-wrap: wrap;
-}
-
-.filterSelect {
-  min-width: 180px;
+  flex: 1;
+  min-width: 250px;
 }
 
 .resetButton {
-  align-self: flex-end;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Table specific styles */
@@ -203,6 +197,27 @@
 
 .formField {
   width: 100%;
+}
+
+/* Checkbox */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  font-size: var(--text-base);
+  color: var(--text);
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.checkboxText {
+  font-weight: 500;
 }
 
 /* Checkbox */

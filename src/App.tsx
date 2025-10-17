@@ -50,10 +50,12 @@ import CBAsListComplete from '@pages/Admin/CBAs/CBAsListComplete';
 import CBAsFormComplete from '@pages/Admin/CBAs/CBAsFormComplete';
 
 // Admin Archives
-import { ArchivesList, ArchivesForm } from '@pages/Admin/Archives';
+import ArchivesListComplete from '@pages/Admin/Archives/ArchivesListComplete';
+import ArchivesFormComplete from '@pages/Admin/Archives/ArchivesFormComplete';
 
 // Admin Terminated Unions
-import { TerminatedUnionsList, TerminatedUnionsForm } from '@pages/Admin/TerminatedUnions';
+import TerminatedUnionsListComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsListComplete';
+import TerminatedUnionsFormComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsFormComplete';
 
 // Placeholder pages for routes not yet fully implemented
 
@@ -169,15 +171,15 @@ function App() {
           <Route path="cbas/new" element={<CBAsFormComplete />} />
           <Route path="cbas/:id/edit" element={<CBAsFormComplete />} />
 
-              {/* Archives Management */}
-              <Route path="archives" element={<ArchivesList />} />
-              <Route path="archives/new" element={<ArchivesForm />} />
-              <Route path="archives/:id/edit" element={<ArchivesForm />} />
+          {/* Archives Management */}
+          <Route path="archives" element={<ArchivesListComplete />} />
+          <Route path="archives/new" element={<ArchivesFormComplete />} />
+          <Route path="archives/:id/edit" element={<ArchivesFormComplete />} />
 
-              {/* Terminated Unions Management */}
-              <Route path="terminated-unions" element={<TerminatedUnionsList />} />
-              <Route path="terminated-unions/new" element={<TerminatedUnionsForm />} />
-              <Route path="terminated-unions/:id/edit" element={<TerminatedUnionsForm />} />
+          {/* Terminated Unions Management */}
+          <Route path="terminated-unions" element={<TerminatedUnionsListComplete />} />
+          <Route path="terminated-unions/new" element={<TerminatedUnionsFormComplete />} />
+          <Route path="terminated-unions/:id/edit" element={<TerminatedUnionsFormComplete />} />
         </Route>
 
         {/* Error Routes */}
