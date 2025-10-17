@@ -472,6 +472,15 @@
             "response": []
           },
           {
+            "name": "Get union executive by id",
+            "request": {
+              "method": "GET",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "url": { "raw": "{{base_url}}/api/union-executives/1", "host": ["{{base_url}}"], "path": ["api","union-executives","1"] }
+            },
+            "response": []
+          },
+          {
             "name": "Create union executive",
             "request": {
               "method": "POST",
@@ -479,6 +488,17 @@
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
               "body": { "mode": "raw", "raw": "{\n  \"union_id\": 1,\n  \"mem_id\": 1,\n  \"position\": \"Vice Chairman\",\n  \"appointed_date\": \"2023-01-01\",\n  \"term_length_years\": 3\n}" },
               "url": { "raw": "{{base_url}}/api/union-executives", "host": ["{{base_url}}"], "path": ["api","union-executives"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Update union executive",
+            "request": {
+              "method": "PUT",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": { "mode": "raw", "raw": "{\n  \"position\": \"Chairman\",\n  \"term_length_years\": 4\n}" },
+              "url": { "raw": "{{base_url}}/api/union-executives/1", "host": ["{{base_url}}"], "path": ["api","union-executives","1"] }
             },
             "response": []
           },
@@ -506,6 +526,15 @@
             "response": []
           },
           {
+            "name": "Get CBA by id",
+            "request": {
+              "method": "GET",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "url": { "raw":"{{base_url}}/api/cbas/1","host":["{{base_url}}"],"path":["api","cbas","1"] }
+            },
+            "response": []
+          },
+          {
             "name": "Create CBA",
             "request": {
               "method": "POST",
@@ -513,6 +542,26 @@
               "header":[{"key":"Content-Type","value":"application/json"}],
               "body": { "mode":"raw", "raw": "{\n  \"union_id\": 1,\n  \"duration_years\": 3,\n  \"status\": \"signed\",\n  \"registration_date\": \"2022-07-01\",\n  \"next_end_date\": \"2025-07-01\",\n  \"round\": \"1st\"\n}" },
               "url": { "raw":"{{base_url}}/api/cbas","host":["{{base_url}}"],"path":["api","cbas"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Update CBA",
+            "request": {
+              "method": "PUT",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body": { "mode":"raw", "raw": "{\n  \"status\": \"expired\",\n  \"notes\": \"CBA expired, needs renewal\"\n}" },
+              "url": { "raw":"{{base_url}}/api/cbas/1","host":["{{base_url}}"],"path":["api","cbas","1"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Delete CBA (confirm)",
+            "request": {
+              "method": "DELETE",
+              "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+              "url": { "raw":"{{base_url}}/api/cbas/1?confirm=true","host":["{{base_url}}"],"path":["api","cbas","1"],"query":[{"key":"confirm","value":"true"}] }
             },
             "response": []
           }
@@ -531,6 +580,15 @@
             "response": []
           },
           {
+            "name": "Get terminated union by id",
+            "request": {
+              "method":"GET",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/terminated-unions/1","host":["{{base_url}}"],"path":["api","terminated-unions","1"]}
+            },
+            "response": []
+          },
+          {
             "name": "Create terminated union (archive)",
             "request": {
               "method":"POST",
@@ -538,6 +596,26 @@
               "header":[{"key":"Content-Type","value":"application/json"}],
               "body":{"mode":"raw","raw":"{\n  \"union_id\": 1,\n  \"name_en\": \"Old Union\",\n  \"terminated_date\": \"2025-09-01\",\n  \"termination_reason\": \"Merged\"\n}"},
               "url":{"raw":"{{base_url}}/api/terminated-unions","host":["{{base_url}}"],"path":["api","terminated-unions"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Update terminated union",
+            "request": {
+              "method":"PUT",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"termination_reason\": \"Dissolved\",\n  \"notes\": \"Updated termination reason\"\n}"},
+              "url":{"raw":"{{base_url}}/api/terminated-unions/1","host":["{{base_url}}"],"path":["api","terminated-unions","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete terminated union (confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/terminated-unions/1?confirm=true","host":["{{base_url}}"],"path":["api","terminated-unions","1"],"query":[{"key":"confirm","value":"true"}]}
             },
             "response": []
           }
@@ -567,6 +645,26 @@
             "response": []
           },
           {
+            "name": "Get account by id (admin)",
+            "request": {
+              "method": "GET",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url": { "raw": "{{base_url}}/api/login-accounts/1", "host": ["{{base_url}}"], "path": ["api","login-accounts","1"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Update account (admin)",
+            "request": {
+              "method": "PUT",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"role\": \"admin\",\n  \"must_change_password\": false\n}"},
+              "url": { "raw": "{{base_url}}/api/login-accounts/1", "host": ["{{base_url}}"], "path": ["api","login-accounts","1"] }
+            },
+            "response": []
+          },
+          {
             "name": "Reset password (admin)",
             "request": {
               "method": "POST",
@@ -574,6 +672,26 @@
               "header":[{"key":"Content-Type","value":"application/json"}],
               "body":{"mode":"raw","raw":"{ \"password\": \"NewPass123!\" }"},
               "url": { "raw": "{{base_url}}/api/login-accounts/reset/admin", "host": ["{{base_url}}"], "path": ["api","login-accounts","reset","admin"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Lock/Unlock account (admin)",
+            "request": {
+              "method": "PUT",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{ \"is_locked\": true }"},
+              "url": { "raw": "{{base_url}}/api/login-accounts/1/lock", "host": ["{{base_url}}"], "path": ["api","login-accounts","1","lock"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Delete account (admin confirm)",
+            "request": {
+              "method": "DELETE",
+              "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url": { "raw": "{{base_url}}/api/login-accounts/1?confirm=true", "host": ["{{base_url}}"], "path": ["api","login-accounts","1"], "query":[{"key":"confirm","value":"true"}] }
             },
             "response": []
           }
@@ -592,6 +710,15 @@
             "response": []
           },
           {
+            "name": "Get org leader by id",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/org-leaders/1","host":["{{base_url}}"],"path":["api","org-leaders","1"]}
+            },
+            "response": []
+          },
+          {
             "name": "Create org leader",
             "request": {
               "method":"POST",
@@ -599,6 +726,26 @@
               "header":[{"key":"Content-Type","value":"application/json"}],
               "body":{"mode":"raw","raw":"{\n  \"union_id\": 1,\n  \"title\": \"Mr\",\n  \"first_name\": \"Yared\",\n  \"position\": \"CEO\",\n  \"phone\": \"+251911222333\",\n  \"email\": \"yared@org.com\"\n}"},
               "url":{"raw":"{{base_url}}/api/org-leaders","host":["{{base_url}}"],"path":["api","org-leaders"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Update org leader",
+            "request": {
+              "method":"PUT",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"phone\": \"+251911222444\",\n  \"email\": \"yared.new@org.com\"\n}"},
+              "url":{"raw":"{{base_url}}/api/org-leaders/1","host":["{{base_url}}"],"path":["api","org-leaders","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete org leader (confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/org-leaders/1?confirm=true","host":["{{base_url}}"],"path":["api","org-leaders","1"],"query":[{"key":"confirm","value":"true"}]}
             },
             "response": []
           }
@@ -612,7 +759,36 @@
             "request": {
               "method":"GET",
               "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
-              "url":{ "raw":"{{base_url}}/api/archives", "host":["{{base_url}}"], "path":["api","archives"] }
+              "url":{ "raw":"{{base_url}}/api/archives?q=john&page=1&per_page=20", "host":["{{base_url}}"], "path":["api","archives"], "query":[{"key":"q","value":"john"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}] }
+            },
+            "response": []
+          },
+          {
+            "name": "Get archive by id",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{ "raw":"{{base_url}}/api/archives/1", "host":["{{base_url}}"], "path":["api","archives","1"] }
+            },
+            "response": []
+          },
+          {
+            "name": "Create archive (admin)",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"mem_id\": 1,\n  \"union_id\": 1,\n  \"member_code\": \"M-1001\",\n  \"first_name\": \"Abebe\",\n  \"father_name\": \"Kebede\",\n  \"surname\": \"Tadesse\",\n  \"resigned_date\": \"2025-09-01\",\n  \"reason\": \"Retired\"\n}"},
+              "url":{"raw":"{{base_url}}/api/archives","host":["{{base_url}}"],"path":["api","archives"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete archive (admin confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/archives/1?confirm=true","host":["{{base_url}}"],"path":["api","archives","1"],"query":[{"key":"confirm","value":"true"}]}
             },
             "response": []
           }
@@ -661,7 +837,25 @@
             "request": {
               "method":"GET",
               "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
-              "url":{"raw":"{{base_url}}/api/contacts","host":["{{base_url}}"],"path":["api","contacts"]}
+              "url":{"raw":"{{base_url}}/api/contacts?q=inquiry&page=1&per_page=20","host":["{{base_url}}"],"path":["api","contacts"],"query":[{"key":"q","value":"inquiry"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
+            },
+            "response": []
+          },
+          {
+            "name": "Get contact by id (admin)",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/contacts/1","host":["{{base_url}}"],"path":["api","contacts","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete contact (admin confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/contacts/1?confirm=true","host":["{{base_url}}"],"path":["api","contacts","1"],"query":[{"key":"confirm","value":"true"}]}
             },
             "response": []
           }
@@ -675,7 +869,16 @@
             "request": {
               "method":"GET",
               "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
-              "url":{"raw":"{{base_url}}/api/news?is_published=true","host":["{{base_url}}"],"path":["api","news"],"query":[{"key":"is_published","value":"true"}]}
+              "url":{"raw":"{{base_url}}/api/news?is_published=true&page=1&per_page=20","host":["{{base_url}}"],"path":["api","news"],"query":[{"key":"is_published","value":"true"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
+            },
+            "response": []
+          },
+          {
+            "name": "Get news by id",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/news/1","host":["{{base_url}}"],"path":["api","news","1"]}
             },
             "response": []
           },
@@ -689,6 +892,26 @@
               "url":{"raw":"{{base_url}}/api/news","host":["{{base_url}}"],"path":["api","news"]}
             },
             "response": []
+          },
+          {
+            "name": "Update news (admin)",
+            "request": {
+              "method":"PUT",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"title\": \"Updated Federation Report\",\n  \"is_published\": false\n}"},
+              "url":{"raw":"{{base_url}}/api/news/1","host":["{{base_url}}"],"path":["api","news","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete news (admin confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/news/1?confirm=true","host":["{{base_url}}"],"path":["api","news","1"],"query":[{"key":"confirm","value":"true"}]}
+            },
+            "response": []
           }
         ]
       },
@@ -700,7 +923,16 @@
             "request": {
               "method":"GET",
               "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
-              "url":{"raw":"{{base_url}}/api/galleries","host":["{{base_url}}"],"path":["api","galleries"]}
+              "url":{"raw":"{{base_url}}/api/galleries?page=1&per_page=20","host":["{{base_url}}"],"path":["api","galleries"],"query":[{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
+            },
+            "response": []
+          },
+          {
+            "name": "Get gallery by id (with photos)",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/galleries/1","host":["{{base_url}}"],"path":["api","galleries","1"]}
             },
             "response": []
           },
@@ -716,13 +948,89 @@
             "response": []
           },
           {
-            "name": "Add photo metadata (admin) - upload separately",
+            "name": "Update gallery",
+            "request": {
+              "method":"PUT",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"title\": \"Conference 2025 - Updated\",\n  \"description\": \"Updated description\"\n}"},
+              "url":{"raw":"{{base_url}}/api/galleries/1","host":["{{base_url}}"],"path":["api","galleries","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete gallery (confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/galleries/1?confirm=true","host":["{{base_url}}"],"path":["api","galleries","1"],"query":[{"key":"confirm","value":"true"}]}
+            },
+            "response": []
+          },
+          {
+            "name": "List photos",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/photos?gallery_id=1&page=1&per_page=20","host":["{{base_url}}"],"path":["api","photos"],"query":[{"key":"gallery_id","value":"1"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
+            },
+            "response": []
+          },
+          {
+            "name": "Get photo by id",
+            "request": {
+              "method":"GET",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/photos/1","host":["{{base_url}}"],"path":["api","photos","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Upload photo file (admin)",
+            "request": {
+              "method":"POST",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "body":{
+                "mode":"formdata",
+                "formdata":[
+                  {"key":"photo","type":"file","src":"path/to/your/image.jpg"},
+                  {"key":"gallery_id","value":"1","type":"text"},
+                  {"key":"caption","value":"Opening ceremony","type":"text"},
+                  {"key":"taken_at","value":"2025-09-20","type":"text"}
+                ]
+              },
+              "url":{"raw":"{{base_url}}/api/photos","host":["{{base_url}}"],"path":["api","photos"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Add photo from URL (admin)",
             "request": {
               "method":"POST",
               "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
               "header":[{"key":"Content-Type","value":"application/json"}],
-              "body":{"mode":"raw","raw":"{\n  \"gallery_id\": 1,\n  \"filename\": \"conference-01.jpg\",\n  \"caption\": \"Opening ceremony\",\n  \"taken_at\": \"2025-09-20\"\n}"},
+              "body":{"mode":"raw","raw":"{\n  \"gallery_id\": 1,\n  \"image_url\": \"https://example.com/image.jpg\",\n  \"caption\": \"Opening ceremony\",\n  \"taken_at\": \"2025-09-20\"\n}"},
               "url":{"raw":"{{base_url}}/api/photos","host":["{{base_url}}"],"path":["api","photos"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Update photo",
+            "request": {
+              "method":"PUT",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "header":[{"key":"Content-Type","value":"application/json"}],
+              "body":{"mode":"raw","raw":"{\n  \"caption\": \"Updated caption\",\n  \"taken_at\": \"2025-09-21\"\n}"},
+              "url":{"raw":"{{base_url}}/api/photos/1","host":["{{base_url}}"],"path":["api","photos","1"]}
+            },
+            "response": []
+          },
+          {
+            "name": "Delete photo (confirm)",
+            "request": {
+              "method":"DELETE",
+              "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+              "url":{"raw":"{{base_url}}/api/photos/1?confirm=true","host":["{{base_url}}"],"path":["api","photos","1"],"query":[{"key":"confirm","value":"true"}]}
             },
             "response": []
           }

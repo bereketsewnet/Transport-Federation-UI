@@ -29,12 +29,30 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: {
+  token?: string;
+  tempToken?: string;
+  requirePasswordChange?: boolean;
+  requireSecurityQuestions?: boolean;
+  message?: string;
+  user?: {
     id: number;
+    mem_id?: number;
     username: string;
     role: string;
   };
+}
+
+export interface SecurityQuestion {
+  id: number;
+  question: string;
+}
+
+export interface ChangePasswordPayload {
+  newPassword: string;
+  securityQuestions?: Array<{
+    questionId: number;
+    answer: string;
+  }>;
 }
 
 export const login = (payload: LoginPayload): Promise<AxiosResponse<LoginResponse>> => {
@@ -43,6 +61,14 @@ export const login = (payload: LoginPayload): Promise<AxiosResponse<LoginRespons
 
 export const logout = (): Promise<AxiosResponse> => {
   return apiClient.post('/api/auth/logout');
+};
+
+export const getSecurityQuestions = (): Promise<AxiosResponse<{ questions: SecurityQuestion[] }>> => {
+  return apiClient.get('/api/auth/security-questions');
+};
+
+export const changePassword = (payload: ChangePasswordPayload): Promise<AxiosResponse<LoginResponse>> => {
+  return apiClient.post('/api/auth/change-password', payload);
 };
 
 // ==================== UNIONS ====================

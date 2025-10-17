@@ -57,6 +57,9 @@ import ArchivesFormComplete from '@pages/Admin/Archives/ArchivesFormComplete';
 import TerminatedUnionsListComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsListComplete';
 import TerminatedUnionsFormComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsFormComplete';
 
+// Member Pages
+import { MemberDashboard, MemberChangePassword } from '@pages/Member';
+
 // Placeholder pages for routes not yet fully implemented
 
 const NotFoundPage = () => (
@@ -180,6 +183,20 @@ function App() {
           <Route path="terminated-unions" element={<TerminatedUnionsListComplete />} />
           <Route path="terminated-unions/new" element={<TerminatedUnionsFormComplete />} />
           <Route path="terminated-unions/:id/edit" element={<TerminatedUnionsFormComplete />} />
+        </Route>
+
+        {/* Member Routes - Protected */}
+        <Route
+          path="/member"
+          element={
+            <ProtectedRoute allowedRoles={['member']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/member/dashboard" replace />} />
+          <Route path="dashboard" element={<MemberDashboard />} />
+          <Route path="change-password" element={<MemberChangePassword />} />
         </Route>
 
         {/* Error Routes */}

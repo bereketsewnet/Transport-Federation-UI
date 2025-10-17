@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@hooks/useAuth';
 import { cn } from '@utils/helpers';
 import styles from './Sidebar.module.css';
 
@@ -18,6 +19,7 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const location = useLocation();
+  const { user } = useAuth();
   const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1024);
 
   React.useEffect(() => {
@@ -29,7 +31,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const menuItems: MenuItem[] = [
+  // Member menu items - only dashboard and change password
+  const memberMenuItems: MenuItem[] = [
+    {
+      path: '/member/dashboard',
+      label: 'My Profile',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+    {
+      path: '/member/change-password',
+      label: 'Change Password',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+  ];
+
+  // Admin menu items - full access
+  const adminMenuItems: MenuItem[] = [
     {
       path: '/admin/dashboard',
       label: t('nav.dashboard'),
@@ -224,6 +257,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     },
   ];
 
+  // Determine which menu to show based on user role
+  const menuItems = user?.role === 'member' ? memberMenuItems : adminMenuItems;
+  const panelTitle = user?.role === 'member' ? 'Member Portal' : 'Admin Panel';
+
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -241,7 +278,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         className={cn(styles.sidebar, isOpen && styles.open)}
       >
         <div className={styles.header}>
-          <h2 className={styles.title}>Admin Panel</h2>
+          <h2 className={styles.title}>{panelTitle}</h2>
           <button className={styles.closeButton} onClick={onClose} aria-label="Close sidebar">
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path d="M6 6L14 14M6 14L14 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />

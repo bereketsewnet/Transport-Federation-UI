@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Storage Error - Transport Federation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #c33;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .solution {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .solution h2 {
+            color: #2e7d32;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .success {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+        .info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .steps {
+            list-style-position: inside;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+        .credentials {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .credentials h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .credentials p {
+            margin: 5px 0;
+            font-family: monospace;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix Storage Error</h1>
+        <p style="color: #666; margin-top: 10px;">Transport & Communication Federation</p>
+
+        <div class="error">
+            <strong>Error:</strong> "undefined" is not valid JSON<br>
+            <small>This happens when browser storage has invalid data.</small>
+        </div>
+
+        <div class="solution">
+            <h2>✅ Quick Fix (One Click!)</h2>
+            <p>Click the button below to clear storage and fix the error:</p>
+            <button id="fixButton" onclick="fixStorage()">
+                🔧 Clear Storage & Reload
+            </button>
+            <div id="success" class="success">
+                ✅ Storage cleared! Redirecting to login...
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>ℹ️ What this does:</strong><br>
+            Clears <code>localStorage</code> items (<code>jwt_token</code>, <code>user</code>) and reloads the page.
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #dee2e6;">
+
+        <h3 style="margin-bottom: 15px;">📝 Test Login Credentials</h3>
+
+        <div class="credentials">
+            <h3>👨‍💼 Admin Login:</h3>
+            <p><strong>Username:</strong> admin</p>
+            <p><strong>Password:</strong> ChangeThisStrongAdminPass!</p>
+        </div>
+
+        <div class="credentials">
+            <h3>👤 Member Login (After Creating):</h3>
+            <p><strong>Username:</strong> [member_code]</p>
+            <p><strong>Password:</strong> [same as member_code]</p>
+            <p style="margin-top: 10px; font-family: sans-serif; font-size: 13px; color: #6c757d;">
+                Example: If member_code is <code>M-1001</code>, use:<br>
+                Username: <code>M-1001</code>, Password: <code>M-1001</code>
+            </p>
+        </div>
+
+        <div class="info" style="margin-top: 20px;">
+            <strong>📌 Steps to Create Member:</strong>
+            <ol class="steps">
+                <li>Login as admin</li>
+                <li>Go to Admin → Members → Add Member</li>
+                <li>Set member_code (e.g., M-TEST-001)</li>
+                <li>Fill required fields and save</li>
+                <li>Logout and login as member</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function fixStorage() {
+            const button = document.getElementById('fixButton');
+            const success = document.getElementById('success');
+            
+            // Disable button
+            button.disabled = true;
+            button.textContent = '⏳ Clearing...';
+            
+            // Clear storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Show success
+            success.style.display = 'block';
+            
+            // Redirect after 1.5 seconds
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        }
+
+        // Auto-clear if accessed with ?fix parameter
+        if (window.location.search.includes('fix')) {
+            setTimeout(fixStorage, 500);
+        }
+    </script>
+</body>
+</html>
+

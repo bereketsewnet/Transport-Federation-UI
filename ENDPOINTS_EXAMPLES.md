@@ -582,6 +582,94 @@ Errors:
 }
 ```
 
+### [GET] {{base_url}}/api/union-executives/1 - Get union executive by id
+Group: Union Executives
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "mem_id": 1,
+  "position": "Vice Chairman",
+  "appointed_date": "2023-01-01",
+  "term_length_years": 3
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/union-executives/1 - Update union executive
+Group: Union Executives
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "position": "Chairman",
+  "term_length_years": 4
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "position": "Chairman",
+  "term_length_years": 4
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
 ### [DELETE] {{base_url}}/api/union-executives/1?confirm=true - Delete union executive (confirm)
 Group: Union Executives
 
@@ -603,6 +691,12 @@ Errors:
 ```json
 {
   "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
@@ -632,6 +726,42 @@ Errors:
 ```json
 {
   "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/cbas/1 - Get CBA by id
+Group: CBAs
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "duration_years": 3,
+  "status": "signed",
+  "registration_date": "2022-07-01",
+  "next_end_date": "2025-07-01",
+  "round": "1st"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
 }
 ```
 - 500:
@@ -696,6 +826,96 @@ Errors:
 }
 ```
 
+### [PUT] {{base_url}}/api/cbas/1 - Update CBA
+Group: CBAs
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "status": "expired",
+  "notes": "CBA expired, needs renewal"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "status": "expired",
+  "notes": "CBA expired, needs renewal"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/cbas/1?confirm=true - Delete CBA (confirm)
+Group: CBAs
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
 ### [GET] {{base_url}}/api/terminated-unions - List terminated unions
 Group: Terminated Unions
 
@@ -716,6 +936,40 @@ Errors:
 ```json
 {
   "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/terminated-unions/1 - Get terminated union by id
+Group: Terminated Unions
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "name_en": "Old Union",
+  "terminated_date": "2025-09-01",
+  "termination_reason": "Merged"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
 }
 ```
 - 500:
@@ -767,6 +1021,95 @@ Errors:
 ```json
 {
   "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/terminated-unions/1 - Update terminated union
+Group: Terminated Unions
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "termination_reason": "Dissolved",
+  "notes": "Updated termination reason"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "termination_reason": "Dissolved",
+  "notes": "Updated termination reason"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/terminated-unions/1?confirm=true - Delete terminated union (confirm)
+Group: Terminated Unions
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
@@ -854,6 +1197,94 @@ Errors:
 }
 ```
 
+### [GET] {{base_url}}/api/login-accounts/1 - Get account by id (admin)
+Group: Login Accounts (admin)
+
+Success (200):
+```json
+{
+  "id": 1,
+  "username": "user1",
+  "role": "member",
+  "mem_id": 1,
+  "must_change_password": false,
+  "is_locked": false
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/login-accounts/1 - Update account (admin)
+Group: Login Accounts (admin)
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "role": "admin",
+  "must_change_password": false
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "username": "user1",
+  "role": "admin"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
 ### [POST] {{base_url}}/api/login-accounts/reset/admin - Reset password (admin)
 Group: Login Accounts (admin)
 
@@ -871,11 +1302,10 @@ Request Body:
 }
 ```
 
-Success (201):
+Success (200):
 ```json
 {
-  "password": "NewPass123!",
-  "id": 1
+  "message": "Password reset"
 }
 ```
 
@@ -886,10 +1316,96 @@ Errors:
   "message": "Unauthorized"
 }
 ```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
 - 400:
 ```json
 {
-  "message": "Validation error"
+  "message": "password required"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/login-accounts/1/lock - Lock/Unlock account (admin)
+Group: Login Accounts (admin)
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "is_locked": true
+}
+```
+
+Success (200):
+```json
+{
+  "message": "Account locked"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/login-accounts/1?confirm=true - Delete account (admin confirm)
+Group: Login Accounts (admin)
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
@@ -919,6 +1435,42 @@ Errors:
 ```json
 {
   "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/org-leaders/1 - Get org leader by id
+Group: Organization Leaders
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "title": "Mr",
+  "first_name": "Yared",
+  "position": "CEO",
+  "phone": "+251911222333",
+  "email": "yared@org.com"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
 }
 ```
 - 500:
@@ -983,7 +1535,96 @@ Errors:
 }
 ```
 
-### [GET] {{base_url}}/api/archives - List archives
+### [PUT] {{base_url}}/api/org-leaders/1 - Update org leader
+Group: Organization Leaders
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "phone": "+251911222444",
+  "email": "yared.new@org.com"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "phone": "+251911222444",
+  "email": "yared.new@org.com"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/org-leaders/1?confirm=true - Delete org leader (confirm)
+Group: Organization Leaders
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/archives?q=john&page=1&per_page=20 - List archives
 Group: Archives
 
 Success (200):
@@ -991,9 +1632,7 @@ Success (200):
 {
   "data": [],
   "meta": {
-    "total": 0,
-    "page": 1,
-    "per_page": 20
+    "total": 0
   }
 }
 ```
@@ -1003,6 +1642,139 @@ Errors:
 ```json
 {
   "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/archives/1 - Get archive by id
+Group: Archives
+
+Success (200):
+```json
+{
+  "id": 1,
+  "mem_id": 1,
+  "union_id": 1,
+  "member_code": "M-1001",
+  "first_name": "Abebe",
+  "father_name": "Kebede",
+  "surname": "Tadesse",
+  "resigned_date": "2025-09-01",
+  "reason": "Retired"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [POST] {{base_url}}/api/archives - Create archive (admin)
+Group: Archives
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "mem_id": 1,
+  "union_id": 1,
+  "member_code": "M-1001",
+  "first_name": "Abebe",
+  "father_name": "Kebede",
+  "surname": "Tadesse",
+  "resigned_date": "2025-09-01",
+  "reason": "Retired"
+}
+```
+
+Success (201):
+```json
+{
+  "id": 1,
+  "mem_id": 1,
+  "union_id": 1,
+  "member_code": "M-1001",
+  "first_name": "Abebe",
+  "father_name": "Kebede",
+  "surname": "Tadesse",
+  "resigned_date": "2025-09-01",
+  "reason": "Retired"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/archives/1?confirm=true - Delete archive (admin confirm)
+Group: Archives
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
@@ -1139,7 +1911,7 @@ Errors:
 }
 ```
 
-### [GET] {{base_url}}/api/contacts - List contact messages (admin)
+### [GET] {{base_url}}/api/contacts?q=inquiry&page=1&per_page=20 - List contact messages (admin)
 Group: Contacts
 
 Success (200):
@@ -1147,9 +1919,7 @@ Success (200):
 {
   "data": [],
   "meta": {
-    "total": 0,
-    "page": 1,
-    "per_page": 20
+    "total": 0
   }
 }
 ```
@@ -1159,6 +1929,76 @@ Errors:
 ```json
 {
   "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/contacts/1 - Get contact by id (admin)
+Group: Contacts
+
+Success (200):
+```json
+{
+  "id": 1,
+  "name": "User",
+  "email_or_phone": "user@example.com",
+  "subject": "Inquiry",
+  "message": "I need help with membership."
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/contacts/1?confirm=true - Delete contact (admin confirm)
+Group: Contacts
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
@@ -1188,6 +2028,41 @@ Errors:
 ```json
 {
   "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/news/1 - Get news by id
+Group: News
+
+Success (200):
+```json
+{
+  "id": 1,
+  "title": "Federation Annual Report",
+  "body": "Detailed report content...",
+  "summary": "Annual summary",
+  "published_at": "2025-10-02T08:00:00Z",
+  "is_published": true
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
 }
 ```
 - 500:
@@ -1241,6 +2116,95 @@ Errors:
 ```json
 {
   "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/news/1 - Update news (admin)
+Group: News
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "title": "Updated Federation Report",
+  "is_published": false
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "title": "Updated Federation Report",
+  "is_published": false
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/news/1?confirm=true - Delete news (admin confirm)
+Group: News
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
@@ -1326,7 +2290,42 @@ Errors:
 }
 ```
 
-### [POST] {{base_url}}/api/photos - Add photo metadata (admin) - upload separately
+### [GET] {{base_url}}/api/galleries/1 - Get gallery by id (with photos)
+Group: Galleries & Photos
+
+Success (200):
+```json
+{
+  "gallery": {
+    "id": 1,
+    "title": "Conference 2025",
+    "description": "Photos from the annual conference"
+  },
+  "photos": []
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/galleries/1 - Update gallery
 Group: Galleries & Photos
 
 Headers:
@@ -1339,8 +2338,187 @@ Headers:
 Request Body:
 ```json
 {
+  "title": "Conference 2025 - Updated",
+  "description": "Updated description"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "title": "Conference 2025 - Updated",
+  "description": "Updated description"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/galleries/1?confirm=true - Delete gallery (confirm)
+Group: Galleries & Photos
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/photos?gallery_id=1&page=1&per_page=20 - List photos
+Group: Galleries & Photos
+
+Success (200):
+```json
+{
+  "data": [],
+  "meta": {
+    "total": 0
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/photos/1 - Get photo by id
+Group: Galleries & Photos
+
+Success (200):
+```json
+{
+  "id": 1,
   "gallery_id": 1,
   "filename": "conference-01.jpg",
+  "caption": "Opening ceremony",
+  "taken_at": "2025-09-20"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [POST] {{base_url}}/api/photos - Upload photo file (admin)
+Group: Galleries & Photos
+
+**Note**: This endpoint supports TWO methods of adding photos:
+1. **File Upload** (multipart/form-data)
+2. **URL String** (application/json)
+
+#### Method 1: Upload File
+
+Content-Type: `multipart/form-data`
+
+Form Data:
+- `photo` (file): Image file (jpeg, jpg, png, gif, webp) - Max 5MB
+- `gallery_id` (text): Gallery ID (required)
+- `caption` (text): Photo caption (optional)
+- `taken_at` (text): Date photo was taken (optional, format: YYYY-MM-DD)
+
+Success (201):
+```json
+{
+  "id": 1,
+  "gallery_id": 1,
+  "filename": "photo-1729178564123-987654321.jpg",
+  "caption": "Opening ceremony",
+  "taken_at": "2025-09-20",
+  "is_local": true,
+  "image_url": "/uploads/photos/photo-1729178564123-987654321.jpg"
+}
+```
+
+#### Method 2: Add from URL
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "gallery_id": 1,
+  "image_url": "https://example.com/image.jpg",
   "caption": "Opening ceremony",
   "taken_at": "2025-09-20"
 }
@@ -1349,11 +2527,12 @@ Request Body:
 Success (201):
 ```json
 {
+  "id": 1,
   "gallery_id": 1,
-  "filename": "conference-01.jpg",
+  "filename": "https://example.com/image.jpg",
   "caption": "Opening ceremony",
   "taken_at": "2025-09-20",
-  "id": 1
+  "is_local": false
 }
 ```
 
@@ -1367,7 +2546,108 @@ Errors:
 - 400:
 ```json
 {
+  "message": "Either upload a photo file or provide an image_url"
+}
+```
+- 400 (File too large):
+```json
+{
+  "message": "File size too large. Maximum 5MB allowed."
+}
+```
+- 400 (Invalid file type):
+```json
+{
+  "message": "Only image files are allowed (jpeg, jpg, png, gif, webp)"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [PUT] {{base_url}}/api/photos/1 - Update photo
+Group: Galleries & Photos
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "caption": "Updated caption",
+  "taken_at": "2025-09-21"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "caption": "Updated caption",
+  "taken_at": "2025-09-21"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
   "message": "Validation error"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [DELETE] {{base_url}}/api/photos/1?confirm=true - Delete photo (confirm)
+Group: Galleries & Photos
+
+Success (200):
+```json
+{
+  "message": "Deleted"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Not found"
+}
+```
+- 400:
+```json
+{
+  "message": "To delete set ?confirm=true"
 }
 ```
 - 500:
