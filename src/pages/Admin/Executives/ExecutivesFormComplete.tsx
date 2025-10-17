@@ -6,7 +6,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { 
-  createUnionExecutive, 
+  createUnionExecutive,
+  updateUnionExecutive,
+  getUnionExecutive,
   getUnions,
   Union
 } from '@api/endpoints';
@@ -38,14 +40,6 @@ export const ExecutivesFormComplete: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
-
-  // If edit mode, redirect to list (no update endpoint available)
-  useEffect(() => {
-    if (isEdit) {
-      toast.error('Edit not available - no update endpoint');
-      navigate('/admin/executives');
-    }
-  }, [isEdit, navigate]);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -54,6 +48,7 @@ export const ExecutivesFormComplete: React.FC = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
     watch,
     setValue
@@ -88,6 +83,13 @@ export const ExecutivesFormComplete: React.FC = () => {
     loadUnions();
   }, []);
 
+  // Load executive data for editing
+  useEffect(() => {
+    if (isEdit && id) {
+      loadExecutive();
+    }
+  }, [isEdit, id]);
+
   const loadUnions = async () => {
     try {
       console.log('🔄 Loading unions for form...');
@@ -102,10 +104,44 @@ export const ExecutivesFormComplete: React.FC = () => {
     }
   };
 
+  const loadExecutive = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Loading executive with ID:', id);
+      const response = await getUnionExecutive(Number(id));
+      const executive = response.data;
+      console.log('✅ Executive loaded:', executive);
+      
+      // Format the date to YYYY-MM-DD for the date input
+      const formattedDate = executive.appointed_date 
+        ? new Date(executive.appointed_date).toISOString().split('T')[0]
+        : '';
+      
+      // Populate form with executive data
+      reset({
+        union_id: executive.union_id,
+        mem_id: executive.mem_id,
+        position: executive.position,
+        appointed_date: formattedDate,
+        term_length_years: executive.term_length_years
+      });
+      
+      toast.success('Executive data loaded');
+    } catch (err: any) {
+      console.error('💥 Error loading executive:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to load executive data';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = async (data: ExecutiveFormData) => {
     console.log('🔍 Form submission started');
     console.log('📝 Form data:', data);
     console.log('❌ Form errors:', errors);
+    console.log('✏️ Is Edit Mode:', isEdit, 'ID:', id);
     
     try {
       setError('');
@@ -128,10 +164,17 @@ export const ExecutivesFormComplete: React.FC = () => {
         term_length_years: typeof executiveData.term_length_years
       });
 
-      console.log('➕ Creating new executive');
-      const response = await createUnionExecutive(executiveData);
-      console.log('✅ Create successful:', response);
-      toast.success('Executive added successfully!');
+      if (isEdit && id) {
+        console.log('✏️ Updating executive with ID:', id);
+        const response = await updateUnionExecutive(Number(id), executiveData);
+        console.log('✅ Update successful:', response);
+        toast.success('Executive updated successfully!');
+      } else {
+        console.log('➕ Creating new executive');
+        const response = await createUnionExecutive(executiveData);
+        console.log('✅ Create successful:', response);
+        toast.success('Executive added successfully!');
+      }
 
       console.log('🎉 Navigating to executives list');
       navigate('/admin/executives');

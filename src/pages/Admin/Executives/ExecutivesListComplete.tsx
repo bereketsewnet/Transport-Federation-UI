@@ -213,13 +213,24 @@ export const ExecutivesListComplete: React.FC = () => {
     }
   ];
 
-  // Row actions (no edit - API doesn't have update endpoint)
+  // Row actions - Edit and Delete
   const rowActions = (executive: UnionExecutive) => {
     console.log('🔧 Rendering actions for executive:', executive);
     console.log('🆔 Executive ID:', executive.id, 'Type:', typeof executive.id);
     
     return (
       <div className={styles.rowActions}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('✏️ Edit clicked for executive ID:', executive.id);
+            navigate(`/admin/executives/${executive.id}/edit`);
+          }}
+        >
+          {t('common.edit')}
+        </Button>
         <Button
           size="sm"
           variant="danger"

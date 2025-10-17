@@ -6,7 +6,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { 
-  createUnionExecutive, 
+  createUnionExecutive,
+  updateUnionExecutive,
+  getUnionExecutive,
   getUnions,
   Union
 } from '@api/endpoints';
@@ -45,6 +47,7 @@ export const ExecutivesForm: React.FC = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ExecutiveFormData>({
     resolver: yupResolver(executiveSchema),
@@ -82,9 +85,22 @@ export const ExecutivesForm: React.FC = () => {
   const loadExecutive = async () => {
     try {
       setLoading(true);
-      // For now, we'll skip loading individual executive since the API doesn't have getUnionExecutive
-      // In a real implementation, you would need to add this endpoint to the API
-      console.log('Loading executive with ID:', id);
+      const response = await getUnionExecutive(Number(id));
+      const executive = response.data;
+      
+      // Format the date to YYYY-MM-DD for the date input
+      const formattedDate = executive.appointed_date 
+        ? new Date(executive.appointed_date).toISOString().split('T')[0]
+        : '';
+      
+      // Populate form with executive data
+      reset({
+        union_id: executive.union_id,
+        mem_id: executive.mem_id,
+        position: executive.position,
+        appointed_date: formattedDate,
+        term_length_years: executive.term_length_years
+      });
     } catch (err) {
       setError(t('messages.errorLoadingData'));
       console.error('Error loading executive:', err);
@@ -104,9 +120,7 @@ export const ExecutivesForm: React.FC = () => {
       };
 
       if (isEdit && id) {
-        // For now, we'll skip updating since the API doesn't have updateUnionExecutive
-        // In a real implementation, you would need to add this endpoint to the API
-        console.log('Updating executive with ID:', id, executiveData);
+        await updateUnionExecutive(Number(id), executiveData);
       } else {
         await createUnionExecutive(executiveData);
       }
