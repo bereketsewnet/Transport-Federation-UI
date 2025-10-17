@@ -110,6 +110,20 @@
   border-color: var(--primary);
 }
 
+.photoImageContainer {
+  aspect-ratio: 4 / 3;
+  background: var(--bg-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.photoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .photoPlaceholder {
   aspect-ratio: 4 / 3;
   background: var(--bg-subtle);
@@ -117,6 +131,11 @@
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .photoInfo {
@@ -149,6 +168,171 @@
   color: var(--text-muted);
 }
 
+/* Photo Form Header */
+.photoFormHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+/* Upload Method Toggle */
+.uploadMethodToggle {
+  display: flex;
+  gap: var(--spacing-2);
+  background: var(--bg-subtle);
+  padding: var(--spacing-1);
+  border-radius: var(--radius);
+}
+
+.toggleActive,
+.toggleInactive {
+  padding: var(--spacing-2) var(--spacing-4);
+  border: none;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.toggleActive {
+  background: var(--primary);
+  color: white;
+}
+
+.toggleInactive {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.toggleInactive:hover {
+  background: white;
+  color: var(--text);
+}
+
+/* Photo Form Content */
+.photoFormContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+/* File Upload Section */
+.fileUploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.fileInputWrapper {
+  position: relative;
+}
+
+.fileInputLabel {
+  display: block;
+  padding: var(--spacing-6);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-align: center;
+}
+
+.fileInputLabel:hover {
+  border-color: var(--primary);
+  background: var(--bg-subtle);
+}
+
+.fileInput {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.filePrompt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  color: var(--text-secondary);
+}
+
+.filePrompt span:first-child {
+  font-weight: 600;
+  font-size: var(--text-base);
+}
+
+.fileHint {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.fileSelected {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  color: var(--success);
+  font-weight: 600;
+}
+
+.fileSize {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Image Preview */
+.imagePreview {
+  max-width: 400px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.imagePreview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* URL Input Section */
+.urlInputSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.urlPreview {
+  max-width: 400px;
+}
+
+.urlPreviewLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.urlPreview img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: none;
+}
+
+/* Common Fields */
+.commonFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
 /* Responsive */
 @media (max-width: 1023px) {
   .container {
@@ -166,6 +350,15 @@
 
   .photosGrid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .photoFormHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .commonFields {
+    grid-template-columns: 1fr;
   }
 }
 

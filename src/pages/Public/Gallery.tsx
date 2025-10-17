@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getGalleries, getPhotos, Gallery as GalleryType, Photo } from '@api/endpoints';
+import { getImageUrl } from '@api/client';
 import { Loading } from '@components/Loading/Loading';
 import styles from './Gallery.module.css';
 
@@ -118,29 +119,47 @@ export const Gallery: React.FC = () => {
               </div>
             ) : (
               <div className={styles.photosGrid}>
-                {photos.map((photo, index) => (
-                  <motion.div
-                    key={photo.id}
-                    className={styles.photoCard}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.03 }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setSelectedPhoto(photo)}
-                  >
-                    <div className={styles.photoPlaceholder}>
-                      {/* In production, use: <img src={`/uploads/${photo.filename}`} alt={photo.caption} /> */}
-                      <div className={styles.photoIcon}>
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                {photos.map((photo, index) => {
+                  const imageUrl = photo.image_url || getImageUrl(photo.filename, photo.is_local);
+                  
+                  return (
+                    <motion.div
+                      key={photo.id}
+                      className={styles.photoCard}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.03 }}
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => setSelectedPhoto(photo)}
+                    >
+                      <div className={styles.photoContainer}>
+                        <img 
+                          src={imageUrl} 
+                          alt={photo.caption || 'Photo'} 
+                          className={styles.photoImage}
+                          onError={(e) => {
+                            // Fallback to placeholder if image fails to load
+                            e.currentTarget.style.display = 'none';
+                            const placeholder = e.currentTarget.nextElementSibling;
+                            if (placeholder) {
+                              (placeholder as HTMLElement).style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className={styles.photoPlaceholder} style={{ display: 'none' }}>
+                          <div className={styles.photoIcon}>
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className={styles.photoOverlay}>
+                          <p className={styles.photoCaption}>{photo.caption}</p>
+                        </div>
                       </div>
-                      <div className={styles.photoOverlay}>
-                        <p className={styles.photoCaption}>{photo.caption}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
             )}
           </>
@@ -168,8 +187,20 @@ export const Gallery: React.FC = () => {
                 ✕
               </button>
               <div className={styles.lightboxImage}>
-                {/* In production: <img src={`/uploads/${selectedPhoto.filename}`} alt={selectedPhoto.caption} /> */}
-                <div className={styles.lightboxPlaceholder}>
+                <img 
+                  src={selectedPhoto.image_url || getImageUrl(selectedPhoto.filename, selectedPhoto.is_local)} 
+                  alt={selectedPhoto.caption || 'Photo'} 
+                  className={styles.lightboxImg}
+                  onError={(e) => {
+                    // Fallback to placeholder if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    const placeholder = e.currentTarget.nextElementSibling;
+                    if (placeholder) {
+                      (placeholder as HTMLElement).style.display = 'flex';
+                    }
+                  }}
+                />
+                <div className={styles.lightboxPlaceholder} style={{ display: 'none' }}>
                   <svg width="128" height="128" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>

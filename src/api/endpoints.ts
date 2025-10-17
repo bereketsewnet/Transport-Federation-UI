@@ -300,6 +300,8 @@ export interface Photo {
   caption: string;
   taken_at: string;
   created_at?: string;
+  image_url?: string; // Full URL for local files or external URL
+  is_local?: boolean; // True if uploaded locally, false if from URL
 }
 
 export const getGalleries = (
@@ -319,6 +321,34 @@ export const getPhotos = (
 };
 
 export const createPhoto = (data: Partial<Photo>): Promise<AxiosResponse<Photo>> => {
+  return apiClient.post('/api/photos', data);
+};
+
+export const uploadPhoto = (
+  file: File,
+  galleryId: number,
+  caption?: string,
+  takenAt?: string
+): Promise<AxiosResponse<Photo>> => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  formData.append('gallery_id', galleryId.toString());
+  if (caption) formData.append('caption', caption);
+  if (takenAt) formData.append('taken_at', takenAt);
+
+  return apiClient.post('/api/photos', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+export const createPhotoFromURL = (data: {
+  gallery_id: number;
+  image_url: string;
+  caption?: string;
+  taken_at?: string;
+}): Promise<AxiosResponse<Photo>> => {
   return apiClient.post('/api/photos', data);
 };
 

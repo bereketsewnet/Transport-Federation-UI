@@ -111,3 +111,26 @@ export const getUser = (): unknown | null => {
   }
 };
 
+// Helper function to get full image URL
+export const getImageUrl = (filename: string, isLocal?: boolean): string => {
+  // If it's not a local file (external URL), return as-is
+  if (isLocal === false || filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  
+  // For local files, construct full URL
+  // Remove leading slash or backslash if present
+  const cleanFilename = filename.replace(/^[\\\/]+/, '');
+  
+  // Replace backslashes with forward slashes for web URLs
+  const webPath = cleanFilename.replace(/\\/g, '/');
+  
+  // If filename already starts with /uploads, don't add it again
+  const finalPath = webPath.startsWith('uploads/') ? webPath : `uploads/${webPath}`;
+  
+  return `${API_BASE_URL}/${finalPath}`;
+};
+
+// Export API_BASE_URL for use in other modules
+export const API_URL = API_BASE_URL;
+
