@@ -73,17 +73,24 @@ export const ArchivesList: React.FC = () => {
         params.sortOrder = sortDirection;
       }
 
+      console.log('📊 Loading archives with params:', params);
       const response = await getArchives(params);
-      setArchives(response.data.data);
+      console.log('✅ Archives response:', response);
+      
+      const archivesData = response.data.data || [];
+      console.log('📋 Archives loaded:', archivesData.length, 'items');
+      console.log('📋 First archive:', archivesData[0]);
+      
+      setArchives(archivesData);
 
       // Update pagination info
       if (response.data.meta) {
-        setTotalItems(response.data.meta.total);
-        setTotalPages(response.data.meta.total_pages || Math.ceil(response.data.meta.total / pageSize));
+        setTotalItems(response.data.meta.total || 0);
+        setTotalPages(response.data.meta.total_pages || Math.ceil((response.data.meta.total || 0) / pageSize));
       }
     } catch (err) {
+      console.error('💥 Error loading archives:', err);
       setError(t('messages.errorLoadingData'));
-      console.error('Error loading archives:', err);
     } finally {
       setLoading(false);
     }

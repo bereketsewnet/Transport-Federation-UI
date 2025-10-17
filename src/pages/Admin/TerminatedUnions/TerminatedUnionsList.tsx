@@ -62,10 +62,14 @@ export const TerminatedUnionsList: React.FC = () => {
   useEffect(() => {
     const loadUnions = async () => {
       try {
+        console.log('🔄 Loading unions for filter...');
         const response = await getUnions({ per_page: 1000 }); // Get all unions for filter
-        setUnions(response.data.data);
+        const rawUnions = response.data.data || [];
+        console.log('✅ Unions loaded:', rawUnions.length);
+        console.log('📋 First union:', rawUnions[0]);
+        setUnions(rawUnions);
       } catch (err) {
-        console.error('Error loading unions:', err);
+        console.error('💥 Error loading unions:', err);
       }
     };
     loadUnions();
@@ -232,10 +236,12 @@ export const TerminatedUnionsList: React.FC = () => {
             className={styles.filterSelect}
             options={[
               { value: '', label: t('terminatedUnions.allUnions') },
-              ...unions.map(union => ({
-                value: union.id.toString(),
-                label: union.name_en
-              }))
+              ...unions
+                .filter(u => u && (u.id || (u as any).union_id) && u.name_en)
+                .map(union => ({
+                  value: ((union.id || (union as any).union_id)).toString(),
+                  label: union.name_en
+                }))
             ]}
           />
 

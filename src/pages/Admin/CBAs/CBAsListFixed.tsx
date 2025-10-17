@@ -109,10 +109,14 @@ export const CBAsListFixed: React.FC = () => {
   // Load unions for filter
   const loadUnions = async () => {
     try {
-      const response = await getUnions({ per_page: 100 });
-      setUnions(response.data.data || []);
+      console.log('🔄 Loading unions for filter...');
+      const response = await getUnions({ per_page: 1000 });
+      const rawUnions = response.data.data || [];
+      console.log('✅ Unions loaded:', rawUnions.length);
+      console.log('📋 First union:', rawUnions[0]);
+      setUnions(rawUnions);
     } catch (err) {
-      console.error('Error loading unions:', err);
+      console.error('💥 Error loading unions:', err);
     }
   };
 
@@ -243,10 +247,12 @@ export const CBAsListFixed: React.FC = () => {
             className={styles.filterSelect}
             options={[
               { value: '', label: t('cbas.allUnions') },
-              ...unions.map(union => ({
-                value: union.id.toString(),
-                label: union.name_en
-              }))
+              ...unions
+                .filter(u => u && (u.id || (u as any).union_id) && u.name_en)
+                .map(union => ({
+                  value: ((union.id || (union as any).union_id)).toString(),
+                  label: union.name_en
+                }))
             ]}
           />
 

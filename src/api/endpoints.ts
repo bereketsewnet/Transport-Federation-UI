@@ -168,6 +168,9 @@ export const createUnionExecutive = (
   return apiClient.post('/api/union-executives', data);
 };
 
+// Note: No update endpoint available for executives
+// export const updateUnionExecutive = (id: number, data: Partial<UnionExecutive>) => {...}
+
 export const deleteUnionExecutive = (id: number): Promise<AxiosResponse> => {
   return apiClient.delete(`/api/union-executives/${id}`, { params: { confirm: true } });
 };

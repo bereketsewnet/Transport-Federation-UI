@@ -42,8 +42,8 @@ import UnionsListComplete from '@pages/Admin/Unions/UnionsListComplete';
 import UnionFormComplete from '@pages/Admin/Unions/UnionFormComplete';
 
 // Admin Executives
-import { ExecutivesForm } from '@pages/Admin/Executives';
-import ExecutivesListFixed from '@pages/Admin/Executives/ExecutivesListFixed';
+import ExecutivesListComplete from '@pages/Admin/Executives/ExecutivesListComplete';
+import ExecutivesFormComplete from '@pages/Admin/Executives/ExecutivesFormComplete';
 
 // Admin CBAs
 import { CBAsForm } from '@pages/Admin/CBAs';
@@ -160,9 +160,9 @@ function App() {
           <Route path="unions/:id/edit" element={<UnionFormComplete />} />
           
           {/* Executives Management */}
-          <Route path="executives" element={<ExecutivesListFixed />} />
-          <Route path="executives/new" element={<ExecutivesForm />} />
-          <Route path="executives/:id/edit" element={<ExecutivesForm />} />
+          <Route path="executives" element={<ExecutivesListComplete />} />
+          <Route path="executives/new" element={<ExecutivesFormComplete />} />
+          <Route path="executives/:id/edit" element={<ExecutivesFormComplete />} />
           
               {/* CBAs Management */}
               <Route path="cbas" element={<CBAsListFixed />} />
