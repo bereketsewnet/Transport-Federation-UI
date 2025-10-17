@@ -46,8 +46,8 @@ import ExecutivesListComplete from '@pages/Admin/Executives/ExecutivesListComple
 import ExecutivesFormComplete from '@pages/Admin/Executives/ExecutivesFormComplete';
 
 // Admin CBAs
-import { CBAsForm } from '@pages/Admin/CBAs';
-import CBAsListFixed from '@pages/Admin/CBAs/CBAsListFixed';
+import CBAsListComplete from '@pages/Admin/CBAs/CBAsListComplete';
+import CBAsFormComplete from '@pages/Admin/CBAs/CBAsFormComplete';
 
 // Admin Archives
 import { ArchivesList, ArchivesForm } from '@pages/Admin/Archives';
@@ -164,11 +164,10 @@ function App() {
           <Route path="executives/new" element={<ExecutivesFormComplete />} />
           <Route path="executives/:id/edit" element={<ExecutivesFormComplete />} />
           
-              {/* CBAs Management */}
-              <Route path="cbas" element={<CBAsListFixed />} />
-              <Route path="cbas/new" element={<CBAsForm />} />
-              <Route path="cbas/:id/edit" element={<CBAsForm />} />
-              <Route path="cbas/:id/view" element={<CBAsForm />} />
+          {/* CBAs Management */}
+          <Route path="cbas" element={<CBAsListComplete />} />
+          <Route path="cbas/new" element={<CBAsFormComplete />} />
+          <Route path="cbas/:id/edit" element={<CBAsFormComplete />} />
 
               {/* Archives Management */}
               <Route path="archives" element={<ArchivesList />} />

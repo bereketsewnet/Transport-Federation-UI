@@ -213,7 +213,7 @@ export const updateCBA = (id: number, data: Partial<CBA>): Promise<AxiosResponse
 };
 
 export const deleteCBA = (id: number): Promise<AxiosResponse> => {
-  return apiClient.delete(`/api/cbas/${id}`);
+  return apiClient.delete(`/api/cbas/${id}`, { params: { confirm: true } });
 };
 
 // ==================== NEWS ====================

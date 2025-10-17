@@ -42,42 +42,32 @@
   align-items: center;
 }
 
-/* Toolbar */
+/* Toolbar - Single Row */
 .toolbar {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
+  gap: var(--spacing-3);
+  align-items: center;
   margin-bottom: var(--spacing-6);
   padding: var(--spacing-4);
   background: var(--bg-subtle);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-}
-
-.searchSection {
-  display: flex;
-  gap: var(--spacing-3);
-  align-items: center;
+  flex-wrap: wrap;
 }
 
 .searchBox {
   flex: 1;
-  max-width: 400px;
-}
-
-.filtersSection {
-  display: flex;
-  gap: var(--spacing-3);
-  align-items: center;
-  flex-wrap: wrap;
+  min-width: 180px;
 }
 
 .filterSelect {
-  min-width: 180px;
+  min-width: 150px;
+  flex-shrink: 0;
 }
 
 .resetButton {
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Error Message */
@@ -156,7 +146,7 @@
   text-transform: capitalize;
 }
 
-.statusBadge.active {
+.statusBadge.signed {
   background: var(--success-subtle);
   color: var(--success);
 }
@@ -171,9 +161,16 @@
   color: var(--warning);
 }
 
-.statusBadge.negotiating {
+/* Round Badge */
+.roundBadge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
   background: var(--primary-subtle);
   color: var(--primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
 /* Row Actions */
@@ -247,6 +244,30 @@
   width: 100%;
 }
 
+/* Info Box */
+.infoBox {
+  padding: var(--spacing-4);
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius);
+  margin-top: var(--spacing-4);
+}
+
+.infoBox p {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.infoBox p:last-child {
+  margin-bottom: 0;
+}
+
+.endDateInfo {
+  color: var(--primary) !important;
+  font-size: var(--text-base) !important;
+}
+
 /* Info Card */
 .infoCard {
   background: var(--bg);
@@ -309,15 +330,21 @@
 
   .toolbar {
     padding: var(--spacing-3);
-  }
-
-  .filtersSection {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .searchBox {
+    min-width: 100%;
+  }
+
   .filterSelect {
-    min-width: auto;
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .resetButton {
+    width: 100%;
   }
 
   .formRow {
