@@ -27,8 +27,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
-  animation: shimmer 15s infinite linear;
+  background: linear-gradient(45deg, transparent 20%, rgba(255, 255, 255, 0.2) 50%, transparent 80%);
+  animation: shimmer 10s infinite linear;
   pointer-events: none;
 }
 
@@ -103,6 +103,7 @@
 .primaryBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.3);
+  background: var(--primary-dark, #1e40af);
 }
 
 .secondaryBtn {
@@ -113,7 +114,9 @@
 }
 
 .secondaryBtn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary);
+  border-color: white;
   transform: translateY(-2px);
 }
 
@@ -327,6 +330,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-6);
   margin-top: var(--spacing-12);
+  padding-bottom: var(--spacing-12);
 }
 
 .serviceCard {
@@ -379,7 +383,6 @@
   color: white;
   position: relative;
   overflow: hidden;
-  margin-top: var(--spacing-12);
 }
 
 .cta::before {
@@ -389,25 +392,36 @@
   right: -50%;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 60%);
   animation: pulse 4s ease-in-out infinite;
+}
+
+.cta::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -30%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  animation: pulse 5s ease-in-out infinite reverse;
 }
 
 @keyframes pulse {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.6;
     transform: scale(1);
   }
   50% {
     opacity: 1;
-    transform: scale(1.1);
+    transform: scale(1.2);
   }
 }
 
 .ctaContent {
   text-align: center;
   max-width: 700px;
-  margin: 0 auto;
+  margin:  var(--spacing-6) auto;
   position: relative;
   z-index: 1;
 }
@@ -434,11 +448,15 @@
   box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
   margin-bottom: var(--spacing-4);
+  border: 2px solid white;
 }
 
 .ctaButton:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 25px 0 rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
+  border-color: white;
 }
 
 /* Responsive Design */

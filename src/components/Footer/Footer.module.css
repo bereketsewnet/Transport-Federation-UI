@@ -74,6 +74,18 @@
   margin: 0;
 }
 
+.contactButton {
+  margin-top: var(--spacing-2);
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.contactButton:hover {
+  background: var(--primary-dark, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
 .social {
   display: flex;
   gap: var(--spacing-3);

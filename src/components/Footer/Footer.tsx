@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@components/Button/Button';
 import styles from './Footer.module.css';
 
 export const Footer: React.FC = () => {
@@ -46,6 +47,11 @@ export const Footer: React.FC = () => {
               <p>+251 11 XXX XXXX</p>
               <p>info@tcwf.org.et</p>
             </div>
+            <Link to="/contact">
+              <Button size="sm" className={styles.contactButton}>
+                {t('contact.title')}
+              </Button>
+            </Link>
           </div>
 
           {/* Social Media */}
