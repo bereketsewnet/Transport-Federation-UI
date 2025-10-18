@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { TextArea } from '@components/TextArea/TextArea';
-import { FileUpload } from '@components/FileUpload/FileUpload';
 import styles from './HomeEditor.module.css';
 
 const homeSchema = yup.object({
@@ -35,9 +34,6 @@ interface HomeFormData {
 }
 
 export const HomeEditor: React.FC = () => {
-  const [heroImage, setHeroImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   const {
     register,
     handleSubmit,
@@ -60,28 +56,12 @@ export const HomeEditor: React.FC = () => {
 
   const onSubmit = async (data: HomeFormData) => {
     console.log('Home page data:', data);
-    console.log('Hero image:', heroImage);
     
     // Here you would typically:
-    // 1. Upload the hero image to your backend
-    // 2. Save the form data to your backend
-    // 3. Update the translation files
+    // 1. Save the form data to your backend
+    // 2. Update the translation files
     
     alert('Home page updated successfully!');
-  };
-
-  const handleFileUpload = (files: File[]) => {
-    if (files.length > 0) {
-      const file = files[0];
-      setHeroImage(file);
-      
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   return (
@@ -92,25 +72,6 @@ export const HomeEditor: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
-        {/* Hero Image Section */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Hero Background Image</h2>
-          <p className={styles.sectionDesc}>Upload a high-quality image related to transport and unions (recommended: 1920x1080px)</p>
-          
-          <FileUpload
-            onFilesChange={handleFileUpload}
-            maxFiles={1}
-            maxSize={5}
-            accept="image/*"
-          />
-
-          {previewUrl && (
-            <div className={styles.preview}>
-              <img src={previewUrl} alt="Hero preview" className={styles.previewImage} />
-            </div>
-          )}
-        </div>
-
         {/* Hero Text Section */}
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Hero Section</h2>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@components/Button/Button';
+import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaUserTie, FaBook, FaHeartbeat, FaFemale, FaHospital } from 'react-icons/fa';
 import styles from './Home.module.css';
 
 export const Home: React.FC = () => {
@@ -171,15 +172,7 @@ export const Home: React.FC = () => {
           >
             <motion.div className={styles.activityCard} variants={fadeInUp}>
               <div className={styles.activityIcon}>
-                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
-                  <path
-                    d="M24 12a8 8 0 100-16 8 8 0 000 16zM8 48v-6c0-4.4 3.6-8 8-8h16c4.4 0 8 3.6 8 8v6"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <FaUsers size={48} />
               </div>
               <h3 className={styles.activityTitle}>{t('home.activities.organizing')}</h3>
               <p className={styles.activityDesc}>{t('home.activities.organizingDesc')}</p>
@@ -187,15 +180,7 @@ export const Home: React.FC = () => {
 
             <motion.div className={styles.activityCard} variants={fadeInUp}>
               <div className={styles.activityIcon}>
-                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
-                  <path
-                    d="M40 8H8a4 4 0 00-4 4v24a4 4 0 004 4h32a4 4 0 004-4V12a4 4 0 00-4-4zM4 16h40M16 24h16"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <FaBalanceScale size={48} />
               </div>
               <h3 className={styles.activityTitle}>{t('home.activities.advocacy')}</h3>
               <p className={styles.activityDesc}>{t('home.activities.advocacyDesc')}</p>
@@ -203,22 +188,7 @@ export const Home: React.FC = () => {
 
             <motion.div className={styles.activityCard} variants={fadeInUp}>
               <div className={styles.activityIcon}>
-                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
-                  <path
-                    d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20z"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M24 16v12l8 4"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <FaChalkboardTeacher size={48} />
               </div>
               <h3 className={styles.activityTitle}>{t('home.activities.training')}</h3>
               <p className={styles.activityDesc}>{t('home.activities.trainingDesc')}</p>
@@ -226,22 +196,7 @@ export const Home: React.FC = () => {
 
             <motion.div className={styles.activityCard} variants={fadeInUp}>
               <div className={styles.activityIcon}>
-                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
-                  <path
-                    d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20z"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M17 22l5 5 9-9"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <FaShieldAlt size={48} />
               </div>
               <h3 className={styles.activityTitle}>{t('home.activities.safety')}</h3>
               <p className={styles.activityDesc}>{t('home.activities.safetyDesc')}</p>
@@ -269,19 +224,35 @@ export const Home: React.FC = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            {[
-              { key: 'rights', icon: '🛡️' },
-              { key: 'organizing', icon: '🤝' },
-              { key: 'training', icon: '📚' },
-              { key: 'health', icon: '⚕️' },
-              { key: 'women', icon: '👩' },
-              { key: 'hiv', icon: '💊' }
-            ].map((service) => (
-              <motion.div key={service.key} className={styles.serviceCard} variants={fadeInUp}>
-                <span className={styles.serviceIcon}>{service.icon}</span>
-                <h4 className={styles.serviceTitle}>{t(`home.services.${service.key}`)}</h4>
-              </motion.div>
-            ))}
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaHandshake size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.rights')}</h4>
+            </motion.div>
+
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaUsers size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.organizing')}</h4>
+            </motion.div>
+
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaBook size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.training')}</h4>
+            </motion.div>
+
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaHeartbeat size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.health')}</h4>
+            </motion.div>
+
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaFemale size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.women')}</h4>
+            </motion.div>
+
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaHospital size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.hiv')}</h4>
+            </motion.div>
           </motion.div>
         </div>
       </section>
