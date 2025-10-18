@@ -83,9 +83,16 @@
   overflow: hidden;
 }
 
+.tableWrapper {
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
 .table table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px;
 }
 
 .table th {
@@ -96,6 +103,9 @@
   color: var(--text);
   background: var(--bg-subtle);
   border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .table td {

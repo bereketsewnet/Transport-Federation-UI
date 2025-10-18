@@ -1,36 +1,86 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { KPICard } from '@components/KPICard/KPICard';
 import { ChartCard } from '@components/ChartCard/ChartCard';
 import { Loading } from '@components/Loading/Loading';
-import { getMembersSummary } from '@api/endpoints';
+import { getMembersSummaryFull, getUnionsSummary, getVisitors } from '@api/endpoints';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { format, startOfWeek, startOfMonth } from 'date-fns';
 import styles from './Dashboard.module.css';
 
 export const Dashboard: React.FC = () => {
   const { t } = useTranslation();
 
-  // Fetch members summary
+  // Fetch members full data
   const { data: membersData, isLoading } = useQuery({
-    queryKey: ['members-summary'],
-    queryFn: getMembersSummary,
+    queryKey: ['members-full'],
+    queryFn: getMembersSummaryFull,
   });
 
-  // Mock KPI data - would come from API in real app
-  const kpis = {
-    totalMembers: 1250,
-    maleMembers: 780,
-    femaleMembers: 470,
-    totalUnions: 15,
-    visitorsToday: 45,
-    visitorsWeek: 312,
-    visitorsMonth: 1420,
+  // Fetch unions summary
+  const { data: unionsSummary } = useQuery({
+    queryKey: ['dashboard-unions-summary'],
+    queryFn: getUnionsSummary,
+  });
+
+  // Fetch visitors
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const monthStart = format(startOfMonth(new Date()), 'yyyy-MM-dd');
+
+  const { data: visitorsTodayData } = useQuery({
+    queryKey: ['visitors-today', today],
+    queryFn: () => getVisitors({ from: today, to: today }),
+  });
+
+  const { data: visitorsWeekData } = useQuery({
+    queryKey: ['visitors-week', weekStart, today],
+    queryFn: () => getVisitors({ from: weekStart, to: today }),
+  });
+
+  const { data: visitorsMonthData } = useQuery({
+    queryKey: ['visitors-month', monthStart, today],
+    queryFn: () => getVisitors({ from: monthStart, to: today }),
+  });
+
+  // KPI values computed from API summary
+  const totalMembers = Number(((membersData?.data as any)?.summary?.grand_total) ?? 0);
+  const maleMembers = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('m'))?.count ?? 0);
+  const femaleMembers = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('f'))?.count ?? 0);
+
+  const totalUnions = unionsSummary?.data?.total_unions || 0;
+
+  const sumVisitors = (resp: any) => {
+    const rows = resp?.data?.data || [];
+    return rows.reduce((sum: number, r: any) => sum + (Number(r.count) || 0), 0);
   };
 
-  const chartData = membersData?.data?.per_year || [];
-  const genderData = membersData?.data?.totals || [];
+  const visitorsToday = sumVisitors(visitorsTodayData);
+  const visitorsWeek = sumVisitors(visitorsWeekData);
+  const visitorsMonth = sumVisitors(visitorsMonthData);
+
+  const kpis = {
+    totalMembers,
+    maleMembers,
+    femaleMembers,
+    totalUnions,
+    visitorsToday,
+    visitorsWeek,
+    visitorsMonth,
+  };
+
+  // Chart data from API
+  const chartData = ((membersData?.data as any)?.by_year || []).map((y: any) => ({
+    year: y.year,
+    cnt: y.total,
+  }));
+
+  const genderData = ((membersData?.data as any)?.summary?.by_sex || []).map((s: any) => ({
+    sex: s.sex,
+    cnt: s.count,
+  }));
 
   return (
     <div className={styles.dashboard}>

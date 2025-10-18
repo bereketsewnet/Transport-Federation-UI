@@ -607,30 +607,32 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Executives Remaining Term</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Union</th>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Term Ends</th>
-                      <th>Days Left</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {execRemaining.data.data.map((e, idx) => (
-                      <tr key={idx}>
-                        <td>{e.union_name}</td>
-                        <td>{e.executive_name}</td>
-                        <td>{e.position}</td>
-                        <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
-                        <td>{e.days_remaining}</td>
-                        <td>{e.status}</td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Term Ends</th>
+                        <th>Days Left</th>
+                        <th>Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {execRemaining.data.data.map((e, idx) => (
+                        <tr key={idx}>
+                          <td>{e.union_name}</td>
+                          <td>{e.executive_name}</td>
+                          <td>{e.position}</td>
+                          <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
+                          <td>{e.days_remaining}</td>
+                          <td>{e.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -640,28 +642,30 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Executives Expiring Before {dateTo}</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Union</th>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Term Ends</th>
-                      <th>Days Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {execExpiringBefore.data.data.map((e, idx) => (
-                      <tr key={idx}>
-                        <td>{e.union_name}</td>
-                        <td>{e.executive_name}</td>
-                        <td>{e.position}</td>
-                        <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
-                        <td>{e.days_remaining}</td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Term Ends</th>
+                        <th>Days Left</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {execExpiringBefore.data.data.map((e, idx) => (
+                        <tr key={idx}>
+                          <td>{e.union_name}</td>
+                          <td>{e.executive_name}</td>
+                          <td>{e.position}</td>
+                          <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
+                          <td>{e.days_remaining}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -743,26 +747,28 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Unions Without General Assembly</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Union ID</th>
-                      <th>Name</th>
-                      <th>Sector</th>
-                      <th>Organization</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {unionsNoGA.data.data.map((u: any, idx: number) => (
-                      <tr key={idx}>
-                        <td>{u.union_id || u.id}</td>
-                        <td>{u.name_en}</td>
-                        <td>{u.sector}</td>
-                        <td>{u.organization}</td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union ID</th>
+                        <th>Name</th>
+                        <th>Sector</th>
+                        <th>Organization</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {unionsNoGA.data.data.map((u: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{u.union_id || u.id}</td>
+                          <td>{u.name_en}</td>
+                          <td>{u.sector}</td>
+                          <td>{u.organization}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -772,22 +778,24 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Unions Assembly on {dateFrom}</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Union</th>
-                      <th>Assembly Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {unionsGAOnDate.data.data.map((u: any, idx: number) => (
-                      <tr key={idx}>
-                        <td>{u.name_en}</td>
-                        <td>{u.general_assembly_date}</td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union</th>
+                        <th>Assembly Date</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {unionsGAOnDate.data.data.map((u: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{u.name_en}</td>
+                          <td>{u.general_assembly_date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -797,24 +805,26 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Recent General Assembly (&lt; 3 months)</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Union</th>
-                      <th>Date</th>
-                      <th>Days Since</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {unionsGARecent.data.data.map((u: any, idx: number) => (
-                      <tr key={idx}>
-                        <td>{u.union_name || u.name_en}</td>
-                        <td>{u.general_assembly_date}</td>
-                        <td>{u.days_since_assembly}</td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union</th>
+                        <th>Date</th>
+                        <th>Days Since</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {unionsGARecent.data.data.map((u: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{u.union_name || u.name_en}</td>
+                          <td>{u.general_assembly_date}</td>
+                          <td>{u.days_since_assembly}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -824,26 +834,28 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Terminated Unions</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Sector</th>
-                      <th>Terminated Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {terminatedList.data.data.map((u: any, idx: number) => (
-                      <tr key={idx}>
-                        <td>{u.id}</td>
-                        <td>{u.name_en}</td>
-                        <td>{u.sector}</td>
-                        <td>{u.terminated_date}</td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Sector</th>
+                        <th>Terminated Date</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {terminatedList.data.data.map((u: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{u.id}</td>
+                          <td>{u.name_en}</td>
+                          <td>{u.sector}</td>
+                          <td>{u.terminated_date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -852,28 +864,30 @@ export const Reports: React.FC = () => {
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Unions with Expired or Expiring CBAs</h3>
               <div className={styles.table}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Union ID</th>
-                      <th>Union Name</th>
-                      <th>End Date</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredExpiredCBAs.map((union, index) => (
-                      <tr key={index}>
-                        <td>{union.union_id}</td>
-                        <td>{union.name_en}</td>
-                        <td>{format(new Date(union.next_end_date), 'MMM dd, yyyy')}</td>
-                        <td>
-                          <span className={styles.statusBadge}>Expired</span>
-                        </td>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union ID</th>
+                        <th>Union Name</th>
+                        <th>End Date</th>
+                        <th>Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {filteredExpiredCBAs.map((union, index) => (
+                        <tr key={index}>
+                          <td>{union.union_id}</td>
+                          <td>{union.name_en}</td>
+                          <td>{format(new Date(union.next_end_date), 'MMM dd, yyyy')}</td>
+                          <td>
+                            <span className={styles.statusBadge}>Expired</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
