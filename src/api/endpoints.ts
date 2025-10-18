@@ -420,6 +420,22 @@ export const createPhotoFromURL = (data: {
   return apiClient.post('/api/photos', data);
 };
 
+export const updatePhoto = (
+  id: number,
+  data: {
+    caption?: string;
+    taken_at?: string;
+  }
+): Promise<AxiosResponse<Photo>> => {
+  return apiClient.put(`/api/photos/${id}`, data);
+};
+
+export const deletePhoto = (id: number): Promise<AxiosResponse<{ message: string }>> => {
+  return apiClient.delete(`/api/photos/${id}`, {
+    params: { confirm: 'true' }
+  });
+};
+
 // ==================== ARCHIVES ====================
 
 export interface Archive {

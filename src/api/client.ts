@@ -135,7 +135,18 @@ export const getImageUrl = (filename: string, isLocal?: boolean): string => {
   // Replace backslashes with forward slashes for web URLs
   const webPath = cleanFilename.replace(/\\/g, '/');
   
-  // Construct the full path
+  // Check if the path already includes a subdirectory (contains a /)
+  // If not, determine the subdirectory based on the filename pattern
+  if (!webPath.includes('/')) {
+    // Gallery photos (start with "photo-") go in photos/ subdirectory
+    if (webPath.startsWith('photo-')) {
+      return `${API_BASE_URL}/uploads/photos/${webPath}`;
+    }
+    // Default: use uploads/ directory directly
+    return `${API_BASE_URL}/uploads/${webPath}`;
+  }
+  
+  // Path already includes subdirectory
   return `${API_BASE_URL}/uploads/${webPath}`;
 };
 

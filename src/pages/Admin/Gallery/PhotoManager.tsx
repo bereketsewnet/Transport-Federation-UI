@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { getPhotos, uploadPhoto, createPhotoFromURL, Photo } from '@api/endpoints';
+import { getPhotos, uploadPhoto, createPhotoFromURL, updatePhoto, deletePhoto, Photo } from '@api/endpoints';
 import { getImageUrl } from '@api/client';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { Loading } from '@components/Loading/Loading';
+import { Modal } from '@components/Modal/Modal';
+import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import { toast } from 'react-hot-toast';
 import styles from './Gallery.module.css';
 
@@ -27,6 +29,12 @@ export const PhotoManager: React.FC = () => {
   const [caption, setCaption] = useState('');
   const [takenAt, setTakenAt] = useState(new Date().toISOString().split('T')[0]);
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  
+  // Edit and delete state
+  const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
+  const [editCaption, setEditCaption] = useState('');
+  const [editTakenAt, setEditTakenAt] = useState('');
+  const [deletePhotoId, setDeletePhotoId] = useState<number | null>(null);
 
   useEffect(() => {
     if (galleryId) {
@@ -134,6 +142,53 @@ export const PhotoManager: React.FC = () => {
       toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleEditClick = (photo: Photo) => {
+    setEditingPhoto(photo);
+    setEditCaption(photo.caption || '');
+    setEditTakenAt(photo.taken_at ? photo.taken_at.split('T')[0] : new Date().toISOString().split('T')[0]);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPhoto) return;
+
+    setIsSubmitting(true);
+    try {
+      await updatePhoto(editingPhoto.id, {
+        caption: editCaption,
+        taken_at: editTakenAt
+      });
+      toast.success('Photo updated successfully!');
+      setEditingPhoto(null);
+      await loadPhotos();
+    } catch (error: any) {
+      console.error('Failed to update photo:', error);
+      const errorMsg = error.response?.data?.message || 'Failed to update photo';
+      toast.error(errorMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteClick = (photoId: number) => {
+    setDeletePhotoId(photoId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletePhotoId) return;
+
+    try {
+      await deletePhoto(deletePhotoId);
+      toast.success('Photo deleted successfully!');
+      setDeletePhotoId(null);
+      await loadPhotos();
+    } catch (error: any) {
+      console.error('Failed to delete photo:', error);
+      const errorMsg = error.response?.data?.message || 'Failed to delete photo';
+      toast.error(errorMsg);
     }
   };
 
@@ -332,6 +387,22 @@ export const PhotoManager: React.FC = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
+                      <div className={styles.photoActions}>
+                        <button 
+                          className={styles.photoActionBtn}
+                          onClick={() => handleEditClick(photo)}
+                          title="Edit photo"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          className={styles.photoActionBtnDelete}
+                          onClick={() => handleDeleteClick(photo.id)}
+                          title="Delete photo"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
                     <div className={styles.photoInfo}>
                       {photo.caption && <p className={styles.photoCaption}>{photo.caption}</p>}
@@ -346,6 +417,69 @@ export const PhotoManager: React.FC = () => {
           )}
         </div>
       </motion.div>
+
+      {/* Edit Photo Modal */}
+      {editingPhoto && (
+        <Modal
+          isOpen={true}
+          onClose={() => setEditingPhoto(null)}
+          title="Edit Photo"
+        >
+          <form onSubmit={handleEditSubmit} className={styles.editForm}>
+            <div className={styles.editPreview}>
+              <img 
+                src={editingPhoto.image_url || getImageUrl(editingPhoto.filename, editingPhoto.is_local)} 
+                alt={editingPhoto.caption || 'Photo'}
+                className={styles.editPreviewImage}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+            
+            <FormField
+              label="Caption"
+              value={editCaption}
+              onChange={(e) => setEditCaption(e.target.value)}
+              placeholder="Photo caption or description"
+              disabled={isSubmitting}
+            />
+
+            <FormField
+              label="Taken Date"
+              type="date"
+              value={editTakenAt}
+              onChange={(e) => setEditTakenAt(e.target.value)}
+              disabled={isSubmitting}
+            />
+
+            <div className={styles.modalActions}>
+              <Button 
+                type="button" 
+                variant="secondary"
+                onClick={() => setEditingPhoto(null)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deletePhotoId !== null}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletePhotoId(null)}
+        title="Delete Photo"
+        message="Are you sure you want to delete this photo? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

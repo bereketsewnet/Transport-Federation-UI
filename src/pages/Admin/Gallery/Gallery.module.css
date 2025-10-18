@@ -377,3 +377,73 @@
   }
 }
 
+/* Photo Action Buttons */
+.photoActions {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+  display: flex;
+  gap: var(--spacing-2);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.photoCard:hover .photoActions {
+  opacity: 1;
+}
+
+.photoActionBtn,
+.photoActionBtnDelete {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-2);
+  cursor: pointer;
+  font-size: var(--text-base);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.photoActionBtn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.photoActionBtnDelete:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  transform: scale(1.1);
+}
+
+/* Edit Form */
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.editPreview {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto var(--spacing-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.editPreviewImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border);
+}
+
