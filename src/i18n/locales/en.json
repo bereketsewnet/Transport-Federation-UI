@@ -493,6 +493,47 @@
     }
   },
   "home": {
+    "hero": {
+      "title": "Transport & Communication Workers Federation",
+      "subtitle": "Empowering workers across Ethiopia's transport and communication sectors",
+      "cta1": "Learn More",
+      "cta2": "Contact Us"
+    },
+    "stats": {
+      "members": "Active Members",
+      "unions": "Worker Unions",
+      "years": "Years of Service",
+      "protection": "Worker Rights Protected"
+    },
+    "overview": {
+      "title": "Overview of the Federation",
+      "content": "The Industrial Federation of Transport and Communication Trade Unions was re-established in November 1974 at a meeting held at the 8th floor of the CETU Building. The federation has held 13 regular general assemblies and 48 Supreme meetings. The Federation is a legally mandated trade union federation organizing workers in Transport (civil aviation, road and railway, seafarers, urban transport) and communication sectors."
+    },
+    "activities": {
+      "title": "Major Activities",
+      "organizing": "Organizing & Strengthening Unions",
+      "organizingDesc": "Building strong unions for workers regardless of race, religion, gender, or ethnicity",
+      "advocacy": "Policy Advocacy & Research",
+      "advocacyDesc": "Participating in policy dialogue and submitting research-based proposals",
+      "training": "Capacity Building & Training",
+      "trainingDesc": "Developing professional skills through comprehensive training programs",
+      "safety": "Occupational Safety & Health",
+      "safetyDesc": "Ensuring workers' safety and health protection in the workplace"
+    },
+    "services": {
+      "title": "Our Services",
+      "rights": "Protecting Workers' Rights",
+      "organizing": "Organizing New Unions",
+      "training": "Leadership Training",
+      "health": "Occupational Safety",
+      "women": "Women's Participation",
+      "hiv": "HIV/AIDS Prevention"
+    },
+    "cta": {
+      "title": "Join Us Today",
+      "description": "Be part of a growing community working towards better rights and conditions for all transport and communication workers",
+      "button": "Contact Us"
+    },
     "whatWeDo": "What We Do",
     "whatWeDoDesc": "Dedicated to protecting and advancing workers' rights across transport and communication sectors",
     "joinUs": "Join Our Growing Community",

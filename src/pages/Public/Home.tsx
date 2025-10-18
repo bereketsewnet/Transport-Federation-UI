@@ -8,171 +8,281 @@ import styles from './Home.module.css';
 export const Home: React.FC = () => {
   const { t } = useTranslation();
 
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
   return (
     <div className={styles.home}>
-      {/* Hero Section */}
+      {/* Hero Section with Background */}
       <section className={styles.hero}>
+        <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className={styles.heroText}
           >
             <h1 className={styles.heroTitle}>
-              Transport & Communication Workers Federation
+              {t('home.hero.title')}
             </h1>
             <p className={styles.heroSubtitle}>
-              Empowering workers across Ethiopia's transport and communication sectors
+              {t('home.hero.subtitle')}
             </p>
             <div className={styles.heroActions}>
               <Link to="/about">
-                <Button size="lg">{t('nav.about')}</Button>
+                <Button size="lg" className={styles.primaryBtn}>
+                  {t('home.hero.cta1')}
+                </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" variant="secondary">
-                  {t('contact.title')}
+                <Button size="lg" variant="secondary" className={styles.secondaryBtn}>
+                  {t('home.hero.cta2')}
                 </Button>
               </Link>
             </div>
           </motion.div>
         </div>
-        <div className={styles.heroImage}>
-          <div className={styles.heroImagePlaceholder}>
-            <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
-              <circle cx="100" cy="100" r="80" fill="var(--primary-subtle)" />
-              <path
-                d="M100 40L60 70v60l40 30 40-30V70L100 40z"
-                stroke="var(--primary)"
-                strokeWidth="4"
-                fill="none"
-              />
-            </svg>
-          </div>
-        </div>
+        
+        {/* Animated scroll indicator */}
+        <motion.div
+          className={styles.scrollIndicator}
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14m0 0l-7-7m7 7l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </motion.div>
       </section>
 
       {/* Stats Section */}
       <section className={styles.stats}>
         <div className={styles.container}>
-          <div className={styles.statsGrid}>
-            <motion.div
-              className={styles.statCard}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-            >
-              <h3 className={styles.statNumber}>1,250+</h3>
-              <p className={styles.statLabel}>Active Members</p>
+          <motion.div 
+            className={styles.statsGrid}
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <motion.div className={styles.statCard} variants={fadeInUp}>
+              <motion.h3 
+                className={styles.statNumber}
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", duration: 1 }}
+              >
+                1,250+
+              </motion.h3>
+              <p className={styles.statLabel}>{t('home.stats.members')}</p>
             </motion.div>
 
-            <motion.div
-              className={styles.statCard}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <h3 className={styles.statNumber}>15</h3>
-              <p className={styles.statLabel}>Worker Unions</p>
+            <motion.div className={styles.statCard} variants={fadeInUp}>
+              <motion.h3 
+                className={styles.statNumber}
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", duration: 1, delay: 0.1 }}
+              >
+                19
+              </motion.h3>
+              <p className={styles.statLabel}>{t('home.stats.unions')}</p>
             </motion.div>
 
-            <motion.div
-              className={styles.statCard}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-            >
-              <h3 className={styles.statNumber}>20+</h3>
-              <p className={styles.statLabel}>Years of Service</p>
+            <motion.div className={styles.statCard} variants={fadeInUp}>
+              <motion.h3 
+                className={styles.statNumber}
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", duration: 1, delay: 0.2 }}
+              >
+                50+
+              </motion.h3>
+              <p className={styles.statLabel}>{t('home.stats.years')}</p>
             </motion.div>
 
-            <motion.div
-              className={styles.statCard}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-            >
-              <h3 className={styles.statNumber}>100%</h3>
-              <p className={styles.statLabel}>Worker Rights Protected</p>
+            <motion.div className={styles.statCard} variants={fadeInUp}>
+              <motion.h3 
+                className={styles.statNumber}
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", duration: 1, delay: 0.3 }}
+              >
+                100%
+              </motion.h3>
+              <p className={styles.statLabel}>{t('home.stats.protection')}</p>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className={styles.features}>
+      {/* Overview Section */}
+      <section className={styles.overview}>
         <div className={styles.container}>
-          <h2 className={styles.sectionTitle}>What We Do</h2>
-          <div className={styles.featuresGrid}>
-            <motion.div
-              className={styles.featureCard}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-            >
-              <div className={styles.featureIcon}>
-                <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className={styles.sectionTitle}>{t('home.overview.title')}</h2>
+            <p className={styles.overviewText}>
+              {t('home.overview.content')}
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Activities Section */}
+      <section className={styles.activities}>
+        <div className={styles.container}>
+          <motion.h2 
+            className={styles.sectionTitle}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            {t('home.activities.title')}
+          </motion.h2>
+          
+          <motion.div 
+            className={styles.activitiesGrid}
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <motion.div className={styles.activityCard} variants={fadeInUp}>
+              <div className={styles.activityIcon}>
+                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
                   <path
-                    d="M20 5v30M35 20H5"
+                    d="M24 12a8 8 0 100-16 8 8 0 000 16zM8 48v-6c0-4.4 3.6-8 8-8h16c4.4 0 8 3.6 8 8v6"
                     stroke="currentColor"
                     strokeWidth="3"
                     strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </div>
-              <h3 className={styles.featureTitle}>Collective Bargaining</h3>
-              <p className={styles.featureDescription}>
-                Negotiating fair wages and working conditions for all members
-              </p>
+              <h3 className={styles.activityTitle}>{t('home.activities.organizing')}</h3>
+              <p className={styles.activityDesc}>{t('home.activities.organizingDesc')}</p>
             </motion.div>
 
-            <motion.div
-              className={styles.featureCard}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-            >
-              <div className={styles.featureIcon}>
-                <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
-                  <circle cx="20" cy="20" r="15" stroke="currentColor" strokeWidth="3" />
-                </svg>
-              </div>
-              <h3 className={styles.featureTitle}>Member Support</h3>
-              <p className={styles.featureDescription}>
-                Providing legal support and representation for workers
-              </p>
-            </motion.div>
-
-            <motion.div
-              className={styles.featureCard}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className={styles.featureIcon}>
-                <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
-                  <rect
-                    x="5"
-                    y="10"
-                    width="30"
-                    height="20"
-                    rx="2"
+            <motion.div className={styles.activityCard} variants={fadeInUp}>
+              <div className={styles.activityIcon}>
+                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
+                  <path
+                    d="M40 8H8a4 4 0 00-4 4v24a4 4 0 004 4h32a4 4 0 004-4V12a4 4 0 00-4-4zM4 16h40M16 24h16"
                     stroke="currentColor"
                     strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </div>
-              <h3 className={styles.featureTitle}>Training & Development</h3>
-              <p className={styles.featureDescription}>
-                Offering skill development and capacity building programs
-              </p>
+              <h3 className={styles.activityTitle}>{t('home.activities.advocacy')}</h3>
+              <p className={styles.activityDesc}>{t('home.activities.advocacyDesc')}</p>
             </motion.div>
-          </div>
+
+            <motion.div className={styles.activityCard} variants={fadeInUp}>
+              <div className={styles.activityIcon}>
+                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
+                  <path
+                    d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20z"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M24 16v12l8 4"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <h3 className={styles.activityTitle}>{t('home.activities.training')}</h3>
+              <p className={styles.activityDesc}>{t('home.activities.trainingDesc')}</p>
+            </motion.div>
+
+            <motion.div className={styles.activityCard} variants={fadeInUp}>
+              <div className={styles.activityIcon}>
+                <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
+                  <path
+                    d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20z"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M17 22l5 5 9-9"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <h3 className={styles.activityTitle}>{t('home.activities.safety')}</h3>
+              <p className={styles.activityDesc}>{t('home.activities.safetyDesc')}</p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className={styles.services}>
+        <div className={styles.container}>
+          <motion.h2 
+            className={styles.sectionTitle}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            {t('home.services.title')}
+          </motion.h2>
+          
+          <motion.div 
+            className={styles.servicesGrid}
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {[
+              { key: 'rights', icon: '🛡️' },
+              { key: 'organizing', icon: '🤝' },
+              { key: 'training', icon: '📚' },
+              { key: 'health', icon: '⚕️' },
+              { key: 'women', icon: '👩' },
+              { key: 'hiv', icon: '💊' }
+            ].map((service) => (
+              <motion.div key={service.key} className={styles.serviceCard} variants={fadeInUp}>
+                <span className={styles.serviceIcon}>{service.icon}</span>
+                <h4 className={styles.serviceTitle}>{t(`home.services.${service.key}`)}</h4>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -181,16 +291,17 @@ export const Home: React.FC = () => {
         <div className={styles.container}>
           <motion.div
             className={styles.ctaContent}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <h2 className={styles.ctaTitle}>Join Us Today</h2>
+            <h2 className={styles.ctaTitle}>{t('home.cta.title')}</h2>
             <p className={styles.ctaDescription}>
-              Be part of a growing community working towards better rights and conditions
+              {t('home.cta.description')}
             </p>
             <Link to="/contact">
-              <Button size="lg">Contact Us</Button>
+              <Button size="lg" className={styles.ctaButton}>{t('home.cta.button')}</Button>
             </Link>
           </motion.div>
         </div>
@@ -200,4 +311,3 @@ export const Home: React.FC = () => {
 };
 
 export default Home;
-
