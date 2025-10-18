@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChartCard } from '@components/ChartCard/ChartCard';
+import { KPICard } from '@components/KPICard/KPICard';
 import { Button } from '@components/Button/Button';
-import { FormField } from '@components/FormField/FormField';
 import { Select } from '@components/Select/Select';
 import { Loading } from '@components/Loading/Loading';
 import {
@@ -180,6 +180,12 @@ export const Reports: React.FC = () => {
     return unionsSummary?.data?.by_sector || [];
   }, [unionsSummary]);
 
+  const sectorOptions = useMemo(() => {
+    const sectors = (unionsSummary?.data?.by_sector || []).map((s: any) => s.sector);
+    const unique = Array.from(new Set(sectors.filter(Boolean)));
+    return [{ value: 'all', label: 'All Sectors' }, ...unique.map((s) => ({ value: s, label: s }))];
+  }, [unionsSummary]);
+
   const expiredCBAs = (cbaExpiredList?.data?.data as any[]) || [];
 
   const youthVsElders = useMemo(() => {
@@ -202,6 +208,101 @@ export const Reports: React.FC = () => {
     ];
   }, [cbaExpiredList, cbaOngoing, cbaExpiringSoon]);
 
+  // Build Members by Sector (Male/Female) by joining members and unions
+  const membersBySector = useMemo(() => {
+    const members: any[] = allMembersData?.data?.data || [];
+    const unions: any[] = unionsList?.data?.data || [];
+    const unionIdToSector = new Map<number, string>();
+    unions.forEach((u) => unionIdToSector.set(u.id, u.sector));
+
+    const sectorAgg: Record<string, { Male: number; Female: number }> = {};
+    members.forEach((m) => {
+      const sector = unionIdToSector.get(m.union_id);
+      if (!sector) return; // skip unknown sector
+      if (!sectorAgg[sector]) sectorAgg[sector] = { Male: 0, Female: 0 };
+      const key = String(m.sex).toLowerCase().startsWith('f') ? 'Female' : 'Male';
+      sectorAgg[sector][key as 'Male' | 'Female'] += 1;
+    });
+
+    return Object.entries(sectorAgg)
+      .map(([sector, vals]) => ({ sector, ...vals }))
+      .sort((a, b) => a.sector.localeCompare(b.sector));
+  }, [allMembersData, unionsList]);
+
+  // KPI values
+  const totalMembers = Number(((membersData?.data as any)?.summary?.grand_total) ?? 0);
+  const maleCount = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('m'))?.count ?? 0);
+  const femaleCount = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('f'))?.count ?? 0);
+
+  // Members by year with Male/Female if available + fallback compute
+  const computedByYearFromMembers = useMemo(() => {
+    const members: any[] = allMembersData?.data?.data || [];
+    const yearAgg: Record<number, { total: number; Male: number; Female: number }> = {};
+    members.forEach((m) => {
+      const dateStr = String(m.registry_date || m.created_at || '');
+      const year = Number(dateStr.slice(0, 4));
+      if (!year || Number.isNaN(year)) return;
+      if (!yearAgg[year]) yearAgg[year] = { total: 0, Male: 0, Female: 0 };
+      yearAgg[year].total += 1;
+      const key = String(m.sex).toLowerCase().startsWith('f') ? 'Female' : 'Male';
+      yearAgg[year][key as 'Male' | 'Female'] += 1;
+    });
+    return Object.entries(yearAgg)
+      .map(([year, vals]) => ({ year: Number(year), ...vals }))
+      .sort((a, b) => a.year - b.year);
+  }, [allMembersData]);
+
+  const membersByYearFull = useMemo(() => {
+    const apiByYear: any[] = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
+    if (!apiByYear.length) return computedByYearFromMembers;
+    const map: Record<number, { total: number; Male?: number; Female?: number }> = {};
+    apiByYear.forEach((row: any) => {
+      const year = row.year;
+      map[year] = {
+        total: row.total ?? row.cnt ?? row.count ?? 0,
+        Male: row.Male ?? row.male,
+        Female: row.Female ?? row.female,
+      };
+    });
+    computedByYearFromMembers.forEach((c) => {
+      if (!map[c.year]) map[c.year] = { total: c.total };
+      if (map[c.year].Male === undefined) map[c.year].Male = c.Male;
+      if (map[c.year].Female === undefined) map[c.year].Female = c.Female;
+      if (!map[c.year].total) map[c.year].total = c.total;
+    });
+    return Object.entries(map)
+      .map(([year, v]) => ({ year: Number(year), total: v.total, Male: v.Male ?? 0, Female: v.Female ?? 0 }))
+      .sort((a, b) => a.year - b.year);
+  }, [membersData, computedByYearFromMembers]);
+
+  // Apply filters
+  const filteredMembersByYear = useMemo(() => {
+    const fromY = parseInt(String(dateFrom).slice(0, 4), 10);
+    const toY = parseInt(String(dateTo).slice(0, 4), 10);
+    return membersByYearFull.filter((d) => (isNaN(fromY) || d.year >= fromY) && (isNaN(toY) || d.year <= toY));
+  }, [membersByYearFull, dateFrom, dateTo]);
+
+  const filteredUnionsBySector = useMemo(() => {
+    if (selectedSector === 'all') return unionsBySector;
+    return unionsBySector.filter((u: any) => u.sector === selectedSector);
+  }, [unionsBySector, selectedSector]);
+
+  const filteredMembersBySector = useMemo(() => {
+    if (selectedSector === 'all') return membersBySector;
+    return membersBySector.filter((m) => m.sector === selectedSector);
+  }, [membersBySector, selectedSector]);
+
+  const filteredExpiredCBAs = useMemo(() => {
+    const from = dateFrom ? new Date(dateFrom) : null;
+    const to = dateTo ? new Date(dateTo) : null;
+    return expiredCBAs.filter((u: any) => {
+      const d = new Date(u.next_end_date);
+      if (from && d < from) return false;
+      if (to && d > to) return false;
+      return true;
+    });
+  }, [expiredCBAs, dateFrom, dateTo]);
+
   // Mock data for additional reports
   const membersByAge = [
     { age_group: 'Under 25', count: 180 },
@@ -212,11 +313,6 @@ export const Reports: React.FC = () => {
   ];
 
   // NOTE: unionsBySector now comes from API above
-
-  const membersBySector = [
-    { sector: 'Transport', Male: 480, Female: 290 },
-    { sector: 'Communication', Male: 300, Female: 180 },
-  ];
 
   // NOTE: youthVsElders now comes from API above
 
@@ -256,39 +352,29 @@ export const Reports: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className={styles.filters}>
-        <h3 className={styles.filtersTitle}>Filters</h3>
-        <div className={styles.filtersGrid}>
-          <FormField
-            type="date"
-            label={t('reports.from')}
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-          />
-          <FormField
-            type="date"
-            label={t('reports.to')}
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-          />
-          <Select
-            label="Sector"
-            options={[
-              { value: 'all', label: 'All Sectors' },
-              { value: 'transport', label: 'Transport' },
-              { value: 'communication', label: 'Communication' },
-            ]}
-            value={selectedSector}
-            onChange={(e) => setSelectedSector(e.target.value)}
-          />
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Button fullWidth onClick={() => {}}>
-              {t('reports.generateReport')}
-            </Button>
-          </div>
-        </div>
+      {/* KPI Cards copied from Dashboard style (first 3) */}
+      <div className={styles.summaryGrid}>
+        <KPICard
+          title={t('dashboard.totalMembers')}
+          value={totalMembers.toLocaleString()}
+          variant="primary"
+          icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        />
+        <KPICard
+          title={t('dashboard.maleMembers')}
+          value={maleCount.toLocaleString()}
+          variant="success"
+          icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M20 9V5h-4M15 10l5-5M13 21a8 8 0 100-16 8 8 0 000 16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        />
+        <KPICard
+          title={t('dashboard.femaleMembers')}
+          value={femaleCount.toLocaleString()}
+          variant="success"
+          icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 16a6 6 0 100-12 6 6 0 000 12zM12 16v6M9 19h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        />
       </div>
+
+      {/* Filters removed by request */}
 
       {isLoading ? (
         <Loading fullScreen message="Loading reports..." />
@@ -328,7 +414,7 @@ export const Reports: React.FC = () => {
               description="New member registrations over time"
             >
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={membersByYear}>
+                <LineChart data={filteredMembersByYear}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis dataKey="year" stroke="var(--text-muted)" />
                   <YAxis stroke="var(--text-muted)" />
@@ -340,13 +426,9 @@ export const Reports: React.FC = () => {
                     }}
                   />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="cnt"
-                    name="Members"
-                    stroke={COLORS[0]}
-                    strokeWidth={3}
-                  />
+                  <Line type="monotone" dataKey="total" name="Total" stroke={COLORS[0]} strokeWidth={3} />
+                  <Line type="monotone" dataKey="Male" name="Male" stroke={COLORS[2]} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="Female" name="Female" stroke={COLORS[1]} strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -408,7 +490,7 @@ export const Reports: React.FC = () => {
           <div className={styles.chartsGrid}>
             <ChartCard title={t('reports.unionsBySector')} description="Distribution of unions">
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={unionsBySector}>
+                <BarChart data={filteredUnionsBySector}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis dataKey="sector" stroke="var(--text-muted)" />
                   <YAxis stroke="var(--text-muted)" />
@@ -452,7 +534,7 @@ export const Reports: React.FC = () => {
               description="Gender distribution across sectors"
             >
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={membersBySector}>
+                <BarChart data={filteredMembersBySector}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis dataKey="sector" stroke="var(--text-muted)" />
                   <YAxis stroke="var(--text-muted)" />
@@ -741,7 +823,7 @@ export const Reports: React.FC = () => {
             </div>
           )}
           {/* Expired CBAs Table */}
-          {expiredCBAs.length > 0 && (
+          {filteredExpiredCBAs.length > 0 && (
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Unions with Expired or Expiring CBAs</h3>
               <div className={styles.table}>
@@ -755,7 +837,7 @@ export const Reports: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {expiredCBAs.map((union, index) => (
+                    {filteredExpiredCBAs.map((union, index) => (
                       <tr key={index}>
                         <td>{union.union_id}</td>
                         <td>{union.name_en}</td>
