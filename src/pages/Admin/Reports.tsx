@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { ChartCard } from '@components/ChartCard/ChartCard';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { Select } from '@components/Select/Select';
 import { Loading } from '@components/Loading/Loading';
-import { getMembersSummary, getUnionsCBAExpired, getMembers } from '@api/endpoints';
+import {
+  getMembersSummaryFull,
+  getUnionsSummary,
+  getExecutivesRemainingDays,
+  getExecutivesExpiringBefore,
+  getExecutivesByUnion,
+  getMembersUnder35,
+  getMembersAbove35,
+  getUnionsCBAExpiredList,
+  getUnionsCBAExpiringSoon,
+  getUnionsCBAOngoing,
+  getGeneralAssemblyStatus,
+  getUnionsNoGeneralAssembly,
+  getUnionsAssemblyOnDate,
+  getUnionsAssemblyRecent,
+  getTerminatedUnionsCount,
+  getTerminatedUnionsList,
+  getMembers,
+  getUnions,
+} from '@api/endpoints';
 import { useExportCsv } from '@hooks/useExportCsv';
 import { useExportPdf } from '@hooks/useExportPdf';
 import {
@@ -33,21 +53,111 @@ export const Reports: React.FC = () => {
   const { t } = useTranslation();
   const { exportToCsv } = useExportCsv();
   const { exportToPdf } = useExportPdf();
+  const navigate = useNavigate();
 
   // Filters
   const [dateFrom, setDateFrom] = useState('2020-01-01');
   const [dateTo, setDateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedSector, setSelectedSector] = useState('all');
+  const [selectedUnionId, setSelectedUnionId] = useState<number | ''>('');
 
   // Fetch data
   const { data: membersData, isLoading: loadingMembers } = useQuery({
-    queryKey: ['reports-members-summary'],
-    queryFn: getMembersSummary,
+    queryKey: ['reports-members-summary-full'],
+    queryFn: getMembersSummaryFull,
   });
 
-  const { data: cbaData, isLoading: loadingCBA } = useQuery({
-    queryKey: ['reports-cba-expired'],
-    queryFn: getUnionsCBAExpired,
+  const { data: unionsSummary } = useQuery({
+    queryKey: ['reports-unions-summary'],
+    queryFn: getUnionsSummary,
+  });
+
+  const { data: execRemaining } = useQuery({
+    queryKey: ['reports-executives-remaining'],
+    queryFn: getExecutivesRemainingDays,
+  });
+
+  const { data: execExpiringBefore } = useQuery({
+    queryKey: ['reports-executives-expiring-before', dateTo],
+    queryFn: () => getExecutivesExpiringBefore(dateTo),
+  });
+
+  const { data: unionsList } = useQuery({
+    queryKey: ['reports-unions-list'],
+    queryFn: () => getUnions({ per_page: 1000 }),
+  });
+
+  const firstUnionId = unionsList?.data?.data?.[0]?.id as number | undefined;
+  const effectiveUnionId = useMemo(() => {
+    if (selectedUnionId !== '') return selectedUnionId as number;
+    return firstUnionId; // avoid defaulting to 1 to prevent 404s
+  }, [selectedUnionId, firstUnionId]);
+
+  const { data: execByUnion } = useQuery({
+    queryKey: ['reports-executives-by-union', effectiveUnionId],
+    queryFn: () => getExecutivesByUnion(Number(effectiveUnionId)),
+    enabled: typeof effectiveUnionId === 'number' && !Number.isNaN(effectiveUnionId),
+    retry: false,
+  });
+
+  const { data: youthData } = useQuery({
+    queryKey: ['reports-members-under-35'],
+    queryFn: getMembersUnder35,
+  });
+
+  const { data: eldersData } = useQuery({
+    queryKey: ['reports-members-above-35'],
+    queryFn: getMembersAbove35,
+  });
+
+  // const { data: cbaStatusData } = useQuery({
+  //   queryKey: ['reports-cba-status'],
+  //   queryFn: getUnionsCBAStatus,
+  // });
+
+  const { data: cbaExpiredList, isLoading: loadingCBAExpired } = useQuery({
+    queryKey: ['reports-cba-expired-list'],
+    queryFn: getUnionsCBAExpiredList,
+  });
+
+  const { data: cbaExpiringSoon } = useQuery({
+    queryKey: ['reports-cba-expiring-soon', 90],
+    queryFn: () => getUnionsCBAExpiringSoon(90),
+  });
+
+  const { data: cbaOngoing } = useQuery({
+    queryKey: ['reports-cba-ongoing'],
+    queryFn: getUnionsCBAOngoing,
+  });
+
+  const { data: gaStatus } = useQuery({
+    queryKey: ['reports-general-assembly-status'],
+    queryFn: getGeneralAssemblyStatus,
+  });
+
+  const { data: unionsNoGA } = useQuery({
+    queryKey: ['reports-unions-no-ga'],
+    queryFn: getUnionsNoGeneralAssembly,
+  });
+
+  const { data: unionsGAOnDate } = useQuery({
+    queryKey: ['reports-unions-ga-on-date', dateFrom],
+    queryFn: () => getUnionsAssemblyOnDate(dateFrom),
+  });
+
+  const { data: unionsGARecent } = useQuery({
+    queryKey: ['reports-unions-ga-recent', 3],
+    queryFn: () => getUnionsAssemblyRecent(3),
+  });
+
+  const { data: terminatedCount } = useQuery({
+    queryKey: ['reports-terminated-unions-count'],
+    queryFn: getTerminatedUnionsCount,
+  });
+
+  const { data: terminatedList } = useQuery({
+    queryKey: ['reports-terminated-unions-list'],
+    queryFn: getTerminatedUnionsList,
   });
 
   const { data: allMembersData } = useQuery({
@@ -55,10 +165,42 @@ export const Reports: React.FC = () => {
     queryFn: () => getMembers({ per_page: 1000 }),
   });
 
-  // Process data
-  const membersByYear = membersData?.data?.per_year || [];
-  const membersByGender = membersData?.data?.totals || [];
-  const expiredCBAs = cbaData?.data?.data || [];
+  // Process data (normalize)
+  const membersByYear = useMemo(() => {
+    const byYear = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
+    return byYear.map((row: any) => ({ year: row.year, cnt: row.cnt ?? row.total ?? row.count ?? 0 }));
+  }, [membersData]);
+
+  const membersByGender = useMemo(() => {
+    const totals = (membersData?.data as any)?.summary?.by_sex || (membersData?.data as any)?.totals || [];
+    return totals.map((row: any) => ({ sex: row.sex, cnt: row.cnt ?? row.count ?? 0 }));
+  }, [membersData]);
+
+  const unionsBySector = useMemo(() => {
+    return unionsSummary?.data?.by_sector || [];
+  }, [unionsSummary]);
+
+  const expiredCBAs = (cbaExpiredList?.data?.data as any[]) || [];
+
+  const youthVsElders = useMemo(() => {
+    const youthTotal = youthData?.data?.total ?? 0;
+    const elderTotal = eldersData?.data?.total ?? 0;
+    return [
+      { category: 'Youth (<35)', value: youthTotal },
+      { category: 'Elders (≥35)', value: elderTotal },
+    ];
+  }, [youthData, eldersData]);
+
+  const cbaStatus = useMemo(() => {
+    const expired = cbaExpiredList?.data?.count ?? 0;
+    const ongoing = cbaOngoing?.data?.count ?? 0;
+    const expiringSoon = cbaExpiringSoon?.data?.count ?? 0;
+    return [
+      { status: 'Signed', count: ongoing },
+      { status: 'Pending', count: expiringSoon },
+      { status: 'Expired', count: expired },
+    ];
+  }, [cbaExpiredList, cbaOngoing, cbaExpiringSoon]);
 
   // Mock data for additional reports
   const membersByAge = [
@@ -69,26 +211,16 @@ export const Reports: React.FC = () => {
     { age_group: 'Over 55', count: 50 },
   ];
 
-  const unionsBySector = [
-    { sector: 'Transport', count: 8 },
-    { sector: 'Communication', count: 7 },
-  ];
+  // NOTE: unionsBySector now comes from API above
 
   const membersBySector = [
     { sector: 'Transport', Male: 480, Female: 290 },
     { sector: 'Communication', Male: 300, Female: 180 },
   ];
 
-  const youthVsElders = [
-    { category: 'Youth (<35)', value: 630 },
-    { category: 'Elders (≥35)', value: 620 },
-  ];
+  // NOTE: youthVsElders now comes from API above
 
-  const cbaStatus = [
-    { status: 'Signed', count: 10 },
-    { status: 'Pending', count: 3 },
-    { status: 'Expired', count: 2 },
-  ];
+  // NOTE: cbaStatus now comes from API above
 
   const handleExportMembersSummary = () => {
     const exportData = allMembersData?.data?.data || [];
@@ -100,7 +232,12 @@ export const Reports: React.FC = () => {
     exportToPdf('members-report', exportData, undefined, 'Members Summary Report');
   };
 
-  const isLoading = loadingMembers || loadingCBA;
+  const isLoading = loadingMembers || loadingCBAExpired;
+
+  const handleCbaSliceClick = (data: any) => {
+    if (!data || !data.name) return;
+    navigate('/admin/cbas');
+  };
 
   return (
     <div className={styles.reports}>
@@ -255,6 +392,7 @@ export const Reports: React.FC = () => {
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="count"
+                    onClick={handleCbaSliceClick}
                   >
                     {cbaStatus.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -333,6 +471,275 @@ export const Reports: React.FC = () => {
             </ChartCard>
           </div>
 
+          {/* Unions by Organization */}
+          {unionsSummary?.data?.by_organization && unionsSummary.data.by_organization.length > 0 && (
+            <div className={styles.fullWidth}>
+              <ChartCard title="Unions by Organization" description="Distribution across organizations">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={unionsSummary.data.by_organization}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="organization" stroke="var(--text-muted)" />
+                    <YAxis stroke="var(--text-muted)" />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="count" name="Unions" fill={COLORS[4]} radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          )}
+
+          {/* Executives Remaining Days */}
+          {execRemaining?.data?.data && execRemaining.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Executives Remaining Term</h3>
+              <div className={styles.table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Union</th>
+                      <th>Name</th>
+                      <th>Position</th>
+                      <th>Term Ends</th>
+                      <th>Days Left</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {execRemaining.data.data.map((e, idx) => (
+                      <tr key={idx}>
+                        <td>{e.union_name}</td>
+                        <td>{e.executive_name}</td>
+                        <td>{e.position}</td>
+                        <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
+                        <td>{e.days_remaining}</td>
+                        <td>{e.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Executives Expiring Before Date */}
+          {execExpiringBefore?.data?.data && execExpiringBefore.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Executives Expiring Before {dateTo}</h3>
+              <div className={styles.table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Union</th>
+                      <th>Name</th>
+                      <th>Position</th>
+                      <th>Term Ends</th>
+                      <th>Days Left</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {execExpiringBefore.data.data.map((e, idx) => (
+                      <tr key={idx}>
+                        <td>{e.union_name}</td>
+                        <td>{e.executive_name}</td>
+                        <td>{e.position}</td>
+                        <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
+                        <td>{e.days_remaining}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Executives Count By Union */}
+          {execByUnion?.data?.executives_count && (
+            <div className={styles.chartsGrid}>
+              <ChartCard
+                title="Executives by Gender (Selected Union)"
+                description={execByUnion.data.union_name}
+                actions={
+                  unionsList?.data?.data ? (
+                    <Select
+                      label="Union"
+                      options={[
+                        { value: '', label: 'Auto' },
+                        ...unionsList.data.data.map((u: any) => ({ value: u.id, label: u.name_en }))
+                      ]}
+                      value={selectedUnionId}
+                      onChange={(e) => setSelectedUnionId((e.target.value as unknown as number) || '')}
+                    />
+                  ) : undefined
+                }
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={execByUnion.data.executives_count.by_sex.map((s: any) => ({ name: s.sex, value: s.count }))}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {execByUnion.data.executives_count.by_sex.map((_: any, index: number) => (
+                        <Cell key={`sex-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          )}
+
+          {/* General Assembly Status */}
+          {gaStatus?.data && (
+            <div className={styles.chartsGrid}>
+              <ChartCard title="General Assembly Status" description="Conducted vs Not Conducted">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Conducted', value: gaStatus.data.conducted_general_assembly },
+                        { name: 'Not Conducted', value: gaStatus.data.not_conducted },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      <Cell fill={COLORS[0]} />
+                      <Cell fill={COLORS[1]} />
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          )}
+
+          {/* Unions without GA */}
+          {unionsNoGA?.data?.data && unionsNoGA.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Unions Without General Assembly</h3>
+              <div className={styles.table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Union ID</th>
+                      <th>Name</th>
+                      <th>Sector</th>
+                      <th>Organization</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {unionsNoGA.data.data.map((u: any, idx: number) => (
+                      <tr key={idx}>
+                        <td>{u.union_id || u.id}</td>
+                        <td>{u.name_en}</td>
+                        <td>{u.sector}</td>
+                        <td>{u.organization}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Unions assembly on date */}
+          {unionsGAOnDate?.data?.data && unionsGAOnDate.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Unions Assembly on {dateFrom}</h3>
+              <div className={styles.table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Union</th>
+                      <th>Assembly Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {unionsGAOnDate.data.data.map((u: any, idx: number) => (
+                      <tr key={idx}>
+                        <td>{u.name_en}</td>
+                        <td>{u.general_assembly_date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Recent General Assembly (< 3 months) */}
+          {unionsGARecent?.data?.data && unionsGARecent.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Recent General Assembly (&lt; 3 months)</h3>
+              <div className={styles.table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Union</th>
+                      <th>Date</th>
+                      <th>Days Since</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {unionsGARecent.data.data.map((u: any, idx: number) => (
+                      <tr key={idx}>
+                        <td>{u.union_name || u.name_en}</td>
+                        <td>{u.general_assembly_date}</td>
+                        <td>{u.days_since_assembly}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Terminated Unions List */}
+          {terminatedList?.data?.data && terminatedList.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Terminated Unions</h3>
+              <div className={styles.table}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Sector</th>
+                      <th>Terminated Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {terminatedList.data.data.map((u: any, idx: number) => (
+                      <tr key={idx}>
+                        <td>{u.id}</td>
+                        <td>{u.name_en}</td>
+                        <td>{u.sector}</td>
+                        <td>{u.terminated_date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
           {/* Expired CBAs Table */}
           {expiredCBAs.length > 0 && (
             <div className={styles.tableSection}>
@@ -370,20 +777,21 @@ export const Reports: React.FC = () => {
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
                 <h4>Total Active Members</h4>
-                <p className={styles.summaryValue}>1,250</p>
+                <p className={styles.summaryValue}>{
+                  ((membersData?.data as any)?.summary?.grand_total || 0).toLocaleString()
+                }</p>
               </div>
               <div className={styles.summaryCard}>
                 <h4>Youth Members (&lt;35)</h4>
-                <p className={styles.summaryValue}>630</p>
-                <span className={styles.percentage}>50.4%</span>
+                <p className={styles.summaryValue}>{(youthData?.data?.total ?? 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Active CBAs</h4>
-                <p className={styles.summaryValue}>10</p>
+                <h4>Total Unions</h4>
+                <p className={styles.summaryValue}>{(unionsSummary?.data?.total_unions ?? 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Pending CBAs</h4>
-                <p className={styles.summaryValue}>3</p>
+                <h4>Terminated Unions</h4>
+                <p className={styles.summaryValue}>{(terminatedCount?.data?.total_terminated ?? 0).toLocaleString()}</p>
               </div>
             </div>
           </div>

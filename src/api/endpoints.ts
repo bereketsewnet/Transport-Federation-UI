@@ -616,6 +616,107 @@ export const saveReportCache = (data: {
   return apiClient.post('/api/reports/cache', data);
 };
 
+// Additional Reports Endpoints (from postman_reports_collection.json and docs)
+export interface MembersByGenderResponse {
+  summary: {
+    by_sex: Array<{ sex: string; count: number }>;
+    grand_total: number;
+  };
+  by_year: Array<{ year: number; Male: number; Female: number; total: number }>; // for flexible charts
+}
+
+export const getMembersSummaryFull = (): Promise<AxiosResponse<MembersByGenderResponse>> => {
+  return apiClient.get('/api/reports/members-summary');
+};
+
+export interface UnionsSummaryResponse {
+  total_unions: number;
+  by_sector: Array<{ sector: string; count: number }>;
+  by_organization: Array<{ organization: string; count: number }>;
+}
+
+export const getUnionsSummary = (): Promise<AxiosResponse<UnionsSummaryResponse>> => {
+  return apiClient.get('/api/reports/unions-summary');
+};
+
+export interface ExecutivesRemainingDaysItem {
+  id: number;
+  union_id: number;
+  union_name: string;
+  mem_id: number;
+  executive_name: string;
+  sex: string;
+  position: string;
+  appointed_date: string;
+  term_end_date: string;
+  days_remaining: number;
+  status?: string;
+}
+
+export const getExecutivesRemainingDays = (): Promise<AxiosResponse<{ data: ExecutivesRemainingDaysItem[] }>> => {
+  return apiClient.get('/api/reports/executives-remaining-days');
+};
+
+export const getExecutivesExpiringBefore = (date: string): Promise<AxiosResponse<{ target_date: string; count: number; data: ExecutivesRemainingDaysItem[] }>> => {
+  return apiClient.get('/api/reports/executives-expiring-before', { params: { date } });
+};
+
+export const getExecutivesByUnion = (union_id: number): Promise<AxiosResponse<{ union_id: number; union_name: string; executives_count: { by_sex: Array<{ sex: string; count: number }>; total: number } }>> => {
+  return apiClient.get('/api/reports/executives-by-union', { params: { union_id } });
+};
+
+export const getMembersUnder35 = (): Promise<AxiosResponse<{ category: string; by_sex: Array<{ sex: string; count: number }>; total: number }>> => {
+  return apiClient.get('/api/reports/members-under-35');
+};
+
+export const getMembersAbove35 = (): Promise<AxiosResponse<{ category: string; by_sex: Array<{ sex: string; count: number }>; total: number }>> => {
+  return apiClient.get('/api/reports/members-above-35');
+};
+
+export const getUnionsCBAStatus = (): Promise<AxiosResponse<{ total_unions: number; with_cba: number; without_cba: number; percentage_with_cba: string }>> => {
+  return apiClient.get('/api/reports/unions-cba-status');
+};
+
+export const getUnionsWithoutCBA = (): Promise<AxiosResponse<{ count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-without-cba');
+};
+
+export const getUnionsCBAExpiredList = (): Promise<AxiosResponse<{ count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-cba-expired');
+};
+
+export const getUnionsCBAExpiringSoon = (days = 90): Promise<AxiosResponse<{ threshold_days: number; count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-cba-expiring-soon', { params: { days } });
+};
+
+export const getUnionsCBAOngoing = (): Promise<AxiosResponse<{ count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-cba-ongoing');
+};
+
+export const getGeneralAssemblyStatus = (): Promise<AxiosResponse<{ total_unions: number; conducted_general_assembly: number; not_conducted: number; percentage_conducted?: string }>> => {
+  return apiClient.get('/api/reports/unions-general-assembly-status');
+};
+
+export const getUnionsNoGeneralAssembly = (): Promise<AxiosResponse<{ count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-no-general-assembly');
+};
+
+export const getUnionsAssemblyOnDate = (date: string): Promise<AxiosResponse<{ target_date?: string; search_date?: string; count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-assembly-on-date', { params: { date } });
+};
+
+export const getUnionsAssemblyRecent = (months = 3): Promise<AxiosResponse<{ threshold_months: number; count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/unions-assembly-recent', { params: { months } });
+};
+
+export const getTerminatedUnionsCount = (): Promise<AxiosResponse<{ total_terminated: number; by_sector?: Array<{ sector: string; count: number }> }>> => {
+  return apiClient.get('/api/reports/terminated-unions-count');
+};
+
+export const getTerminatedUnionsList = (): Promise<AxiosResponse<{ count: number; data: Array<Record<string, unknown>> }>> => {
+  return apiClient.get('/api/reports/terminated-unions-list');
+};
+
 // ==================== ORGANIZATION LEADERS ====================
 
 export interface OrgLeader {
