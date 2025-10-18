@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getNewsItem, News } from '@api/endpoints';
+import { getImageUrl } from '@api/client';
 import { Loading } from '@components/Loading/Loading';
 import styles from './News.module.css';
 
@@ -97,6 +98,19 @@ export const NewsDetail: React.FC = () => {
             <p className={styles.articleSummary}>{news.summary}</p>
           )}
         </header>
+
+        {/* Featured Image */}
+        {news.image_url && (
+          <div className={styles.articleImage}>
+            <img 
+              src={getImageUrl(news.image_url, news.is_local)} 
+              alt={news.title}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+        )}
 
         <div className={styles.articleBody}>
           <div className={styles.articleContent} dangerouslySetInnerHTML={{ __html: news.body }} />

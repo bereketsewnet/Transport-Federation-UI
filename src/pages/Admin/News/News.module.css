@@ -112,6 +112,149 @@
   border-top: 1px solid var(--border);
 }
 
+/* Image Upload Styles */
+.imageSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-1);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.imageSourceTabs {
+  display: flex;
+  gap: var(--spacing-2);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: var(--spacing-2);
+}
+
+.tab,
+.tabActive {
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover:not(:disabled) {
+  background: var(--background);
+  border-bottom-color: var(--primary);
+}
+
+.tabActive {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+}
+
+.tab:disabled,
+.tabActive:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fileUploadSection,
+.urlInputSection {
+  margin-top: var(--spacing-3);
+}
+
+.fileInput {
+  width: 100%;
+  padding: var(--spacing-3);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fileInput:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.fileInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.helpText {
+  margin-top: var(--spacing-2);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.imagePreview {
+  position: relative;
+  margin-top: var(--spacing-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: white;
+}
+
+.previewImage {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+}
+
+.removeImageBtn {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+}
+
+.errorAlert {
+  padding: var(--spacing-4);
+  background: #FEE2E2;
+  border: 1px solid #F87171;
+  border-radius: var(--radius);
+  color: #991B1B;
+  margin-bottom: var(--spacing-4);
+  font-size: var(--text-sm);
+}
+
+/* Thumbnail in list */
+.thumbnail {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.noImage {
+  display: inline-block;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--background);
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
 /* Responsive */
 @media (max-width: 1023px) {
   .container {
@@ -125,6 +268,10 @@
 
   .formRow {
     grid-template-columns: 1fr;
+  }
+
+  .imageSourceTabs {
+    flex-wrap: wrap;
   }
 }
 
@@ -144,6 +291,21 @@
 
   .rowActions button {
     width: 100%;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 45px;
+  }
+
+  .imageSourceTabs {
+    gap: var(--spacing-1);
+  }
+
+  .tab,
+  .tabActive {
+    padding: var(--spacing-1) var(--spacing-2);
+    font-size: var(--text-xs);
   }
 }
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { getNews, deleteNews, News } from '@api/endpoints';
+import { getImageUrl } from '@api/client';
 import { DataTable, Column } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
 import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
@@ -56,6 +57,26 @@ export const AdminNewsList: React.FC = () => {
   };
 
   const columns: Column<News>[] = [
+    {
+      key: 'image_url',
+      label: 'Image',
+      render: (val, row) => {
+        if (val) {
+          const imageUrl = getImageUrl(val as string, row.is_local);
+          return (
+            <img 
+              src={imageUrl} 
+              alt={row.title} 
+              className={styles.thumbnail}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          );
+        }
+        return <span className={styles.noImage}>No Image</span>;
+      },
+    },
     {
       key: 'title',
       label: t('news.newsTitle'),

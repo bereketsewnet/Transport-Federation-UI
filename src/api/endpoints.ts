@@ -259,6 +259,9 @@ export interface News {
   summary: string;
   published_at: string;
   is_published: boolean;
+  image_filename?: string | null;
+  is_local?: boolean;
+  image_url?: string | null;
   created_at?: string;
 }
 
@@ -282,6 +285,71 @@ export const updateNews = (id: number, data: Partial<News>): Promise<AxiosRespon
 
 export const deleteNews = (id: number): Promise<AxiosResponse> => {
   return apiClient.delete(`/api/news/${id}`, { params: { confirm: true } });
+};
+
+// Upload news with image file
+export const uploadNewsWithImage = (
+  file: File,
+  data: {
+    title: string;
+    body?: string;
+    summary?: string;
+    published_at?: string;
+    is_published?: boolean;
+  }
+): Promise<AxiosResponse<News>> => {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('title', data.title);
+  if (data.body) formData.append('body', data.body);
+  if (data.summary) formData.append('summary', data.summary);
+  if (data.published_at) formData.append('published_at', data.published_at);
+  if (data.is_published !== undefined) formData.append('is_published', String(data.is_published));
+
+  return apiClient.post('/api/news', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+// Update news with new image file
+export const updateNewsWithImage = (
+  id: number,
+  file: File,
+  data: {
+    title: string;
+    body?: string;
+    summary?: string;
+    published_at?: string;
+    is_published?: boolean;
+  }
+): Promise<AxiosResponse<News>> => {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('title', data.title);
+  formData.append('body', data.body || '');
+  formData.append('summary', data.summary || '');
+  formData.append('published_at', data.published_at || new Date().toISOString());
+  formData.append('is_published', String(data.is_published ?? false));
+
+  return apiClient.put(`/api/news/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+// Create news from URL
+export const createNewsFromURL = (data: {
+  title: string;
+  body?: string;
+  summary?: string;
+  published_at?: string;
+  is_published?: boolean;
+  image_url: string;
+}): Promise<AxiosResponse<News>> => {
+  return apiClient.post('/api/news', data);
 };
 
 // ==================== GALLERIES & PHOTOS ====================

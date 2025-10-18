@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getNews, News } from '@api/endpoints';
+import { getImageUrl } from '@api/client';
 import { Loading } from '@components/Loading/Loading';
 import styles from './News.module.css';
 
@@ -81,6 +82,17 @@ export const NewsList: React.FC = () => {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                 >
+                  {item.image_url && (
+                    <div className={styles.newsCardImage}>
+                      <img 
+                        src={getImageUrl(item.image_url, item.is_local)} 
+                        alt={item.title}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className={styles.newsCardContent}>
                     <div className={styles.newsDate}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">

@@ -119,16 +119,24 @@ export const getImageUrl = (filename: string, isLocal?: boolean): string => {
   }
   
   // For local files, construct full URL
+  // If filename already contains a full path starting with /uploads, use it directly
+  if (filename.startsWith('/uploads/')) {
+    return `${API_BASE_URL}${filename}`;
+  }
+  
+  // If filename starts with uploads/ (no leading slash)
+  if (filename.startsWith('uploads/')) {
+    return `${API_BASE_URL}/${filename}`;
+  }
+  
   // Remove leading slash or backslash if present
   const cleanFilename = filename.replace(/^[\\\/]+/, '');
   
   // Replace backslashes with forward slashes for web URLs
   const webPath = cleanFilename.replace(/\\/g, '/');
   
-  // If filename already starts with /uploads, don't add it again
-  const finalPath = webPath.startsWith('uploads/') ? webPath : `uploads/${webPath}`;
-  
-  return `${API_BASE_URL}/${finalPath}`;
+  // Construct the full path
+  return `${API_BASE_URL}/uploads/${webPath}`;
 };
 
 // Export API_BASE_URL for use in other modules

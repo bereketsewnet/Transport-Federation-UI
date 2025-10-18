@@ -2008,17 +2008,28 @@ Errors:
 }
 ```
 
-### [GET] {{base_url}}/api/news?is_published=true - List news
+### [GET] {{base_url}}/api/news?is_published=true&page=1&per_page=20 - List news
 Group: News
 
 Success (200):
 ```json
 {
-  "data": [],
+  "data": [
+    {
+      "id": 1,
+      "title": "Federation Annual Report",
+      "body": "Detailed report content...",
+      "summary": "Annual summary",
+      "published_at": "2025-10-02T08:00:00Z",
+      "is_published": true,
+      "image_filename": "news-1729265892123-456789012.jpg",
+      "is_local": true,
+      "image_url": "/uploads/news/news-1729265892123-456789012.jpg",
+      "created_at": "2025-10-18T08:00:00.000Z"
+    }
+  ],
   "meta": {
-    "total": 0,
-    "page": 1,
-    "per_page": 20
+    "total": 1
   }
 }
 ```
@@ -2048,7 +2059,11 @@ Success (200):
   "body": "Detailed report content...",
   "summary": "Annual summary",
   "published_at": "2025-10-02T08:00:00Z",
-  "is_published": true
+  "is_published": true,
+  "image_filename": "news-1729265892123-456789012.jpg",
+  "is_local": true,
+  "image_url": "/uploads/news/news-1729265892123-456789012.jpg",
+  "created_at": "2025-10-18T08:00:00.000Z"
 }
 ```
 
@@ -2075,6 +2090,78 @@ Errors:
 ### [POST] {{base_url}}/api/news - Create news (admin)
 Group: News
 
+**Note**: This endpoint supports TWO methods of adding images:
+1. **File Upload** (multipart/form-data)
+2. **URL String** (application/json)
+3. **No Image** (optional)
+
+#### Method 1: Upload File with News
+
+Content-Type: `multipart/form-data`
+
+Form Data:
+- `image` (file): Image file (jpeg, jpg, png, gif, webp) - Max 5MB - **Optional**
+- `title` (text): News title (required)
+- `body` (text): News body content (optional)
+- `summary` (text): News summary (optional)
+- `published_at` (text): Publication date (optional, format: ISO 8601)
+- `is_published` (text): "true" or "false" (optional)
+
+Success (201):
+```json
+{
+  "id": 1,
+  "title": "Federation Annual Report",
+  "body": "Detailed report content...",
+  "summary": "Annual summary",
+  "published_at": "2025-10-02T08:00:00.000Z",
+  "is_published": true,
+  "image_filename": "news-1729265892123-456789012.jpg",
+  "is_local": true,
+  "image_url": "/uploads/news/news-1729265892123-456789012.jpg",
+  "created_at": "2025-10-18T08:00:00.000Z"
+}
+```
+
+#### Method 2: Add with Image URL
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "title": "Federation Annual Report",
+  "body": "Detailed report content...",
+  "summary": "Annual summary",
+  "published_at": "2025-10-02T08:00:00Z",
+  "is_published": true,
+  "image_url": "https://example.com/images/report.jpg"
+}
+```
+
+Success (201):
+```json
+{
+  "id": 1,
+  "title": "Federation Annual Report",
+  "body": "Detailed report content...",
+  "summary": "Annual summary",
+  "published_at": "2025-10-02T08:00:00.000Z",
+  "is_published": true,
+  "image_filename": "https://example.com/images/report.jpg",
+  "is_local": false,
+  "image_url": "https://example.com/images/report.jpg",
+  "created_at": "2025-10-18T08:00:00.000Z"
+}
+```
+
+#### Method 3: Create without Image
+
 Headers:
 ```json
 {
@@ -2096,12 +2183,15 @@ Request Body:
 Success (201):
 ```json
 {
+  "id": 1,
   "title": "Federation Annual Report",
   "body": "Detailed report content...",
   "summary": "Annual summary",
-  "published_at": "2025-10-02T08:00:00Z",
+  "published_at": "2025-10-02T08:00:00.000Z",
   "is_published": true,
-  "id": 1
+  "image_filename": null,
+  "is_local": false,
+  "created_at": "2025-10-18T08:00:00.000Z"
 }
 ```
 
@@ -2128,6 +2218,31 @@ Errors:
 ### [PUT] {{base_url}}/api/news/1 - Update news (admin)
 Group: News
 
+**Note**: You can update the image using file upload, URL, or remove it.
+
+#### Method 1: Update with New Image File
+
+Content-Type: `multipart/form-data`
+
+Form Data:
+- `image` (file): New image file - **Optional**
+- `title` (text): Updated title - Optional
+- Other fields as needed
+
+Success (200):
+```json
+{
+  "id": 1,
+  "title": "Updated Federation Report",
+  "is_published": false,
+  "image_filename": "news-1729265999123-987654321.jpg",
+  "is_local": true,
+  "image_url": "/uploads/news/news-1729265999123-987654321.jpg"
+}
+```
+
+#### Method 2: Update with Image URL
+
 Headers:
 ```json
 {
@@ -2139,7 +2254,8 @@ Request Body:
 ```json
 {
   "title": "Updated Federation Report",
-  "is_published": false
+  "is_published": false,
+  "image_url": "https://example.com/new-image.jpg"
 }
 ```
 
@@ -2148,7 +2264,39 @@ Success (200):
 {
   "id": 1,
   "title": "Updated Federation Report",
-  "is_published": false
+  "is_published": false,
+  "image_filename": "https://example.com/new-image.jpg",
+  "is_local": false,
+  "image_url": "https://example.com/new-image.jpg"
+}
+```
+
+#### Method 3: Update and Remove Image
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "title": "Updated Federation Report",
+  "is_published": false,
+  "remove_image": true
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "title": "Updated Federation Report",
+  "is_published": false,
+  "image_filename": null,
+  "is_local": false
 }
 ```
 

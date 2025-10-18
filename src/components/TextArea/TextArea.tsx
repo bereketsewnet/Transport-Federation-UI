@@ -1,5 +1,4 @@
-import React from 'react';
-import { UseFormRegisterReturn } from 'react-hook-form';
+import React, { forwardRef } from 'react';
 import { cn } from '@utils/helpers';
 import styles from './TextArea.module.css';
 
@@ -8,20 +7,18 @@ export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   error?: string;
   helperText?: string;
   required?: boolean;
-  register?: UseFormRegisterReturn;
 }
 
-export const TextArea: React.FC<TextAreaProps> = ({
+export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   label,
   error,
   helperText,
   required,
-  register,
   className,
   id,
   rows = 4,
   ...props
-}) => {
+}, ref) => {
   const textareaId = id || `textarea-${Math.random().toString(36).substring(7)}`;
 
   return (
@@ -33,6 +30,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
         </label>
       )}
       <textarea
+        ref={ref}
         id={textareaId}
         rows={rows}
         className={cn(styles.textarea, error && styles.textareaError, className)}
@@ -40,7 +38,6 @@ export const TextArea: React.FC<TextAreaProps> = ({
         aria-describedby={
           error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined
         }
-        {...register}
         {...props}
       />
       {error && (
@@ -55,7 +52,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
       )}
     </div>
   );
-};
+});
+
+TextArea.displayName = 'TextArea';
 
 export default TextArea;
 

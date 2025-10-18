@@ -62,6 +62,24 @@
   cursor: pointer;
 }
 
+.newsCardImage {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: var(--bg-subtle);
+}
+
+.newsCardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-base);
+}
+
+.newsCard:hover .newsCardImage img {
+  transform: scale(1.05);
+}
+
 .newsCardContent {
   padding: var(--spacing-6);
 }
@@ -231,6 +249,19 @@
   line-height: 1.6;
   margin: 0;
   font-weight: 500;
+}
+
+.articleImage {
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.articleImage img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  display: block;
 }
 
 .articleBody {

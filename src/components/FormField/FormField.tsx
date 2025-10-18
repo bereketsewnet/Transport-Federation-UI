@@ -1,5 +1,4 @@
-import React from 'react';
-import { UseFormRegisterReturn } from 'react-hook-form';
+import React, { forwardRef } from 'react';
 import { cn } from '@utils/helpers';
 import styles from './FormField.module.css';
 
@@ -8,19 +7,17 @@ export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputEleme
   error?: string;
   helperText?: string;
   required?: boolean;
-  register?: UseFormRegisterReturn;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(({
   label,
   error,
   helperText,
   required,
-  register,
   className,
   id,
   ...props
-}) => {
+}, ref) => {
   const inputId = id || `field-${Math.random().toString(36).substring(7)}`;
 
   return (
@@ -32,11 +29,11 @@ export const FormField: React.FC<FormFieldProps> = ({
         </label>
       )}
       <input
+        ref={ref}
         id={inputId}
         className={cn(styles.input, error && styles.inputError, className)}
         aria-invalid={!!error}
         aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
-        {...register}
         {...props}
       />
       {error && (
@@ -51,7 +48,9 @@ export const FormField: React.FC<FormFieldProps> = ({
       )}
     </div>
   );
-};
+});
+
+FormField.displayName = 'FormField';
 
 export default FormField;
 
