@@ -1,0 +1,434 @@
+{
+  "info": {
+    "name": "TCWF Reports API Collection",
+    "_postman_id": "tcwf-reports-collection-0001",
+    "description": "Complete collection of 21+ report endpoints for Transport & Communication Workers Federation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Member Statistics",
+      "description": "Reports 1-2: Member counts and statistics",
+      "item": [
+        {
+          "name": "Members Summary (Male/Female/Total by Year)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/members-summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "members-summary"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Union Statistics",
+      "description": "Reports 3-4: Union counts by sector and organization",
+      "item": [
+        {
+          "name": "Unions Summary (Total/By Sector/By Organization)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-summary"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Union Executives",
+      "description": "Reports 5-7: Executive committee statistics and lists",
+      "item": [
+        {
+          "name": "Executives with Remaining Days",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/executives-remaining-days",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "executives-remaining-days"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Executives Expiring Before Date",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/executives-expiring-before?date=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "executives-expiring-before"],
+              "query": [{"key": "date", "value": "2025-12-31"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Executives Count by Union (Male/Female)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/executives-by-union?union_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "executives-by-union"],
+              "query": [{"key": "union_id", "value": "1"}]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Age-Based Member Statistics",
+      "description": "Reports 8-9: Member counts by age groups",
+      "item": [
+        {
+          "name": "Members Under 35 Years (Male/Female/Total)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/members-under-35",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "members-under-35"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Members Above 35 Years (Male/Female/Total)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/members-above-35",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "members-above-35"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CBA Reports",
+      "description": "Reports 10-15: Collective Bargaining Agreement statistics",
+      "item": [
+        {
+          "name": "Unions CBA Status (With/Without)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-cba-status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-cba-status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions Without CBA",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-without-cba",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-without-cba"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with Expired CBA",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-cba-expired",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-cba-expired"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with CBA Expiring Soon",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-cba-expiring-soon?days=90",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-cba-expiring-soon"],
+              "query": [{"key": "days", "value": "90", "description": "Number of days threshold (default: 90)"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with Ongoing CBA",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-cba-ongoing",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-cba-ongoing"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "General Assembly Reports",
+      "description": "Reports 16-18, 21: General assembly statistics",
+      "item": [
+        {
+          "name": "General Assembly Status (Conducted/Not)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-general-assembly-status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-general-assembly-status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions Without General Assembly",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-no-general-assembly",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-no-general-assembly"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with Assembly on Specific Date",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-assembly-on-date?date=2024-01-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-assembly-on-date"],
+              "query": [{"key": "date", "value": "2024-01-01"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with Recent Assembly (< 3 months)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/unions-assembly-recent?months=3",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "unions-assembly-recent"],
+              "query": [{"key": "months", "value": "3", "description": "Number of months threshold (default: 3)"}]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Terminated Unions",
+      "description": "Reports 19-20: Terminated union statistics",
+      "item": [
+        {
+          "name": "Terminated Unions Count",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/terminated-unions-count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "terminated-unions-count"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Terminated Unions",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/terminated-unions-list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "terminated-unions-list"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Report Cache Management",
+      "description": "Cache and retrieve generated reports",
+      "item": [
+        {
+          "name": "Save Report Cache",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"report_name\": \"members_summary_2025\",\n  \"payload\": {\n    \"generated_at\": \"2025-10-18\",\n    \"data\": {}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/cache",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "cache"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Cached Reports",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/cache",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "cache"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cached Report by ID",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/cache/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "cache", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Cached Report",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports/cache/1?confirm=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "cache", "1"],
+              "query": [{"key": "confirm", "value": "true"}]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+

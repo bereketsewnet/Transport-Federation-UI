@@ -62,14 +62,13 @@ export const Login: React.FC = () => {
           <p className={styles.subtitle}>Transport & Communication Workers Federation</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
           <FormField
             label={t('auth.username')}
             placeholder="Enter your username"
             error={errors.username?.message}
             register={register('username')}
             autoComplete="username"
-            required
           />
 
           <FormField
@@ -79,7 +78,6 @@ export const Login: React.FC = () => {
             error={errors.password?.message}
             register={register('password')}
             autoComplete="current-password"
-            required
           />
 
           <Button type="submit" fullWidth isLoading={isLoading}>
