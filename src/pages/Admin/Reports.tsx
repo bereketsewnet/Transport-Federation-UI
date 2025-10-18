@@ -208,25 +208,49 @@ export const Reports: React.FC = () => {
     ];
   }, [cbaExpiredList, cbaOngoing, cbaExpiringSoon]);
 
-  // Build Members by Sector (Male/Female) by joining members and unions
+  // Build Members by Sector (Total/Male/Female) using members joined with unions
   const membersBySector = useMemo(() => {
     const members: any[] = allMembersData?.data?.data || [];
     const unions: any[] = unionsList?.data?.data || [];
-    const unionIdToSector = new Map<number, string>();
-    unions.forEach((u) => unionIdToSector.set(u.id, u.sector));
 
-    const sectorAgg: Record<string, { Male: number; Female: number }> = {};
+    const normalizeSector = (s: unknown): string => {
+      const v = String(s || '').trim().toLowerCase();
+      if (!v) return '';
+      if (v.startsWith('trans')) return 'Transport';
+      if (v.startsWith('comm')) return 'Communication';
+      if (v.startsWith('logis')) return 'Logistics';
+      if (v.startsWith('avia')) return 'Aviation';
+      if (v.startsWith('mari') || v.startsWith('marit')) return 'Maritime';
+      return v.charAt(0).toUpperCase() + v.slice(1);
+    };
+
+    const unionIdToSector = new Map<number, string>();
+    unions.forEach((u) => unionIdToSector.set(u.id, normalizeSector(u.sector)));
+
+    const defaultSectors = ['Transport', 'Communication', 'Logistics', 'Aviation', 'Maritime'];
+    const sectorAgg: Record<string, { Total: number; Male: number; Female: number }> = {};
+    defaultSectors.forEach((s) => (sectorAgg[s] = { Total: 0, Male: 0, Female: 0 }));
+
     members.forEach((m) => {
-      const sector = unionIdToSector.get(m.union_id);
-      if (!sector) return; // skip unknown sector
-      if (!sectorAgg[sector]) sectorAgg[sector] = { Male: 0, Female: 0 };
-      const key = String(m.sex).toLowerCase().startsWith('f') ? 'Female' : 'Male';
-      sectorAgg[sector][key as 'Male' | 'Female'] += 1;
+      const sector = normalizeSector(unionIdToSector.get(m.union_id));
+      if (!sector) return; // skip if union not found
+      if (!sectorAgg[sector]) sectorAgg[sector] = { Total: 0, Male: 0, Female: 0 };
+      const isFemale = String(m.sex).toLowerCase().startsWith('f');
+      sectorAgg[sector].Total += 1;
+      if (isFemale) sectorAgg[sector].Female += 1; else sectorAgg[sector].Male += 1;
     });
 
-    return Object.entries(sectorAgg)
+    // Return in preferred order first, then any extras
+    const ordered = defaultSectors
+      .map((s) => ({ sector: s, ...sectorAgg[s] }))
+      .filter((r) => r.Total > 0 || r.Male > 0 || r.Female > 0);
+
+    const extras = Object.entries(sectorAgg)
+      .filter(([k]) => !defaultSectors.includes(k))
       .map(([sector, vals]) => ({ sector, ...vals }))
       .sort((a, b) => a.sector.localeCompare(b.sector));
+
+    return [...ordered, ...extras];
   }, [allMembersData, unionsList]);
 
   // KPI values
@@ -546,8 +570,9 @@ export const Reports: React.FC = () => {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="Male" fill={COLORS[0]} radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="Female" fill={COLORS[1]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Total" name="Total" fill={COLORS[5]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Male" name="Male" fill={COLORS[0]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Female" name="Female" fill={COLORS[1]} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
