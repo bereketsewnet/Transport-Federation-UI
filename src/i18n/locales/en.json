@@ -442,9 +442,14 @@
     "title": "About Us",
     "mission": "Our Mission",
     "vision": "Our Vision",
-    "values": "Our Values",
+    "values": "Core Values",
     "history": "Our History",
-    "objectives": "Our Objectives"
+    "objectives": "Our Objectives",
+    "structure": "Federation Structure",
+    "stakeholders": "Key Stakeholders",
+    "executives": "Executive Team",
+    "otherExperts": "Our Team",
+    "departments": "Departments"
   },
   "profile": {
     "title": "My Profile",

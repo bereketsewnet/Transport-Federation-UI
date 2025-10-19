@@ -865,28 +865,28 @@ export const Reports: React.FC = () => {
               <h3 className={styles.sectionTitle}>Unions with Expired or Expiring CBAs</h3>
               <div className={styles.table}>
                 <div className={styles.tableWrapper}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Union ID</th>
-                        <th>Union Name</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Union ID</th>
+                      <th>Union Name</th>
+                      <th>End Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                       {filteredExpiredCBAs.map((union, index) => (
-                        <tr key={index}>
-                          <td>{union.union_id}</td>
-                          <td>{union.name_en}</td>
-                          <td>{format(new Date(union.next_end_date), 'MMM dd, yyyy')}</td>
-                          <td>
-                            <span className={styles.statusBadge}>Expired</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      <tr key={index}>
+                        <td>{union.union_id}</td>
+                        <td>{union.name_en}</td>
+                        <td>{format(new Date(union.next_end_date), 'MMM dd, yyyy')}</td>
+                        <td>
+                          <span className={styles.statusBadge}>Expired</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 </div>
               </div>
             </div>

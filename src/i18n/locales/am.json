@@ -442,9 +442,14 @@
     "title": "ስለ እኛ",
     "mission": "ተልእኮአችን",
     "vision": "ራዕያችን",
-    "values": "እሴቶቻችን",
+    "values": "ዋና እሴቶች",
     "history": "ታሪካችን",
-    "objectives": "አላማዎቻችን"
+    "objectives": "አላማዎቻችን",
+    "structure": "የፌዴሬሽኑ አወቃቀር",
+    "stakeholders": "ባለድርሻ አካላት",
+    "executives": "የአመራር ቡድን",
+    "otherExperts": "የእኛ ቡድን",
+    "departments": "የስራ መምሪያዎች"
   },
   "profile": {
     "title": "የእኔ መገለጫ",
