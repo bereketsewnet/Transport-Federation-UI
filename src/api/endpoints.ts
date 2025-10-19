@@ -1,4 +1,4 @@
-import apiClient from './client';
+import apiClient, { publicApiClient } from './client';
 import { AxiosResponse } from 'axios';
 
 // Types
@@ -56,7 +56,7 @@ export interface ChangePasswordPayload {
 }
 
 export const login = (payload: LoginPayload): Promise<AxiosResponse<LoginResponse>> => {
-  return apiClient.post('/api/auth/login', payload);
+  return publicApiClient.post('/api/auth/login', payload);
 };
 
 export const logout = (): Promise<AxiosResponse> => {
@@ -764,5 +764,38 @@ export const createLoginAccount = (data: {
 
 export const resetPassword = (username: string, password: string): Promise<AxiosResponse> => {
   return apiClient.post(`/api/login-accounts/reset/${username}`, { password });
+};
+
+// ==================== FORGOT PASSWORD ====================
+
+export interface ForgotPasswordStep1Payload {
+  username: string;
+}
+
+export interface ForgotPasswordStep1Response {
+  username: string;
+  securityQuestions: Array<{
+    questionId: number;
+    question: string;
+  }>;
+  message: string;
+}
+
+export interface ForgotPasswordStep2Payload {
+  username: string;
+  answers: string[]; // Array of 3 answers
+  newPassword: string;
+}
+
+export interface ForgotPasswordStep2Response {
+  message: string;
+}
+
+export const forgotPasswordStep1 = (payload: ForgotPasswordStep1Payload): Promise<AxiosResponse<ForgotPasswordStep1Response>> => {
+  return publicApiClient.post('/api/auth/forgot-password/step1', payload);
+};
+
+export const forgotPasswordStep2 = (payload: ForgotPasswordStep2Payload): Promise<AxiosResponse<ForgotPasswordStep2Response>> => {
+  return publicApiClient.post('/api/auth/forgot-password/step2', payload);
 };
 

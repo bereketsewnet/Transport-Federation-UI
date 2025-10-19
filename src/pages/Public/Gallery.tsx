@@ -28,7 +28,7 @@ export const Gallery: React.FC = () => {
         selectGallery(response.data.data[0]);
       }
     } catch (error) {
-      console.error('Failed to load galleries:', error);
+      // Silently handle error
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +41,7 @@ export const Gallery: React.FC = () => {
       const response = await getPhotos({ gallery_id: gallery.id, per_page: 100 });
       setPhotos(response.data.data);
     } catch (error) {
-      console.error('Failed to load photos:', error);
+      // Silently handle error
       setPhotos([]);
     } finally {
       setIsLoadingPhotos(false);

@@ -32,7 +32,7 @@ export const Contact: React.FC = () => {
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       setError(t('messages.error'));
-      console.error('Failed to submit:', err);
+      // Silently handle error
     } finally {
       setIsSubmitting(false);
     }

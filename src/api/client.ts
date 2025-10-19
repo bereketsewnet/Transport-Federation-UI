@@ -51,7 +51,10 @@ apiClient.interceptors.response.use(
           break;
 
         case 404:
-          toast.error('Resource not found.');
+          // Don't show toast for report endpoints (they might not be implemented yet)
+          if (!error.config?.url?.includes('/api/reports/')) {
+            toast.error('Resource not found.');
+          }
           break;
 
         case 422:
@@ -79,6 +82,24 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+
+// Public API client (no auth headers, no automatic error toasts)
+export const publicApiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Public client has minimal error handling (no toasts, no redirects)
+publicApiClient.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    // Just pass the error through without showing toasts
+    return Promise.reject(error);
+  }
+);
 
 // Helper functions
 export const setAuthToken = (token: string) => {

@@ -45,8 +45,7 @@ export const About: React.FC = () => {
       otherExperts: Array.isArray(loadedContent.otherExperts) ? loadedContent.otherExperts : [],
     };
   } catch (error) {
-    console.error('Error loading about content, using defaults:', error);
-    // Clear corrupted data
+    // Clear corrupted data and use defaults
     localStorage.removeItem('tcwf_content_about');
     content = defaultAboutContent;
   }

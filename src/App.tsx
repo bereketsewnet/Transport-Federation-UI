@@ -7,6 +7,7 @@ import { AdminLayout } from '@components/Layout';
 // Auth Pages
 import Login from '@pages/Auth/Login';
 import ChangePassword from '@pages/Auth/ChangePassword';
+import ForgotPassword from '@pages/Auth/ForgotPassword';
 
 // Public Pages
 import Home from '@pages/Public/Home';
@@ -102,6 +103,7 @@ function App() {
 
         {/* Auth Routes - Standalone (no layout) */}
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
 
         {/* Admin Routes - Protected */}

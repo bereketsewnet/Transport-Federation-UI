@@ -85,7 +85,19 @@
     "passwordMismatch": "Passwords do not match",
     "passwordChanged": "Password changed successfully",
     "securityQuestion": "Security Question",
-    "securityAnswer": "Security Answer"
+    "securityAnswer": "Security Answer",
+    "forgotPasswordTitle": "Forgot Password",
+    "forgotPasswordSubtitle": "Reset your password securely",
+    "enterUsername": "Enter your username",
+    "answerSecurityQuestions": "Answer your security questions",
+    "createNewPassword": "Create a new password",
+    "passwordResetSuccess": "Password Reset Successful",
+    "passwordResetSuccessMessage": "Your password has been successfully reset. You can now log in with your new password.",
+    "backToLogin": "Back to Login",
+    "continueButton": "Continue",
+    "verifyAnswers": "Verify Answers",
+    "resetPassword": "Reset Password",
+    "goToLogin": "Go to Login"
   },
   "dashboard": {
     "title": "Dashboard",

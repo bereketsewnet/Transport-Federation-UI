@@ -25,7 +25,7 @@ export const NewsList: React.FC = () => {
       setNews(response.data.data);
       setTotalPages(response.data.meta?.total_pages || 1);
     } catch (error) {
-      console.error('Failed to load news:', error);
+      // Silently handle error
     } finally {
       setIsLoading(false);
     }

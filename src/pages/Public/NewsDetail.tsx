@@ -28,7 +28,7 @@ export const NewsDetail: React.FC = () => {
       const response = await getNewsItem(newsId);
       setNews(response.data);
     } catch (err) {
-      console.error('Failed to load news:', err);
+      // Silently handle error
       setError(true);
     } finally {
       setIsLoading(false);

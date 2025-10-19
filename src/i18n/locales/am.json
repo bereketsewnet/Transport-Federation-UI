@@ -85,7 +85,19 @@
     "passwordMismatch": "የይለፍ ቃሎች አይዛመዱም",
     "passwordChanged": "የይለፍ ቃል በተሳካ ሁኔታ ተቀይሯል",
     "securityQuestion": "የደህንነት ጥያቄ",
-    "securityAnswer": "መልስ"
+    "securityAnswer": "መልስ",
+    "forgotPasswordTitle": "የይለፍ ቃል ረሱ",
+    "forgotPasswordSubtitle": "የይለፍ ቃልዎን በደህንነት ይቀይሩ",
+    "enterUsername": "የተጠቃሚ ስምዎን ያስገቡ",
+    "answerSecurityQuestions": "የደህንነት ጥያቄዎችን ይመልሱ",
+    "createNewPassword": "አዲስ የይለፍ ቃል ይፍጠሩ",
+    "passwordResetSuccess": "የይለፍ ቃል በተሳካ ሁኔታ ተቀይሯል",
+    "passwordResetSuccessMessage": "የይለፍ ቃልዎ በተሳካ ሁኔታ ተቀይሯል። አሁን በአዲሱ የይለፍ ቃልዎ መግባት ይችላሉ።",
+    "backToLogin": "ወደ መግቢያ ተመለስ",
+    "continueButton": "ቀጥል",
+    "verifyAnswers": "መልሶችን ያረጋግጡ",
+    "resetPassword": "የይለፍ ቃል ይቀይሩ",
+    "goToLogin": "ወደ መግቢያ ይሂዱ"
   },
   "dashboard": {
     "title": "ዳሽቦርድ",
