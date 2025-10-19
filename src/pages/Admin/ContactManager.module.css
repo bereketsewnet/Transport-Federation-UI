@@ -38,29 +38,6 @@
   flex-shrink: 0;
 }
 
-.infoBox h3 {
-  margin: 0 0 var(--spacing-3);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.infoBox p {
-  margin: 0 0 var(--spacing-3);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.codeBlock {
-  background: #1F2937;
-  color: #10B981;
-  padding: var(--spacing-4);
-  border-radius: var(--radius);
-  font-size: var(--text-sm);
-  overflow-x: auto;
-  margin: var(--spacing-3) 0;
-}
 
 .contactDetail {
   display: flex;

@@ -94,23 +94,6 @@ export const ContactManager: React.FC = () => {
           </div>
         </div>
 
-        <div className={styles.infoBox}>
-          <div className={styles.infoIcon}>ℹ️</div>
-          <div>
-            <h3>Contact Information Settings</h3>
-            <p>
-              To update company contact info (address, phone, email), edit the <code>.env</code> file:
-            </p>
-            <pre className={styles.codeBlock}>
-{`VITE_CONTACT_ADDRESS=Your Address
-VITE_CONTACT_PHONE=+251-11-XXX-XXXX
-VITE_CONTACT_EMAIL=info@yourorg.org
-VITE_CONTACT_MAP_URL=https://...`}
-            </pre>
-            <p><small>Then restart the dev server for changes to take effect.</small></p>
-          </div>
-        </div>
-
         <DataTable
           columns={columns}
           data={contacts}
