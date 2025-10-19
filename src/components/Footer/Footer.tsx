@@ -43,9 +43,11 @@ export const Footer: React.FC = () => {
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>{t('contact.title')}</h4>
             <div className={styles.contact}>
-              <p>Addis Ababa, Ethiopia</p>
-              <p>+251 11 XXX XXXX</p>
-              <p>info@tcwf.org.et</p>
+              <p>The Confederation of Ethiopian Trade Unions building 8th floor 
+              African Avenue Street near Meskel Square or near Flamingo Restaurant Addis Ababa,Ethiopia
+              </p>
+              <p>+251-115 15 73 75 <br /> +251-115 15 73 10</p>
+              <p>tcwfethiopia@gmail.com</p>
             </div>
             <Link to="/contact">
               <Button size="sm" className={styles.contactButton}>

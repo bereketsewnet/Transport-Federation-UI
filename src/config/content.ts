@@ -298,7 +298,7 @@ export const defaultHomeContent: HomeContent = {
 export const getContactInfo = (): ContactInfo => {
   return {
     address: import.meta.env.VITE_CONTACT_ADDRESS || "Addis Ababa, Ethiopia",
-    phone: import.meta.env.VITE_CONTACT_PHONE || "+251-11-XXX-XXXX",
+    phone: import.meta.env.VITE_CONTACT_PHONE1 || "+251-11-XXX-XXXX",
     email: import.meta.env.VITE_CONTACT_EMAIL || "info@tcwf-ethiopia.org",
     fax: import.meta.env.VITE_CONTACT_FAX || "",
     poBox: import.meta.env.VITE_CONTACT_PO_BOX || "P.O. Box XXXX",

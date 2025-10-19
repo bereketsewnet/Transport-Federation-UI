@@ -29,6 +29,11 @@
   transition: opacity var(--transition-base);
 }
 
+.logoImage {
+  width: 42px;
+  height: 42px;
+}
+
 .logo:hover {
   opacity: 0.8;
 }
