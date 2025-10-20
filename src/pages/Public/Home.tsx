@@ -68,6 +68,20 @@ export const Home: React.FC = () => {
     return <Loading />;
   }
 
+  // Fallback helpers for stat labels when CMS fields are empty/null
+  const stat1Label = content
+    ? ((lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) || t('home.stats.members'))
+    : t('home.stats.members');
+  const stat2Label = content
+    ? ((lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) || t('home.stats.unions'))
+    : t('home.stats.unions');
+  const stat3Label = content
+    ? ((lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) || t('home.stats.years'))
+    : t('home.stats.years');
+  const stat4Label = content
+    ? ((lang === 'en' ? content.stat4LabelEn : content.stat4LabelAm) || t('home.stats.protection'))
+    : t('home.stats.protection');
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
     visible: { opacity: 1, y: 0 }
@@ -149,7 +163,7 @@ export const Home: React.FC = () => {
                 {content ? `${content.stat1Value.toLocaleString()}+` : '1,250+'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {content ? (lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) : t('home.stats.members')}
+                {stat1Label}
               </p>
             </motion.div>
 
@@ -164,7 +178,7 @@ export const Home: React.FC = () => {
                 {content ? content.stat2Value : '19'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {content ? (lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) : t('home.stats.unions')}
+                {stat2Label}
               </p>
             </motion.div>
 
@@ -179,7 +193,7 @@ export const Home: React.FC = () => {
                 {content ? `${content.stat3Value}+` : '50+'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {content ? (lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) : t('home.stats.years')}
+                {stat3Label}
               </p>
             </motion.div>
 
@@ -194,7 +208,7 @@ export const Home: React.FC = () => {
                 {content ? `${content.stat4Value}%` : '100%'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {content ? (lang === 'en' ? content.stat4LabelEn : content.stat4LabelAm) : t('home.stats.protection')}
+                {stat4Label}
               </p>
             </motion.div>
           </motion.div>
