@@ -1,13 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@components/Button/Button';
+import { Loading } from '@components/Loading/Loading';
+import { getHomeContent } from '@api/cms-endpoints';
+import { getImageUrl } from '@api/client';
 import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaUserTie, FaBook, FaHeartbeat, FaFemale, FaHospital } from 'react-icons/fa';
 import styles from './Home.module.css';
 
 export const Home: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'am';
+  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await getHomeContent();
+        const data = response.data.data;
+        // Normalize hero image path
+        // Backend might return: uploads/hero-123.png or hero-123.png
+        // Should be: /uploads/cms/hero/hero-123.png
+        const normalizeImagePath = (p?: string | null): string | null => {
+          if (!p) return null;
+          
+          // Convert backslashes to forward slashes
+          let normalized = p.replace(/\\/g, '/');
+          
+          // Remove leading slash temporarily to process
+          normalized = normalized.replace(/^\/+/, '');
+          
+          // Check if path needs directory structure added
+          if (normalized.startsWith('hero-')) {
+            // Just filename: hero-123.png -> uploads/cms/hero/hero-123.png
+            normalized = `uploads/cms/hero/${normalized}`;
+          } else if (normalized.startsWith('uploads/hero-')) {
+            // Missing cms/hero: uploads/hero-123.png -> uploads/cms/hero/hero-123.png
+            normalized = normalized.replace('uploads/', 'uploads/cms/hero/');
+          } else if (!normalized.includes('cms/hero') && normalized.includes('hero-')) {
+            // Has uploads but missing cms/hero
+            if (normalized.startsWith('uploads/')) {
+              normalized = normalized.replace('uploads/', 'uploads/cms/hero/');
+            }
+          }
+          
+          // Add leading slash and convert to full URL
+          return getImageUrl('/' + normalized);
+        };
+
+        setContent({
+          ...data,
+          heroImage: normalizeImagePath(data.heroImage)
+        });
+      } catch (error) {
+        console.error('Failed to load home content:', error);
+        // Use fallback from i18n if API fails
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContent();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
@@ -27,7 +86,7 @@ export const Home: React.FC = () => {
   return (
     <div className={styles.home}>
       {/* Hero Section with Background */}
-      <section className={styles.hero}>
+      <section className={styles.hero} style={content?.heroImage ? { backgroundImage: `url(${content.heroImage})` } : undefined}>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
           <motion.div
@@ -37,10 +96,10 @@ export const Home: React.FC = () => {
             className={styles.heroText}
           >
             <h1 className={styles.heroTitle}>
-              {t('home.hero.title')}
+              {content ? (lang === 'en' ? content.heroTitleEn : content.heroTitleAm) : t('home.hero.title')}
             </h1>
             <p className={styles.heroSubtitle}>
-              {t('home.hero.subtitle')}
+              {content ? (lang === 'en' ? content.heroSubtitleEn : content.heroSubtitleAm) : t('home.hero.subtitle')}
             </p>
             <div className={styles.heroActions}>
               <Link to="/about">
@@ -87,9 +146,11 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1 }}
               >
-                1,250+
+                {content ? `${content.stat1Value.toLocaleString()}+` : '1,250+'}
               </motion.h3>
-              <p className={styles.statLabel}>{t('home.stats.members')}</p>
+              <p className={styles.statLabel}>
+                {content ? (lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) : t('home.stats.members')}
+              </p>
             </motion.div>
 
             <motion.div className={styles.statCard} variants={fadeInUp}>
@@ -100,9 +161,11 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.1 }}
               >
-                19
+                {content ? content.stat2Value : '19'}
               </motion.h3>
-              <p className={styles.statLabel}>{t('home.stats.unions')}</p>
+              <p className={styles.statLabel}>
+                {content ? (lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) : t('home.stats.unions')}
+              </p>
             </motion.div>
 
             <motion.div className={styles.statCard} variants={fadeInUp}>
@@ -113,9 +176,11 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.2 }}
               >
-                50+
+                {content ? `${content.stat3Value}+` : '50+'}
               </motion.h3>
-              <p className={styles.statLabel}>{t('home.stats.years')}</p>
+              <p className={styles.statLabel}>
+                {content ? (lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) : t('home.stats.years')}
+              </p>
             </motion.div>
 
             <motion.div className={styles.statCard} variants={fadeInUp}>
@@ -126,9 +191,11 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.3 }}
               >
-                100%
+                {content ? `${content.stat4Value}%` : '100%'}
               </motion.h3>
-              <p className={styles.statLabel}>{t('home.stats.protection')}</p>
+              <p className={styles.statLabel}>
+                {content ? (lang === 'en' ? content.stat4LabelEn : content.stat4LabelAm) : t('home.stats.protection')}
+              </p>
             </motion.div>
           </motion.div>
         </div>

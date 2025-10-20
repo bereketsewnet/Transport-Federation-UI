@@ -1,201 +1,386 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 import { FaPlus, FaTrash, FaImage, FaTimes } from 'react-icons/fa';
-import { defaultAboutContent, loadContentFromStorage, saveContentToStorage, AboutContent, Executive } from '@config/content';
 import { Button } from '@components/Button/Button';
 import { TextArea } from '@components/TextArea/TextArea';
 import { FormField } from '@components/FormField/FormField';
+import { Loading } from '@components/Loading/Loading';
+import {
+  getAboutContent,
+  updateAboutContent,
+  getExecutives,
+  createExecutive,
+  updateExecutive,
+  deleteExecutive,
+  uploadExecutiveImage,
+  type Executive,
+} from '@api/cms-endpoints';
+import { getImageUrl } from '@api/client';
 import styles from './AboutEditor.module.css';
 
 type Language = 'en' | 'am';
 
+interface AboutContentState {
+  mission: { en: string; am: string };
+  vision: { en: string; am: string };
+  values: { en: string[]; am: string[] };
+  history: { en: string; am: string };
+  objectives: { en: string[]; am: string[] };
+  structure: {
+    title: { en: string; am: string };
+    departments: { en: string[]; am: string[] };
+  };
+  stakeholders: {
+    title: { en: string; am: string };
+    list: { en: string[]; am: string[] };
+  };
+}
+
 export const AboutEditor: React.FC = () => {
   const { t } = useTranslation();
   const [currentLang, setCurrentLang] = useState<Language>('en');
+  const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   
-  // Initialize content with proper validation
-  const initializeContent = (): AboutContent => {
-    try {
-      const loadedContent = loadContentFromStorage('about', defaultAboutContent);
-      
-      return {
-        mission: loadedContent.mission || defaultAboutContent.mission,
-        vision: loadedContent.vision || defaultAboutContent.vision,
-        values: {
-          en: Array.isArray(loadedContent.values?.en) ? loadedContent.values.en : defaultAboutContent.values.en,
-          am: Array.isArray(loadedContent.values?.am) ? loadedContent.values.am : defaultAboutContent.values.am,
-        },
-        history: loadedContent.history || defaultAboutContent.history,
-        objectives: {
-          en: Array.isArray(loadedContent.objectives?.en) ? loadedContent.objectives.en : defaultAboutContent.objectives.en,
-          am: Array.isArray(loadedContent.objectives?.am) ? loadedContent.objectives.am : defaultAboutContent.objectives.am,
-        },
-        structure: {
-          title: loadedContent.structure?.title || defaultAboutContent.structure.title,
-          departments: {
-            en: Array.isArray(loadedContent.structure?.departments?.en) ? loadedContent.structure.departments.en : defaultAboutContent.structure.departments.en,
-            am: Array.isArray(loadedContent.structure?.departments?.am) ? loadedContent.structure.departments.am : defaultAboutContent.structure.departments.am,
-          }
-        },
-        stakeholders: {
-          title: loadedContent.stakeholders?.title || defaultAboutContent.stakeholders.title,
-          list: {
-            en: Array.isArray(loadedContent.stakeholders?.list?.en) ? loadedContent.stakeholders.list.en : defaultAboutContent.stakeholders.list.en,
-            am: Array.isArray(loadedContent.stakeholders?.list?.am) ? loadedContent.stakeholders.list.am : defaultAboutContent.stakeholders.list.am,
-          }
-        },
-        executives: Array.isArray(loadedContent.executives) ? loadedContent.executives : defaultAboutContent.executives,
-        otherExperts: Array.isArray(loadedContent.otherExperts) ? loadedContent.otherExperts : [],
-      };
-    } catch (error) {
-      console.error('Error loading about content, using defaults:', error);
-      localStorage.removeItem('tcwf_content_about');
-      return defaultAboutContent;
-    }
-  };
-  
-  const [content, setContent] = useState<AboutContent>(initializeContent());
-  
-  const { register, handleSubmit, reset, watch } = useForm({
-    defaultValues: content,
+  const [content, setContent] = useState<AboutContentState>({
+    mission: { en: '', am: '' },
+    vision: { en: '', am: '' },
+    values: { en: [], am: [] },
+    history: { en: '', am: '' },
+    objectives: { en: [], am: [] },
+    structure: { title: { en: '', am: '' }, departments: { en: [], am: [] } },
+    stakeholders: { title: { en: '', am: '' }, list: { en: [], am: [] } },
   });
+
+  const [executives, setExecutives] = useState<Executive[]>([]);
+  const [experts, setExperts] = useState<Executive[]>([]);
+
+  // Load content on mount
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        const [aboutResponse, executivesResponse, expertsResponse] = await Promise.all([
+          getAboutContent(),
+          getExecutives({ type: 'executive' }),
+          getExecutives({ type: 'expert' }),
+        ]);
+
+        const about = aboutResponse.data.data;
+        
+        // Debug: Log raw API response
+        console.log('Admin - Executives from API:', executivesResponse.data.data);
+        console.log('Admin - Experts from API:', expertsResponse.data.data);
+        
+        // Helper to normalize image path
+        // Backend might return: uploads/executive-123.png or executive-123.png
+        // Should be: /uploads/cms/executives/executive-123.png
+        const normalizeImagePath = (path: string | null | undefined): string | null => {
+          if (!path) return null;
+          
+          // Convert backslashes to forward slashes
+          let normalized = path.replace(/\\/g, '/');
+          
+          // Remove leading slash temporarily to process
+          normalized = normalized.replace(/^\/+/, '');
+          
+          // Check if path needs directory structure added
+          if (normalized.startsWith('executive-') || normalized.startsWith('expert-')) {
+            // Just filename: executive-123.png -> uploads/cms/executives/executive-123.png
+            normalized = `uploads/cms/executives/${normalized}`;
+          } else if (normalized.startsWith('uploads/executive-') || normalized.startsWith('uploads/expert-')) {
+            // Missing cms/executives: uploads/executive-123.png -> uploads/cms/executives/executive-123.png
+            normalized = normalized.replace('uploads/', 'uploads/cms/executives/');
+          } else if (!normalized.includes('cms/executives') && (normalized.includes('executive-') || normalized.includes('expert-'))) {
+            // Has uploads but missing cms/executives
+            if (normalized.startsWith('uploads/')) {
+              normalized = normalized.replace('uploads/', 'uploads/cms/executives/');
+            }
+          }
+          
+          // Add leading slash
+          return '/' + normalized;
+        };
+        
+        // Helper function to parse JSON arrays (in case they come as strings)
+        const parseArray = (value: any): string[] => {
+          if (Array.isArray(value)) return value;
+          if (typeof value === 'string') {
+            try {
+              const parsed = JSON.parse(value);
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          }
+          return [];
+        };
+
+        setContent({
+          mission: { en: about.missionEn || '', am: about.missionAm || '' },
+          vision: { en: about.visionEn || '', am: about.visionAm || '' },
+          values: { 
+            en: parseArray(about.valuesEn), 
+            am: parseArray(about.valuesAm) 
+          },
+          history: { en: about.historyEn || '', am: about.historyAm || '' },
+          objectives: { 
+            en: parseArray(about.objectivesEn), 
+            am: parseArray(about.objectivesAm) 
+          },
+          structure: {
+            title: { 
+              en: about.structureTitleEn || '', 
+              am: about.structureTitleAm || '' 
+            },
+            departments: { 
+              en: parseArray(about.structureDepartmentsEn), 
+              am: parseArray(about.structureDepartmentsAm) 
+            },
+          },
+          stakeholders: {
+            title: { 
+              en: about.stakeholdersTitleEn || '', 
+              am: about.stakeholdersTitleAm || '' 
+            },
+            list: { 
+              en: parseArray(about.stakeholdersListEn), 
+              am: parseArray(about.stakeholdersListAm) 
+            },
+          },
+        });
+
+        // Map executives and experts with full image URLs
+        const executivesData = (executivesResponse.data.data || []).map((exec: any) => {
+          const imagePath = exec.image || exec.photoUrl;
+          const normalizedPath = normalizeImagePath(imagePath);
+          return {
+            ...exec,
+            image: normalizedPath ? getImageUrl(normalizedPath) : null
+          };
+        });
+        
+        const expertsData = (expertsResponse.data.data || []).map((expert: any) => {
+          const imagePath = expert.image || expert.photoUrl;
+          const normalizedPath = normalizeImagePath(imagePath);
+          return {
+            ...expert,
+            image: normalizedPath ? getImageUrl(normalizedPath) : null
+          };
+        });
+        
+        // Debug: Log mapped data with image URLs
+        console.log('Admin - Executives with images:', executivesData);
+        console.log('Admin - Experts with images:', expertsData);
+        
+        setExecutives(executivesData);
+        setExperts(expertsData);
+      } catch (error) {
+        console.error('Failed to load about content:', error);
+        toast.error('Failed to load content');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContent();
+  }, []);
 
   // Handle image upload for executives
   const handleImageUpload = async (
     file: File, 
     type: 'executive' | 'expert', 
-    id: string
+    id: number
   ): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result && typeof e.target.result === 'string') {
-          setContent(prev => {
-            const array = type === 'executive' ? prev.executives : prev.otherExperts;
-            const index = array.findIndex(item => item.id === id);
-            if (index !== -1) {
-              const updated = [...array];
-              updated[index] = { ...updated[index], image: e.target!.result as string };
-              return {
-                ...prev,
-                [type === 'executive' ? 'executives' : 'otherExperts']: updated
-              };
-            }
-            return prev;
-          });
-          resolve();
-        } else {
-          reject(new Error('Failed to read file'));
+    try {
+      const response = await uploadExecutiveImage(id, file);
+      console.log('Upload response:', response.data);
+      toast.success('Image uploaded successfully');
+      
+      // Normalize image path (backend might return various formats)
+      let imagePath = response.data.imageUrl;
+      // Convert backslashes to forward slashes
+      imagePath = imagePath.replace(/\\/g, '/');
+      // Remove leading slash temporarily
+      imagePath = imagePath.replace(/^\/+/, '');
+      
+      // Fix directory structure if needed
+      if (imagePath.startsWith('executive-') || imagePath.startsWith('expert-')) {
+        imagePath = `uploads/cms/executives/${imagePath}`;
+      } else if (imagePath.startsWith('uploads/executive-') || imagePath.startsWith('uploads/expert-')) {
+        imagePath = imagePath.replace('uploads/', 'uploads/cms/executives/');
+      } else if (!imagePath.includes('cms/executives') && (imagePath.includes('executive-') || imagePath.includes('expert-'))) {
+        if (imagePath.startsWith('uploads/')) {
+          imagePath = imagePath.replace('uploads/', 'uploads/cms/executives/');
         }
-      };
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsDataURL(file);
-    });
-  };
-
-  // Remove image
-  const removeImage = (type: 'executive' | 'expert', id: string) => {
-    setContent(prev => {
-      const array = type === 'executive' ? prev.executives : prev.otherExperts;
-      const index = array.findIndex(item => item.id === id);
-      if (index !== -1) {
-        const updated = [...array];
-        updated[index] = { ...updated[index], image: undefined };
-        return {
-          ...prev,
-          [type === 'executive' ? 'executives' : 'otherExperts']: updated
-        };
       }
-      return prev;
-    });
+      
+      // Add leading slash
+      imagePath = '/' + imagePath;
+      
+      // Convert relative URL to full URL
+      const fullImageUrl = getImageUrl(imagePath);
+      console.log('Normalized image path:', imagePath);
+      console.log('Full image URL:', fullImageUrl);
+      
+      // Update local state
+      if (type === 'executive') {
+        setExecutives(prev => prev.map(exec => 
+          exec.id === id ? { ...exec, image: fullImageUrl } : exec
+        ));
+      } else {
+        setExperts(prev => prev.map(expert => 
+          expert.id === id ? { ...expert, image: fullImageUrl } : expert
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      toast.error('Failed to upload image');
+    }
   };
 
   // Add new executive
-  const addExecutive = () => {
-    const newExec: Executive = {
-      id: `exec-${Date.now()}`,
-      name: { en: '', am: '' },
-      position: { en: '', am: '' },
-    };
-    setContent(prev => ({
-      ...prev,
-      executives: [...prev.executives, newExec]
-    }));
+  const addExecutive = async () => {
+    try {
+      const response = await createExecutive({
+        nameEn: 'New Executive',
+        nameAm: 'አዲስ አስፈፃሚ',
+        positionEn: 'Position',
+        positionAm: 'የስራ ቦታ',
+        type: 'executive',
+        displayOrder: executives.length,
+      });
+      setExecutives(prev => [...prev, response.data.data]);
+      toast.success('Executive added');
+    } catch (error) {
+      console.error('Failed to add executive:', error);
+      toast.error('Failed to add executive');
+    }
   };
 
   // Remove executive
-  const removeExecutive = (id: string) => {
-    setContent(prev => ({
-      ...prev,
-      executives: prev.executives.filter(exec => exec.id !== id)
-    }));
+  const removeExecutive = async (id: number) => {
+    try {
+      await deleteExecutive(id);
+      setExecutives(prev => prev.filter(exec => exec.id !== id));
+      toast.success('Executive deleted');
+    } catch (error) {
+      console.error('Failed to delete executive:', error);
+      toast.error('Failed to delete executive');
+    }
   };
 
   // Add new expert
-  const addExpert = () => {
-    const newExpert: Executive = {
-      id: `expert-${Date.now()}`,
-      name: { en: '', am: '' },
-      position: { en: '', am: '' },
-    };
-    setContent(prev => ({
-      ...prev,
-      otherExperts: [...prev.otherExperts, newExpert]
-    }));
+  const addExpert = async () => {
+    try {
+      const response = await createExecutive({
+        nameEn: 'New Expert',
+        nameAm: 'አዲስ ባለሙያ',
+        positionEn: 'Position',
+        positionAm: 'የስራ ቦታ',
+        type: 'expert',
+        displayOrder: experts.length,
+      });
+      setExperts(prev => [...prev, response.data.data]);
+      toast.success('Expert added');
+    } catch (error) {
+      console.error('Failed to add expert:', error);
+      toast.error('Failed to add expert');
+    }
   };
 
   // Remove expert
-  const removeExpert = (id: string) => {
-    setContent(prev => ({
-      ...prev,
-      otherExperts: prev.otherExperts.filter(expert => expert.id !== id)
-    }));
+  const removeExpert = async (id: number) => {
+    try {
+      await deleteExecutive(id);
+      setExperts(prev => prev.filter(expert => expert.id !== id));
+      toast.success('Expert deleted');
+    } catch (error) {
+      console.error('Failed to delete expert:', error);
+      toast.error('Failed to delete expert');
+    }
   };
 
   // Update executive/expert field
-  const updatePerson = (
+  const updatePerson = async (
     type: 'executive' | 'expert',
-    id: string,
+    id: number,
     field: 'name' | 'position' | 'bio',
     lang: Language,
     value: string
   ) => {
-    setContent(prev => {
-      const array = type === 'executive' ? prev.executives : prev.otherExperts;
-      const index = array.findIndex(item => item.id === id);
-      if (index !== -1) {
-        const updated = [...array];
-        if (field === 'bio') {
-          updated[index] = {
-            ...updated[index],
-            bio: {
-              en: lang === 'en' ? value : (updated[index].bio?.en || ''),
-              am: lang === 'am' ? value : (updated[index].bio?.am || '')
-            }
-          };
-        } else {
-          updated[index] = {
-            ...updated[index],
-            [field]: { ...updated[index][field], [lang]: value }
-          };
-        }
-        return {
-          ...prev,
-          [type === 'executive' ? 'executives' : 'otherExperts']: updated
-        };
+    const array = type === 'executive' ? executives : experts;
+    const person = array.find(item => item.id === id);
+    if (!person) return;
+
+    try {
+      const updateData: any = {};
+      
+      if (field === 'name') {
+        updateData.nameEn = lang === 'en' ? value : person.nameEn;
+        updateData.nameAm = lang === 'am' ? value : person.nameAm;
+      } else if (field === 'position') {
+        updateData.positionEn = lang === 'en' ? value : person.positionEn;
+        updateData.positionAm = lang === 'am' ? value : person.positionAm;
+      } else if (field === 'bio') {
+        updateData.bioEn = lang === 'en' ? value : (person.bioEn || '');
+        updateData.bioAm = lang === 'am' ? value : (person.bioAm || '');
       }
-      return prev;
-    });
+
+      const response = await updateExecutive(id, updateData);
+      
+      // Update local state
+      if (type === 'executive') {
+        setExecutives(prev => prev.map(exec => 
+          exec.id === id ? response.data.data : exec
+        ));
+      } else {
+        setExperts(prev => prev.map(expert => 
+          expert.id === id ? response.data.data : expert
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to update person:', error);
+      toast.error('Failed to update');
+    }
   };
 
-  const onSubmit = () => {
-    saveContentToStorage('about', content);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const onSubmit = async () => {
+    try {
+      await updateAboutContent({
+        missionEn: content.mission.en,
+        missionAm: content.mission.am,
+        visionEn: content.vision.en,
+        visionAm: content.vision.am,
+        valuesEn: content.values.en,
+        valuesAm: content.values.am,
+        historyEn: content.history.en,
+        historyAm: content.history.am,
+        objectivesEn: content.objectives.en,
+        objectivesAm: content.objectives.am,
+        structureTitleEn: content.structure.title.en,
+        structureTitleAm: content.structure.title.am,
+        structureDepartmentsEn: content.structure.departments.en,
+        structureDepartmentsAm: content.structure.departments.am,
+        stakeholdersTitleEn: content.stakeholders.title.en,
+        stakeholdersTitleAm: content.stakeholders.title.am,
+        stakeholdersListEn: content.stakeholders.list.en,
+        stakeholdersListAm: content.stakeholders.list.am,
+      });
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      toast.success('About page updated successfully!');
+    } catch (error) {
+      console.error('Failed to update about content:', error);
+      toast.error('Failed to update about content');
+    }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.container}>
@@ -239,7 +424,7 @@ export const AboutEditor: React.FC = () => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className={styles.form}>
           {/* Mission */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>{t('about.mission')}</h3>
@@ -456,10 +641,10 @@ export const AboutEditor: React.FC = () => {
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>{t('about.executives')}</h3>
             <div className={styles.execList}>
-              {content.executives.map((exec) => (
+              {executives.map((exec, index) => (
                 <div key={exec.id} className={styles.execCard}>
                   <div className={styles.execHeader}>
-                    <h4>Executive {content.executives.indexOf(exec) + 1}</h4>
+                    <h4>Executive {index + 1}</h4>
                     <button
                       type="button"
                       onClick={() => removeExecutive(exec.id)}
@@ -476,7 +661,7 @@ export const AboutEditor: React.FC = () => {
                         <img src={exec.image} alt="Preview" />
                         <button
                           type="button"
-                          onClick={() => removeImage('executive', exec.id)}
+                          onClick={() => uploadExecutiveImage(exec.id, new File([], ''))}
                           className={styles.removeImageBtn}
                         >
                           <FaTimes />
@@ -502,17 +687,17 @@ export const AboutEditor: React.FC = () => {
                   </div>
 
                   <FormField
-                    value={exec.name[currentLang]}
+                    value={currentLang === 'en' ? exec.nameEn : exec.nameAm}
                     onChange={(e) => updatePerson('executive', exec.id, 'name', currentLang, e.target.value)}
                     placeholder={`Name (${currentLang === 'en' ? 'English' : 'Amharic'})`}
                   />
                   <FormField
-                    value={exec.position[currentLang]}
+                    value={currentLang === 'en' ? exec.positionEn : exec.positionAm}
                     onChange={(e) => updatePerson('executive', exec.id, 'position', currentLang, e.target.value)}
                     placeholder={`Position (${currentLang === 'en' ? 'English' : 'Amharic'})`}
                   />
                   <TextArea
-                    value={exec.bio?.[currentLang] || ''}
+                    value={(currentLang === 'en' ? exec.bioEn : exec.bioAm) || ''}
                     onChange={(e) => updatePerson('executive', exec.id, 'bio', currentLang, e.target.value)}
                     rows={2}
                     placeholder={`Bio (${currentLang === 'en' ? 'English' : 'Amharic'}) - Optional`}
@@ -534,10 +719,10 @@ export const AboutEditor: React.FC = () => {
             <h3 className={styles.sectionTitle}>{t('about.otherExperts')}</h3>
             <p className={styles.sectionDesc}>These will be displayed in a carousel on the About page</p>
             <div className={styles.execList}>
-              {content.otherExperts.map((expert) => (
+              {experts.map((expert, index) => (
                 <div key={expert.id} className={styles.execCard}>
                   <div className={styles.execHeader}>
-                    <h4>Expert {content.otherExperts.indexOf(expert) + 1}</h4>
+                    <h4>Expert {index + 1}</h4>
                     <button
                       type="button"
                       onClick={() => removeExpert(expert.id)}
@@ -554,7 +739,7 @@ export const AboutEditor: React.FC = () => {
                         <img src={expert.image} alt="Preview" />
                         <button
                           type="button"
-                          onClick={() => removeImage('expert', expert.id)}
+                          onClick={() => uploadExecutiveImage(expert.id, new File([], ''))}
                           className={styles.removeImageBtn}
                         >
                           <FaTimes />
@@ -580,17 +765,17 @@ export const AboutEditor: React.FC = () => {
                   </div>
 
                   <FormField
-                    value={expert.name[currentLang]}
+                    value={currentLang === 'en' ? expert.nameEn : expert.nameAm}
                     onChange={(e) => updatePerson('expert', expert.id, 'name', currentLang, e.target.value)}
                     placeholder={`Name (${currentLang === 'en' ? 'English' : 'Amharic'})`}
                   />
                   <FormField
-                    value={expert.position[currentLang]}
+                    value={currentLang === 'en' ? expert.positionEn : expert.positionAm}
                     onChange={(e) => updatePerson('expert', expert.id, 'position', currentLang, e.target.value)}
                     placeholder={`Position (${currentLang === 'en' ? 'English' : 'Amharic'})`}
                   />
             <TextArea
-                    value={expert.bio?.[currentLang] || ''}
+                    value={(currentLang === 'en' ? expert.bioEn : expert.bioAm) || ''}
                     onChange={(e) => updatePerson('expert', expert.id, 'bio', currentLang, e.target.value)}
                     rows={2}
                     placeholder={`Bio (${currentLang === 'en' ? 'English' : 'Amharic'}) - Optional`}

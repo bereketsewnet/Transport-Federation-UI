@@ -36,6 +36,7 @@ import PhotoManager from '@pages/Admin/Gallery/PhotoManager';
 import ContactManager from '@pages/Admin/ContactManager';
 import AboutEditor from '@pages/Admin/AboutEditor';
 import HomeEditor from '@pages/Admin/HomeEditor';
+import ContactInfoEditor from '@pages/Admin/ContactInfoEditor';
 
 // Admin Unions
 import UnionsListComplete from '@pages/Admin/Unions/UnionsListComplete';
@@ -154,6 +155,7 @@ function App() {
           
           {/* Contact & About */}
           <Route path="contacts" element={<ContactManager />} />
+          <Route path="contact-info-editor" element={<ContactInfoEditor />} />
           <Route path="about-editor" element={<AboutEditor />} />
           <Route path="home-editor" element={<HomeEditor />} />
           

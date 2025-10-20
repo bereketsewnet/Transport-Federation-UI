@@ -1,56 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaUsers, FaEye, FaHeart, FaHistory, FaBullseye, FaSitemap, FaHandshake, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { defaultAboutContent, loadContentFromStorage } from '@config/content';
+import { Loading } from '@components/Loading/Loading';
+import { getAboutContent, getExecutives } from '@api/cms-endpoints';
+import { getImageUrl } from '@api/client';
 import styles from './About.module.css';
 
 export const About: React.FC = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'am';
-  
-  // Load content with proper validation
-  let content = defaultAboutContent;
-  try {
-    const loadedContent = loadContentFromStorage('about', defaultAboutContent);
-    
-    // Validate and merge loaded content
-    content = {
-      mission: loadedContent.mission || defaultAboutContent.mission,
-      vision: loadedContent.vision || defaultAboutContent.vision,
-      values: {
-        en: Array.isArray(loadedContent.values?.en) ? loadedContent.values.en : defaultAboutContent.values.en,
-        am: Array.isArray(loadedContent.values?.am) ? loadedContent.values.am : defaultAboutContent.values.am,
-      },
-      history: loadedContent.history || defaultAboutContent.history,
-      objectives: {
-        en: Array.isArray(loadedContent.objectives?.en) ? loadedContent.objectives.en : defaultAboutContent.objectives.en,
-        am: Array.isArray(loadedContent.objectives?.am) ? loadedContent.objectives.am : defaultAboutContent.objectives.am,
-      },
-      structure: {
-        title: loadedContent.structure?.title || defaultAboutContent.structure.title,
-        departments: {
-          en: Array.isArray(loadedContent.structure?.departments?.en) ? loadedContent.structure.departments.en : defaultAboutContent.structure.departments.en,
-          am: Array.isArray(loadedContent.structure?.departments?.am) ? loadedContent.structure.departments.am : defaultAboutContent.structure.departments.am,
-        }
-      },
-      stakeholders: {
-        title: loadedContent.stakeholders?.title || defaultAboutContent.stakeholders.title,
-        list: {
-          en: Array.isArray(loadedContent.stakeholders?.list?.en) ? loadedContent.stakeholders.list.en : defaultAboutContent.stakeholders.list.en,
-          am: Array.isArray(loadedContent.stakeholders?.list?.am) ? loadedContent.stakeholders.list.am : defaultAboutContent.stakeholders.list.am,
-        }
-      },
-      executives: Array.isArray(loadedContent.executives) ? loadedContent.executives : defaultAboutContent.executives,
-      otherExperts: Array.isArray(loadedContent.otherExperts) ? loadedContent.otherExperts : [],
-    };
-  } catch (error) {
-    // Clear corrupted data and use defaults
-    localStorage.removeItem('tcwf_content_about');
-    content = defaultAboutContent;
-  }
-  
+  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState<any>(null);
+  const [executives, setExecutives] = useState<any[]>([]);
+  const [experts, setExperts] = useState<any[]>([]);
   const [currentExpertIndex, setCurrentExpertIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const [aboutResponse, executivesResponse, expertsResponse] = await Promise.all([
+          getAboutContent(),
+          getExecutives({ type: 'executive' }),
+          getExecutives({ type: 'expert' }),
+        ]);
+
+        const about = aboutResponse.data.data;
+        
+        // Debug: Log raw API response
+        console.log('Executives from API:', executivesResponse.data.data);
+        console.log('Experts from API:', expertsResponse.data.data);
+        
+        // Helper to normalize image path
+        // Backend might return: uploads/executive-123.png or executive-123.png
+        // Should be: /uploads/cms/executives/executive-123.png
+        const normalizeImagePath = (path: string | null | undefined): string | null => {
+          if (!path) return null;
+          
+          // Convert backslashes to forward slashes
+          let normalized = path.replace(/\\/g, '/');
+          
+          // Remove leading slash temporarily to process
+          normalized = normalized.replace(/^\/+/, '');
+          
+          // Check if path needs directory structure added
+          if (normalized.startsWith('executive-') || normalized.startsWith('expert-')) {
+            // Just filename: executive-123.png -> uploads/cms/executives/executive-123.png
+            normalized = `uploads/cms/executives/${normalized}`;
+          } else if (normalized.startsWith('uploads/executive-') || normalized.startsWith('uploads/expert-')) {
+            // Missing cms/executives: uploads/executive-123.png -> uploads/cms/executives/executive-123.png
+            normalized = normalized.replace('uploads/', 'uploads/cms/executives/');
+          } else if (!normalized.includes('cms/executives') && (normalized.includes('executive-') || normalized.includes('expert-'))) {
+            // Has uploads but missing cms/executives
+            if (normalized.startsWith('uploads/')) {
+              normalized = normalized.replace('uploads/', 'uploads/cms/executives/');
+            }
+          }
+          
+          // Add leading slash
+          return '/' + normalized;
+        };
+        
+        // Helper to parse JSON arrays
+        const parseArray = (value: any): string[] => {
+          if (Array.isArray(value)) return value;
+          if (typeof value === 'string') {
+            try {
+              const parsed = JSON.parse(value);
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          }
+          return [];
+        };
+
+        setContent({
+          mission: { en: about.missionEn || '', am: about.missionAm || '' },
+          vision: { en: about.visionEn || '', am: about.visionAm || '' },
+          values: { en: parseArray(about.valuesEn), am: parseArray(about.valuesAm) },
+          history: { en: about.historyEn || '', am: about.historyAm || '' },
+          objectives: { en: parseArray(about.objectivesEn), am: parseArray(about.objectivesAm) },
+          structure: {
+            title: { en: about.structureTitleEn || '', am: about.structureTitleAm || '' },
+            departments: { en: parseArray(about.structureDepartmentsEn), am: parseArray(about.structureDepartmentsAm) },
+          },
+          stakeholders: {
+            title: { en: about.stakeholdersTitleEn || '', am: about.stakeholdersTitleAm || '' },
+            list: { en: parseArray(about.stakeholdersListEn), am: parseArray(about.stakeholdersListAm) },
+          },
+        });
+        
+        // Map executives and experts with full image URLs
+        const executivesWithImages = (executivesResponse.data.data || []).map((exec: any) => {
+          const imagePath = exec.image || exec.photoUrl;
+          const normalizedPath = normalizeImagePath(imagePath);
+          return {
+            ...exec,
+            image: normalizedPath ? getImageUrl(normalizedPath) : null
+          };
+        });
+        
+        const expertsWithImages = (expertsResponse.data.data || []).map((expert: any) => {
+          const imagePath = expert.image || expert.photoUrl;
+          const normalizedPath = normalizeImagePath(imagePath);
+          return {
+            ...expert,
+            image: normalizedPath ? getImageUrl(normalizedPath) : null
+          };
+        });
+        
+        // Debug: Log mapped data with image URLs
+        console.log('Executives with images:', executivesWithImages);
+        console.log('Experts with images:', expertsWithImages);
+        
+        setExecutives(executivesWithImages);
+        setExperts(expertsWithImages);
+      } catch (error) {
+        console.error('Failed to load about content:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContent();
+  }, []);
 
   const sectionVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -64,18 +137,26 @@ export const About: React.FC = () => {
 
   // Carousel navigation
   const nextExpert = () => {
-    if (content.otherExperts.length > 0) {
-      setCurrentExpertIndex((prev) => (prev + 1) % content.otherExperts.length);
+    if (experts.length > 0) {
+      setCurrentExpertIndex((prev) => (prev + 1) % experts.length);
     }
   };
 
   const prevExpert = () => {
-    if (content.otherExperts.length > 0) {
+    if (experts.length > 0) {
       setCurrentExpertIndex((prev) => 
-        prev === 0 ? content.otherExperts.length - 1 : prev - 1
+        prev === 0 ? experts.length - 1 : prev - 1
       );
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!content) {
+    return <div>Error loading content</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -289,7 +370,7 @@ export const About: React.FC = () => {
             <h2 className={styles.sectionTitle}>{t('about.executives')}</h2>
           </div>
           <div className={styles.executivesGrid}>
-            {content.executives.map((exec, index) => (
+            {executives.map((exec, index) => (
               <motion.div
                 key={exec.id}
                 className={styles.executiveCard}
@@ -301,7 +382,7 @@ export const About: React.FC = () => {
               >
                 <div className={styles.executiveImage}>
                   {exec.image ? (
-                    <img src={exec.image} alt={exec.name[lang]} />
+                    <img src={exec.image} alt={lang === 'en' ? exec.nameEn : exec.nameAm} />
                   ) : (
                     <div className={styles.executivePlaceholder}>
                       <FaUsers />
@@ -309,10 +390,10 @@ export const About: React.FC = () => {
                   )}
                 </div>
                 <div className={styles.executiveInfo}>
-                  <h3 className={styles.executiveName}>{exec.name[lang]}</h3>
-                  <p className={styles.executivePosition}>{exec.position[lang]}</p>
-                  {exec.bio && (
-                    <p className={styles.executiveBio}>{exec.bio[lang]}</p>
+                  <h3 className={styles.executiveName}>{lang === 'en' ? exec.nameEn : exec.nameAm}</h3>
+                  <p className={styles.executivePosition}>{lang === 'en' ? exec.positionEn : exec.positionAm}</p>
+                  {(exec.bioEn || exec.bioAm) && (
+                    <p className={styles.executiveBio}>{lang === 'en' ? exec.bioEn : exec.bioAm}</p>
                   )}
                 </div>
               </motion.div>
@@ -321,7 +402,7 @@ export const About: React.FC = () => {
         </motion.section>
 
         {/* Other Experts Carousel */}
-        {content.otherExperts.length > 0 && (
+        {experts.length > 0 && (
           <motion.section
             className={`${styles.section} ${styles.carouselSection}`}
             initial="hidden"
@@ -353,13 +434,13 @@ export const About: React.FC = () => {
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ duration: 0.4 }}
                   >
-                    {content.otherExperts[currentExpertIndex] && (
+                    {experts[currentExpertIndex] && (
                       <>
                         <div className={styles.carouselImage}>
-                          {content.otherExperts[currentExpertIndex].image ? (
+                          {experts[currentExpertIndex].image ? (
                             <img 
-                              src={content.otherExperts[currentExpertIndex].image} 
-                              alt={content.otherExperts[currentExpertIndex].name[lang]} 
+                              src={experts[currentExpertIndex].image} 
+                              alt={lang === 'en' ? experts[currentExpertIndex].nameEn : experts[currentExpertIndex].nameAm} 
                             />
                           ) : (
                             <div className={styles.carouselPlaceholder}>
@@ -369,14 +450,14 @@ export const About: React.FC = () => {
                         </div>
                         <div className={styles.carouselInfo}>
                           <h3 className={styles.carouselName}>
-                            {content.otherExperts[currentExpertIndex].name[lang]}
+                            {lang === 'en' ? experts[currentExpertIndex].nameEn : experts[currentExpertIndex].nameAm}
                           </h3>
                           <p className={styles.carouselPosition}>
-                            {content.otherExperts[currentExpertIndex].position[lang]}
+                            {lang === 'en' ? experts[currentExpertIndex].positionEn : experts[currentExpertIndex].positionAm}
                           </p>
-                          {content.otherExperts[currentExpertIndex].bio && (
+                          {(experts[currentExpertIndex].bioEn || experts[currentExpertIndex].bioAm) && (
                             <p className={styles.carouselBio}>
-                              {content.otherExperts[currentExpertIndex].bio[lang]}
+                              {lang === 'en' ? experts[currentExpertIndex].bioEn : experts[currentExpertIndex].bioAm}
                             </p>
                           )}
                         </div>
@@ -397,7 +478,7 @@ export const About: React.FC = () => {
             
             {/* Carousel indicators */}
             <div className={styles.carouselIndicators}>
-              {content.otherExperts.map((_, index) => (
+              {experts.map((_, index) => (
                 <button
                   key={index}
                   className={`${styles.indicator} ${index === currentExpertIndex ? styles.indicatorActive : ''}`}
