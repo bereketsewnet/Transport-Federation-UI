@@ -125,15 +125,27 @@ export const Contact: React.FC = () => {
             </div>
 
             {/* Map */}
-            {contactInfo?.mapUrl && (
+            {(contactInfo?.mapUrl || (contactInfo?.latitude && contactInfo?.longitude)) && (
               <div className={styles.mapContainer}>
-                <iframe
-                  src={contactInfo.mapUrl}
-                  className={styles.map}
-                  allowFullScreen
-                  loading="lazy"
-                  title="Location Map"
-                />
+                {contactInfo.mapUrl ? (
+                  <iframe
+                    src={contactInfo.mapUrl}
+                    className={styles.map}
+                    allowFullScreen
+                    loading="lazy"
+                    title="Location Map"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : contactInfo.latitude && contactInfo.longitude && (
+                  <iframe
+                    src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}&q=${contactInfo.latitude},${contactInfo.longitude}&zoom=15`}
+                    className={styles.map}
+                    allowFullScreen
+                    loading="lazy"
+                    title="Location Map"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                )}
               </div>
             )}
 

@@ -31,7 +31,7 @@ export const Header: React.FC = () => {
       <div className={styles.container}>
         {/* Logo */}
         <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
-          <img src="src\assets\logo.png" alt="TCWF Logo" className={styles.logoImage} />
+          <img src="/logo.png" alt="TCWF Logo" className={styles.logoImage} />
           <span className={styles.logoText}>TCWF</span>
         </Link>
 
