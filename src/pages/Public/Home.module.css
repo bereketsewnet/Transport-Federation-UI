@@ -217,7 +217,6 @@
 .overview {
   padding: var(--spacing-20) var(--spacing-6);
   background: var(--bg);
-  margin-top: var(--spacing-12);
 }
 
 .overviewText {
@@ -240,7 +239,7 @@
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   text-align: center;
-  margin: 0 0 var(--spacing-12) 0;
+  padding-top: 120px;
   color: var(--text);
   position: relative;
   display: inline-block;
