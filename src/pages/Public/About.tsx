@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaUsers, FaEye, FaHeart, FaHistory, FaBullseye, FaSitemap, FaHandshake, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaUsers, FaEye, FaHeart, FaHistory, FaBullseye, FaSitemap, FaHandshake, FaChevronLeft, FaChevronRight, FaBook } from 'react-icons/fa';
 import { Loading } from '@components/Loading/Loading';
 import { getAboutContent, getExecutives } from '@api/cms-endpoints';
 import { getImageUrl } from '@api/client';
@@ -205,8 +205,9 @@ export const About: React.FC = () => {
               className={styles.iconBadge}
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
+              style={{ backgroundColor: '#3B82F6' }}
             >
-              <FaBullseye />
+              <FaBullseye color="white" size={26} />
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.mission')}</h2>
@@ -229,8 +230,9 @@ export const About: React.FC = () => {
               className={styles.iconBadge}
               whileHover={{ scale: 1.1, rotate: -5 }}
               transition={{ type: "spring", stiffness: 300 }}
+              style={{ backgroundColor: '#10B981' }}
             >
-              <FaEye />
+              <FaEye color="white" size={24} />
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.vision')}</h2>
@@ -253,7 +255,7 @@ export const About: React.FC = () => {
             <h2 className={styles.sectionTitle}>{t('about.values')}</h2>
           </div>
           <div className={styles.valuesList}>
-            {content.values[lang].map((value, index) => (
+            {content.values[lang].map((value: string, index: number) => (
               <motion.div
                 key={index}
                 className={styles.valueCard}
@@ -284,8 +286,9 @@ export const About: React.FC = () => {
               className={styles.iconBadge}
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
+              style={{ backgroundColor: '#F59E0B' }}
             >
-              <FaHistory />
+              <FaBook color="white" size={26} />
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.history')}</h2>
@@ -308,7 +311,7 @@ export const About: React.FC = () => {
             <h2 className={styles.sectionTitle}>{t('about.objectives')}</h2>
           </div>
           <div className={styles.objectivesList}>
-            {content.objectives[lang].map((objective, index) => (
+            {content.objectives[lang].map((objective: string, index: number) => (
               <motion.div
                 key={index}
                 className={styles.objectiveCard}
@@ -339,7 +342,7 @@ export const About: React.FC = () => {
             <h2 className={styles.sectionTitle}>{content.structure.title[lang]}</h2>
           </div>
           <div className={styles.departmentsList}>
-            {content.structure.departments[lang].map((dept, index) => (
+            {content.structure.departments[lang].map((dept: string, index: number) => (
               <motion.div
                 key={index}
                 className={styles.departmentCard}
@@ -504,7 +507,7 @@ export const About: React.FC = () => {
             <h2 className={styles.sectionTitle}>{content.stakeholders.title[lang]}</h2>
           </div>
           <div className={styles.stakeholdersList}>
-            {content.stakeholders.list[lang].map((stakeholder, index) => (
+            {content.stakeholders.list[lang].map((stakeholder: string, index: number) => (
               <motion.div
                 key={index}
                 className={styles.stakeholderCard}
