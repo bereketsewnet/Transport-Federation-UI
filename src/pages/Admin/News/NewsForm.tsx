@@ -25,8 +25,8 @@ interface NewsFormData {
   summary: string;
   body: string;
   published_at: string;
-  is_published: boolean;
-  image_url?: string;
+  is_published?: boolean;
+  image_url?: string | null;
 }
 
 type ImageSource = 'file' | 'url' | 'none';

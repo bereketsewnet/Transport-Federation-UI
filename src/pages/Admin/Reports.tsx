@@ -56,9 +56,9 @@ export const Reports: React.FC = () => {
   const navigate = useNavigate();
 
   // Filters
-  const [dateFrom, setDateFrom] = useState('2020-01-01');
-  const [dateTo, setDateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [selectedSector, setSelectedSector] = useState('all');
+  const [dateFrom] = useState('2020-01-01');
+  const [dateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [selectedSector] = useState('all');
   const [selectedUnionId, setSelectedUnionId] = useState<number | ''>('');
 
   // Fetch data
@@ -166,10 +166,10 @@ export const Reports: React.FC = () => {
   });
 
   // Process data (normalize)
-  const membersByYear = useMemo(() => {
-    const byYear = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
-    return byYear.map((row: any) => ({ year: row.year, cnt: row.cnt ?? row.total ?? row.count ?? 0 }));
-  }, [membersData]);
+  // const membersByYear = useMemo(() => {
+  //   const byYear = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
+  //   return byYear.map((row: any) => ({ year: row.year, cnt: row.cnt ?? row.total ?? row.count ?? 0 }));
+  // }, [membersData]);
 
   const membersByGender = useMemo(() => {
     const totals = (membersData?.data as any)?.summary?.by_sex || (membersData?.data as any)?.totals || [];
@@ -180,11 +180,11 @@ export const Reports: React.FC = () => {
     return unionsSummary?.data?.by_sector || [];
   }, [unionsSummary]);
 
-  const sectorOptions = useMemo(() => {
-    const sectors = (unionsSummary?.data?.by_sector || []).map((s: any) => s.sector);
-    const unique = Array.from(new Set(sectors.filter(Boolean)));
-    return [{ value: 'all', label: 'All Sectors' }, ...unique.map((s) => ({ value: s, label: s }))];
-  }, [unionsSummary]);
+  // const sectorOptions = useMemo(() => {
+  //   const sectors = (unionsSummary?.data?.by_sector || []).map((s: any) => s.sector);
+  //   const unique = Array.from(new Set(sectors.filter(Boolean)));
+  //   return [{ value: 'all', label: 'All Sectors' }, ...unique.map((s) => ({ value: s, label: s }))];
+  // }, [unionsSummary]);
 
   const expiredCBAs = (cbaExpiredList?.data?.data as any[]) || [];
 

@@ -139,7 +139,7 @@ export const MembersListEnhanced: React.FC = () => {
 
   // Handle delete member
   const handleDelete = async () => {
-    if (!deleteDialog.member) return;
+    if (!deleteDialog.member || !deleteDialog.member.id) return;
     
     try {
       await deleteMember(deleteDialog.member.id);
@@ -155,7 +155,7 @@ export const MembersListEnhanced: React.FC = () => {
 
   // Handle archive member
   const handleArchive = async () => {
-    if (!archiveDialog.member) return;
+    if (!archiveDialog.member || !archiveDialog.member.id) return;
     
     try {
       await archiveMember(archiveDialog.member.id, 'Member left organization');
@@ -175,7 +175,7 @@ export const MembersListEnhanced: React.FC = () => {
       key: 'member_code',
       label: t('members.memberCode'),
       sortable: true,
-      render: (value: unknown, row: Member) => (
+      render: (value: unknown) => (
         <div className={styles.memberInfo}>
           <div className={styles.memberCode}>{String(value || 'N/A')}</div>
         </div>
@@ -185,7 +185,7 @@ export const MembersListEnhanced: React.FC = () => {
       key: 'first_name',
       label: t('members.name'),
       sortable: true,
-      render: (value: unknown, row: Member) => (
+      render: (_value: unknown, row: any) => (
         <div className={styles.memberName}>
           <div className={styles.fullName}>
             {row?.first_name || ''} {row?.father_name || ''} {row?.surname || ''}
@@ -225,7 +225,7 @@ export const MembersListEnhanced: React.FC = () => {
   ];
 
   // Row actions
-  const rowActions = (member: Member) => {
+  const rowActions = (member: any) => {
     if (!member || !member.id) {
       return <div className={styles.rowActions}>Invalid member</div>;
     }
@@ -358,7 +358,7 @@ export const MembersListEnhanced: React.FC = () => {
       {/* Data Table */}
       <div className={styles.tableContainer}>
         <DataTable
-          data={members}
+          data={members.filter(member => member && member.id)}
           columns={columns}
           actions={rowActions}
           currentPage={currentPage}

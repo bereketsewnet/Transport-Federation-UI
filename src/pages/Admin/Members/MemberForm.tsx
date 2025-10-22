@@ -9,14 +9,12 @@ import {
   getMember, 
   createMember, 
   updateMember, 
-  Member,
   getUnions,
   Union
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { Select } from '@components/Select/Select';
-import { TextArea } from '@components/TextArea/TextArea';
 import { Loading } from '@components/Loading/Loading';
 import { toast } from 'react-hot-toast';
 import styles from './Members.module.css';

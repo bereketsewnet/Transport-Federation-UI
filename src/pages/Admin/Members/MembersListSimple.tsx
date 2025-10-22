@@ -91,7 +91,7 @@ export const MembersListSimple: React.FC = () => {
 
   // Handle delete member
   const handleDelete = async () => {
-    if (!deleteDialog.member) return;
+    if (!deleteDialog.member || !deleteDialog.member.id) return;
     
     try {
       await deleteMember(deleteDialog.member.id);
@@ -106,7 +106,7 @@ export const MembersListSimple: React.FC = () => {
 
   // Handle archive member
   const handleArchive = async () => {
-    if (!archiveDialog.member) return;
+    if (!archiveDialog.member || !archiveDialog.member.id) return;
     
     try {
       await archiveMember(archiveDialog.member.id, 'Member left organization');
@@ -163,7 +163,7 @@ export const MembersListSimple: React.FC = () => {
             className={styles.filterSelect}
             options={[
               { value: '', label: 'All Unions' },
-              ...unions.filter(u => u && u.id).map((union, idx) => ({
+              ...unions.filter(u => u && u.id).map((union, _idx) => ({
                 value: union.id.toString(),
                 label: union.name_en || 'Unknown Union'
               }))

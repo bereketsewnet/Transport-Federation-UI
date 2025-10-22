@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaUsers, FaEye, FaHeart, FaHistory, FaBullseye, FaSitemap, FaHandshake, FaChevronLeft, FaChevronRight, FaBook } from 'react-icons/fa';
+import { FaUsers, FaEye, FaHeart, FaBullseye, FaSitemap, FaHandshake, FaChevronLeft, FaChevronRight, FaBook } from 'react-icons/fa';
 import { Loading } from '@components/Loading/Loading';
 import { getAboutContent, getExecutives } from '@api/cms-endpoints';
 import { getImageUrl } from '@api/client';
@@ -130,10 +130,10 @@ export const About: React.FC = () => {
     visible: { opacity: 1, y: 0 }
   };
 
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1 }
-  };
+  // const cardVariants = {
+  //   hidden: { opacity: 0, scale: 0.9 },
+  //   visible: { opacity: 1, scale: 1 }
+  // };
 
   // Carousel navigation
   const nextExpert = () => {

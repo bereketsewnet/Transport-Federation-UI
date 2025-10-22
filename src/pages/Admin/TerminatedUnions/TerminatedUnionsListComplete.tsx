@@ -139,7 +139,7 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       key: 'union_id',
       label: 'Union',
       sortable: true,
-      render: (value: unknown, row: TerminatedUnion) => {
+      render: (value: unknown, _row: TerminatedUnion) => {
         const unionId = Number(value);
         const union = unions.find(u => (u.id || (u as any).union_id) === unionId);
         return union ? union.name_en : `Union #${unionId}`;

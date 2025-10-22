@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
@@ -15,7 +15,7 @@ import { FormField } from '@components/FormField/FormField';
 import { Select } from '@components/Select/Select';
 import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import { Loading } from '@components/Loading/Loading';
-import { useTable } from '@hooks/useTable';
+// import { useTable } from '@hooks/useTable';
 import { formatDate } from '@utils/formatters';
 import styles from './Executives.module.css';
 

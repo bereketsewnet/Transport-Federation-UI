@@ -474,7 +474,7 @@ export const PhotoManager: React.FC = () => {
       <ConfirmDialog
         isOpen={deletePhotoId !== null}
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletePhotoId(null)}
+        onClose={() => setDeletePhotoId(null)}
         title="Delete Photo"
         message="Are you sure you want to delete this photo? This action cannot be undone."
         confirmText="Delete"

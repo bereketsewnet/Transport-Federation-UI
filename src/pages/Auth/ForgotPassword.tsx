@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaCheckCircle, FaKey, FaUser, FaLock } from 'react-icons/fa';
@@ -42,7 +42,7 @@ const resetPasswordSchema = yup.object({
 });
 
 export const ForgotPassword: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('username');
   const [isLoading, setIsLoading] = useState(false);
@@ -277,7 +277,7 @@ export const ForgotPassword: React.FC = () => {
               <div className={styles.formActions}>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => {
                     setCurrentStep('username');
                     setError('');

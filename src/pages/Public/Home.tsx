@@ -6,7 +6,7 @@ import { Button } from '@components/Button/Button';
 import { Loading } from '@components/Loading/Loading';
 import { getHomeContent } from '@api/cms-endpoints';
 import { getImageUrl } from '@api/client';
-import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaUserTie, FaBook, FaHeartbeat, FaFemale, FaHospital } from 'react-icons/fa';
+import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaBook, FaHeartbeat, FaFemale, FaHospital } from 'react-icons/fa';
 import styles from './Home.module.css';
 
 export const Home: React.FC = () => {
@@ -129,17 +129,6 @@ export const Home: React.FC = () => {
             </div>
           </motion.div>
         </div>
-        
-        {/* Animated scroll indicator */}
-        <motion.div
-          className={styles.scrollIndicator}
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14m0 0l-7-7m7 7l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </motion.div>
       </section>
 
       {/* Stats Section */}

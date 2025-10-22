@@ -202,7 +202,7 @@ export const ExecutivesListComplete: React.FC = () => {
       key: 'status',
       label: t('executives.status'),
       sortable: false,
-      render: (value: unknown, row: UnionExecutive) => {
+      render: (_value: unknown, row: UnionExecutive) => {
         const isActive = isExecutiveActive(row);
         return (
           <span className={`${styles.statusBadge} ${isActive ? styles.active : styles.inactive}`}>

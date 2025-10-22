@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaGlobe, FaFacebook, FaTwitter, FaLinkedin, FaTelegram, FaYoutube, FaClock, FaSave } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaGlobe, FaClock, FaSave } from 'react-icons/fa';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { TextArea } from '@components/TextArea/TextArea';
@@ -13,7 +13,7 @@ import styles from './ContactInfoEditor.module.css';
 type Language = 'en' | 'am';
 
 export const ContactInfoEditor: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [currentLang, setCurrentLang] = useState<Language>('en');
   const [saved, setSaved] = useState(false);
@@ -282,7 +282,7 @@ export const ContactInfoEditor: React.FC = () => {
             <div className={styles.socialGrid}>
               <div className={styles.socialField}>
                 <FormField
-                  label={<span><FaFacebook className={styles.socialIcon + ' ' + styles.facebook} /> Facebook</span>}
+                  label="Facebook"
                   value={contactInfo.facebookUrl}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, facebookUrl: e.target.value }))}
                   placeholder="https://facebook.com/..."
@@ -290,7 +290,7 @@ export const ContactInfoEditor: React.FC = () => {
               </div>
               <div className={styles.socialField}>
                 <FormField
-                  label={<span><FaTwitter className={styles.socialIcon + ' ' + styles.twitter} /> Twitter</span>}
+                  label="Twitter"
                   value={contactInfo.twitterUrl}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, twitterUrl: e.target.value }))}
                   placeholder="https://twitter.com/..."
@@ -298,7 +298,7 @@ export const ContactInfoEditor: React.FC = () => {
               </div>
               <div className={styles.socialField}>
                 <FormField
-                  label={<span><FaLinkedin className={styles.socialIcon + ' ' + styles.linkedin} /> LinkedIn</span>}
+                  label="LinkedIn"
                   value={contactInfo.linkedinUrl}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, linkedinUrl: e.target.value }))}
                   placeholder="https://linkedin.com/company/..."
@@ -306,7 +306,7 @@ export const ContactInfoEditor: React.FC = () => {
               </div>
               <div className={styles.socialField}>
                 <FormField
-                  label={<span><FaTelegram className={styles.socialIcon + ' ' + styles.telegram} /> Telegram</span>}
+                  label="Telegram"
                   value={contactInfo.telegramUrl}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, telegramUrl: e.target.value }))}
                   placeholder="https://t.me/..."
@@ -314,7 +314,7 @@ export const ContactInfoEditor: React.FC = () => {
               </div>
               <div className={styles.socialField}>
                 <FormField
-                  label={<span><FaYoutube className={styles.socialIcon + ' ' + styles.youtube} /> YouTube</span>}
+                  label="YouTube"
                   value={contactInfo.youtubeUrl}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, youtubeUrl: e.target.value }))}
                   placeholder="https://youtube.com/..."

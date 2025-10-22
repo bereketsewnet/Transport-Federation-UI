@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@components/Button/Button';
@@ -36,7 +36,7 @@ const schema = yup.object({
 });
 
 export const ChangePassword: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [securityQuestions, setSecurityQuestions] = useState<SecurityQuestion[]>([]);
@@ -47,7 +47,7 @@ export const ChangePassword: React.FC = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    setValue,
+    // setValue,
   } = useForm<ChangePasswordFormData>({
     resolver: yupResolver(schema),
   });
