@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
-  getArchives,
-  deleteArchive,
-  Archive
+  getDocuments,
+  deleteDocument,
+  Document as Archive
 } from '@api/endpoints';
 import { DataTable, Column } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
@@ -68,13 +68,13 @@ export const ArchivesListComplete: React.FC = () => {
         q: searchTerm
       };
 
-      console.log('📊 Loading archives with params:', params);
-      const response = await getArchives(params);
-      console.log('✅ Archives response:', response);
+      console.log('📊 Loading documents with params:', params);
+      const response = await getDocuments(params);
+      console.log('✅ Documents response:', response);
       
       const archivesData = response.data.data || [];
-      console.log('📋 Archives loaded:', archivesData.length);
-      console.log('📋 First archive:', archivesData[0]);
+      console.log('📋 Documents loaded:', archivesData.length);
+      console.log('📋 First document:', archivesData[0]);
       
       setArchives(archivesData);
       
@@ -96,18 +96,18 @@ export const ArchivesListComplete: React.FC = () => {
     loadArchives();
   }, [currentPage, pageSize, searchTerm]);
 
-  // Handle delete archive
+  // Handle delete document
   const handleDelete = async () => {
     if (!deleteDialog.archive) return;
     
     try {
-      console.log('🗑️ Deleting archive:', deleteDialog.archive.id);
-      await deleteArchive(deleteDialog.archive.id);
+      console.log('🗑️ Deleting document:', deleteDialog.archive.id);
+      await deleteDocument(deleteDialog.archive.id);
       toast.success(t('messages.deleteSuccess'));
       setDeleteDialog({ isOpen: false, archive: null });
       await loadArchives(); // Reload data
     } catch (err) {
-      console.error('💥 Error deleting archive:', err);
+      console.error('💥 Error deleting document:', err);
       setError(t('messages.errorDeletingData'));
       toast.error(t('messages.errorDeletingData'));
     }
@@ -128,7 +128,7 @@ export const ArchivesListComplete: React.FC = () => {
       sortable: true,
       render: (value: unknown, row: Archive) => (
         <div className={styles.archiveInfo}>
-          <div className={styles.archiveTitle}>{String(value || 'N/A')}</div>
+          <div className={styles.archiveTitle}>{String(value || '-')}</div>
           {row.description && (
             <div className={styles.archiveDescription}>{row.description}</div>
           )}
@@ -140,7 +140,7 @@ export const ArchivesListComplete: React.FC = () => {
       label: t('archives.category'),
       sortable: true,
       render: (value: unknown) => (
-        <span className={styles.categoryBadge}>{String(value || 'N/A')}</span>
+        <span className={styles.categoryBadge}>{String(value || '-')}</span>
       )
     },
     {
@@ -148,7 +148,7 @@ export const ArchivesListComplete: React.FC = () => {
       label: t('archives.documentType'),
       sortable: true,
       render: (value: unknown) => (
-        <span className={styles.typeBadge}>{String(value || 'N/A')}</span>
+        <span className={styles.typeBadge}>{String(value || '-')}</span>
       )
     },
     {
@@ -156,7 +156,7 @@ export const ArchivesListComplete: React.FC = () => {
       label: t('archives.fileName'),
       render: (value: unknown, row: Archive) => (
         <div className={styles.fileInfo}>
-          <div className={styles.fileName}>{String(value || 'N/A')}</div>
+          <div className={styles.fileName}>{String(value || '-')}</div>
           {row.file_size && (
             <div className={styles.fileSize}>{formatFileSize(row.file_size)}</div>
           )}
@@ -164,10 +164,29 @@ export const ArchivesListComplete: React.FC = () => {
       )
     },
     {
+      key: 'tags',
+      label: 'Tags',
+      render: (value: unknown) => {
+        if (Array.isArray(value) && value.length > 0) {
+          return <span>{value.join(', ')}</span>;
+        }
+        return <span>-</span>;
+      }
+    },
+    {
+      key: 'is_public',
+      label: 'Public',
+      render: (value: unknown) => (
+        <span className={Boolean(value) ? styles.publicBadge : styles.privateBadge}>
+          {Boolean(value) ? 'Yes' : 'No'}
+        </span>
+      )
+    },
+    {
       key: 'created_at',
       label: t('archives.createdAt'),
       sortable: true,
-      render: (value: unknown) => value ? formatDate(String(value)) : 'N/A'
+      render: (value: unknown) => value ? formatDate(String(value)) : '-'
     }
   ];
 
@@ -178,17 +197,6 @@ export const ArchivesListComplete: React.FC = () => {
     
     return (
       <div className={styles.rowActions}>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('📥 Download clicked for archive ID:', archive.id);
-            handleDownload(archive);
-          }}
-        >
-          Download
-        </Button>
         <Button
           size="sm"
           variant="secondary"
@@ -230,7 +238,7 @@ export const ArchivesListComplete: React.FC = () => {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <h1 className={styles.title}>{t('archives.title')}</h1>
-          <p className={styles.subtitle}>Manage federation archives and documents</p>
+          <p className={styles.subtitle}>Manage documents and files (PDFs, Reports, etc.)</p>
         </div>
         <div className={styles.headerActions}>
           <Button onClick={() => navigate('/admin/archives/new')}>

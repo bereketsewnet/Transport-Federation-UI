@@ -53,6 +53,7 @@ import CBAsFormComplete from '@pages/Admin/CBAs/CBAsFormComplete';
 // Admin Archives
 import ArchivesListComplete from '@pages/Admin/Archives/ArchivesListComplete';
 import ArchivesFormComplete from '@pages/Admin/Archives/ArchivesFormComplete';
+import ArchivedMembers from '@pages/Admin/ArchivedMembers';
 
 // Admin Terminated Unions
 import TerminatedUnionsListComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsListComplete';
@@ -180,10 +181,13 @@ function App() {
           <Route path="cbas/new" element={<CBAsFormComplete />} />
           <Route path="cbas/:id/edit" element={<CBAsFormComplete />} />
 
-          {/* Archives Management */}
+          {/* Archives Management - Documents/Files */}
           <Route path="archives" element={<ArchivesListComplete />} />
           <Route path="archives/new" element={<ArchivesFormComplete />} />
           <Route path="archives/:id/edit" element={<ArchivesFormComplete />} />
+          
+          {/* Archived Members */}
+          <Route path="archived-members" element={<ArchivedMembers />} />
 
           {/* Terminated Unions Management */}
           <Route path="terminated-unions" element={<TerminatedUnionsListComplete />} />

@@ -438,7 +438,71 @@ export const deletePhoto = (id: number): Promise<AxiosResponse<{ message: string
   });
 };
 
-// ==================== ARCHIVES ====================
+// ==================== DOCUMENTS ====================
+
+export interface Document {
+  id: number;
+  title: string;
+  description?: string;
+  category: string;
+  document_type: string;
+  file_url: string;
+  file_size?: number;
+  file_name?: string;
+  tags?: string[];
+  is_public: boolean;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: number;
+}
+
+export interface DocumentFilters extends SearchParams {
+  category?: string;
+  document_type?: string;
+  is_public?: boolean;
+  tags?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export const getDocuments = (params?: DocumentFilters): Promise<AxiosResponse<ApiResponse<Document[]>>> => {
+  return apiClient.get('/api/documents', { params });
+};
+
+export const getDocument = (id: number): Promise<AxiosResponse<Document>> => {
+  return apiClient.get(`/api/documents/${id}`);
+};
+
+export const createDocument = (data: Partial<Document>): Promise<AxiosResponse<Document>> => {
+  return apiClient.post('/api/documents', data);
+};
+
+export const updateDocument = (id: number, data: Partial<Document>): Promise<AxiosResponse<Document>> => {
+  return apiClient.put(`/api/documents/${id}`, data);
+};
+
+export const deleteDocument = (id: number, confirm = true): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/documents/${id}`, { params: { confirm } });
+};
+
+export const uploadDocumentFile = (file: File, onProgress?: (progress: number) => void): Promise<AxiosResponse<{ file_url: string; file_name: string; file_size: number }>> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  return apiClient.post('/api/documents/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    onUploadProgress: (progressEvent) => {
+      if (onProgress && progressEvent.total) {
+        const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(progress);
+      }
+    },
+  });
+};
+
+// ==================== ARCHIVES (Archived Members) ====================
 
 export interface Archive {
   id: number;

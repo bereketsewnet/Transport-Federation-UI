@@ -76,11 +76,23 @@ export const useAuth = () => {
 
         toast.success('Login successful!');
         
+        // Open dashboard in new tab for new user (first successful login)
+        // Check if this is a new user by checking if they recently completed password change
+        const isNewUser = data.user.username && !localStorage.getItem('has_logged_in_' + data.user.username);
+        
         // Navigate based on role
-        if (data.user.role === 'member') {
-          navigate('/member/dashboard');
+        const dashboardPath = data.user.role === 'member' ? '/member/dashboard' : '/admin/dashboard';
+        
+        if (isNewUser) {
+          // Open in new tab for new users
+          window.open(window.location.origin + dashboardPath, '_blank');
+          // Mark that they've logged in
+          localStorage.setItem('has_logged_in_' + data.user.username, 'true');
+          // Also navigate in current tab
+          navigate(dashboardPath);
         } else {
-          navigate('/admin/dashboard');
+          // Normal navigation for existing users
+          navigate(dashboardPath);
         }
       } catch (error: any) {
         console.error('Login error:', error);
