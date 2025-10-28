@@ -146,10 +146,10 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1 }}
               >
-                {content ? content.stat1Value : '19'}
+                {content ? content.stat2Value : '19'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {stat1Label}
+                {content ? (lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) || t('home.stats.unions') : t('home.stats.unions')}
               </p>
             </motion.div>
 
@@ -161,10 +161,10 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.1 }}
               >
-                {content ? `${content.stat2Value}+` : '50+'}
+                {content ? `${content.stat3Value}+` : '50+'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {stat2Label}
+                {content ? (lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) || t('home.stats.years') : t('home.stats.years')}
               </p>
             </motion.div>
 
@@ -176,10 +176,10 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.2 }}
               >
-                {content ? `${content.stat3Value}%` : '100%'}
+                {content ? `${content.stat4Value}%` : '100%'}
               </motion.h3>
               <p className={styles.statLabel}>
-                {stat3Label}
+                {content ? (lang === 'en' ? content.stat4LabelEn : content.stat4LabelAm) || t('home.stats.protection') : t('home.stats.protection')}
               </p>
             </motion.div>
           </motion.div>

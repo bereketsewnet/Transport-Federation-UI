@@ -39,8 +39,14 @@ export interface HomeContentUpdate {
   overviewAm?: string;
   stat1Value?: number;
   stat2Value?: number;
+  stat2LabelEn?: string;
+  stat2LabelAm?: string;
   stat3Value?: number;
+  stat3LabelEn?: string;
+  stat3LabelAm?: string;
   stat4Value?: number;
+  stat4LabelEn?: string;
+  stat4LabelAm?: string;
 }
 
 // About Content

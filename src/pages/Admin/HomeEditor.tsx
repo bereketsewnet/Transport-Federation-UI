@@ -18,10 +18,15 @@ const homeSchema = yup.object({
   heroSubtitleAm: yup.string().required('Hero subtitle (Amharic) is required'),
   overviewEn: yup.string().required('Overview (English) is required'),
   overviewAm: yup.string().required('Overview (Amharic) is required'),
-  stat1Value: yup.number().positive().required('Stat 1 value is required'),
-  stat2Value: yup.number().positive().required('Stat 2 value is required'),
-  stat3Value: yup.number().positive().required('Stat 3 value is required'),
-  stat4Value: yup.number().positive().required('Stat 4 value is required'),
+  stat2Value: yup.number().positive().required('Worker Unions is required'),
+  stat2LabelEn: yup.string().required('Worker Unions label (English) is required'),
+  stat2LabelAm: yup.string().required('Worker Unions label (Amharic) is required'),
+  stat3Value: yup.number().positive().required('Years of Experience is required'),
+  stat3LabelEn: yup.string().required('Years label (English) is required'),
+  stat3LabelAm: yup.string().required('Years label (Amharic) is required'),
+  stat4Value: yup.number().positive().required('Protection Rate is required'),
+  stat4LabelEn: yup.string().required('Protection Rate label (English) is required'),
+  stat4LabelAm: yup.string().required('Protection Rate label (Amharic) is required'),
 });
 
 interface HomeFormData {
@@ -31,10 +36,15 @@ interface HomeFormData {
   heroSubtitleAm: string;
   overviewEn: string;
   overviewAm: string;
-  stat1Value: number;
   stat2Value: number;
+  stat2LabelEn: string;
+  stat2LabelAm: string;
   stat3Value: number;
+  stat3LabelEn: string;
+  stat3LabelAm: string;
   stat4Value: number;
+  stat4LabelEn: string;
+  stat4LabelAm: string;
 }
 
 export const HomeEditor: React.FC = () => {
@@ -96,10 +106,15 @@ export const HomeEditor: React.FC = () => {
           heroSubtitleAm: content.heroSubtitleAm,
           overviewEn: content.overviewEn,
           overviewAm: content.overviewAm,
-          stat1Value: content.stat1Value,
           stat2Value: content.stat2Value,
+          stat2LabelEn: content.stat2LabelEn || 'Worker Unions',
+          stat2LabelAm: content.stat2LabelAm || 'የሠራተኞች ማህበረሰቦች',
           stat3Value: content.stat3Value,
+          stat3LabelEn: content.stat3LabelEn || 'Years of Experience',
+          stat3LabelAm: content.stat3LabelAm || 'የልምድ ዓመታት',
           stat4Value: content.stat4Value,
+          stat4LabelEn: content.stat4LabelEn || 'Protection Rate',
+          stat4LabelAm: content.stat4LabelAm || 'የጥበቃ መጠን',
         });
 
         setCurrentHeroImage(normalizeImagePath(content.heroImage));
@@ -116,19 +131,28 @@ export const HomeEditor: React.FC = () => {
 
   const onSubmit = async (data: HomeFormData) => {
     try {
+      console.log('📤 Raw form data:', data);
       // Update text content
-      await updateHomeContent({
+      const updatePayload = {
         heroTitleEn: data.heroTitleEn,
         heroTitleAm: data.heroTitleAm,
         heroSubtitleEn: data.heroSubtitleEn,
         heroSubtitleAm: data.heroSubtitleAm,
         overviewEn: data.overviewEn,
         overviewAm: data.overviewAm,
-        stat1Value: Number(data.stat1Value),
         stat2Value: Number(data.stat2Value),
+        stat2LabelEn: data.stat2LabelEn,
+        stat2LabelAm: data.stat2LabelAm,
         stat3Value: Number(data.stat3Value),
+        stat3LabelEn: data.stat3LabelEn,
+        stat3LabelAm: data.stat3LabelAm,
         stat4Value: Number(data.stat4Value),
-      });
+        stat4LabelEn: data.stat4LabelEn,
+        stat4LabelAm: data.stat4LabelAm,
+      };
+      console.log('📤 Sending payload to API:', updatePayload);
+      const response = await updateHomeContent(updatePayload);
+      console.log('✅ API response:', response);
 
       // Upload hero image if selected
       if (heroImageFile) {
@@ -158,8 +182,35 @@ export const HomeEditor: React.FC = () => {
       }
 
       toast.success('Home page updated successfully!');
+      
+      // Reload the form data to show updated values
+      console.log('🔄 Reloading content after update...');
+      const reloadResponse = await getHomeContent();
+      const updatedContent = reloadResponse.data.data;
+      console.log('🔄 Reloaded content from API:', updatedContent);
+      console.log('🔄 stat2LabelEn value:', updatedContent.stat2LabelEn);
+      console.log('🔄 stat2LabelAm value:', updatedContent.stat2LabelAm);
+      
+      reset({
+        heroTitleEn: updatedContent.heroTitleEn,
+        heroTitleAm: updatedContent.heroTitleAm,
+        heroSubtitleEn: updatedContent.heroSubtitleEn,
+        heroSubtitleAm: updatedContent.heroSubtitleAm,
+        overviewEn: updatedContent.overviewEn,
+        overviewAm: updatedContent.overviewAm,
+        stat2Value: updatedContent.stat2Value,
+        stat2LabelEn: updatedContent.stat2LabelEn || 'Worker Unions',
+        stat2LabelAm: updatedContent.stat2LabelAm || 'የሠራተኞች ማህበረሰቦች',
+        stat3Value: updatedContent.stat3Value,
+        stat3LabelEn: updatedContent.stat3LabelEn || 'Years of Experience',
+        stat3LabelAm: updatedContent.stat3LabelAm || 'የልምድ ዓመታት',
+        stat4Value: updatedContent.stat4Value,
+        stat4LabelEn: updatedContent.stat4LabelEn || 'Protection Rate',
+        stat4LabelAm: updatedContent.stat4LabelAm || 'የጥበቃ መጠን',
+      });
     } catch (error) {
-      console.error('Failed to update home content:', error);
+      console.error('❌ Failed to update home content:', error);
+      console.error('❌ Error details:', error);
       toast.error('Failed to update home content');
     }
   };
@@ -251,35 +302,69 @@ export const HomeEditor: React.FC = () => {
 
         {/* Statistics Section */}
         <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Statistics</h2>
+          <h2 className={styles.sectionTitle}>Statistics (3 Cards Only)</h2>
           <div className={styles.statsGrid}>
+            {/* Stat 2: Worker Unions */}
             <FormField
               type="number"
-              label="Active Members"
-              register={register('stat1Value')}
-              error={errors.stat1Value?.message}
-              placeholder="1250"
-            />
-            <FormField
-              type="number"
-              label="Worker Unions"
+              label="Worker Unions (Value)"
               register={register('stat2Value')}
               error={errors.stat2Value?.message}
               placeholder="19"
             />
             <FormField
+              label="Worker Unions Label (English)"
+              register={register('stat2LabelEn')}
+              error={errors.stat2LabelEn?.message}
+              placeholder="Worker Unions"
+            />
+            <FormField
+              label="Worker Unions Label (Amharic)"
+              register={register('stat2LabelAm')}
+              error={errors.stat2LabelAm?.message}
+              placeholder="የሠራተኞች ማህበረሰቦች"
+            />
+
+            {/* Stat 3: Years of Experience */}
+            <FormField
               type="number"
-              label="Years of Service"
+              label="Years of Experience (Value)"
               register={register('stat3Value')}
               error={errors.stat3Value?.message}
               placeholder="50"
             />
+            <FormField
+              label="Years Label (English)"
+              register={register('stat3LabelEn')}
+              error={errors.stat3LabelEn?.message}
+              placeholder="Years of Experience"
+            />
+            <FormField
+              label="Years Label (Amharic)"
+              register={register('stat3LabelAm')}
+              error={errors.stat3LabelAm?.message}
+              placeholder="የልምድ ዓመታት"
+            />
+
+            {/* Stat 4: Protection Rate */}
             <FormField
               type="number"
               label="Protection Rate (%)"
               register={register('stat4Value')}
               error={errors.stat4Value?.message}
               placeholder="100"
+            />
+            <FormField
+              label="Protection Rate Label (English)"
+              register={register('stat4LabelEn')}
+              error={errors.stat4LabelEn?.message}
+              placeholder="Protection Rate"
+            />
+            <FormField
+              label="Protection Rate Label (Amharic)"
+              register={register('stat4LabelAm')}
+              error={errors.stat4LabelAm?.message}
+              placeholder="የጥበቃ መጠን"
             />
           </div>
         </div>
