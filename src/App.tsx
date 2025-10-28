@@ -61,6 +61,9 @@ import TerminatedUnionsFormComplete from '@pages/Admin/TerminatedUnions/Terminat
 // Admin OSH
 import { OSH } from '@pages/Admin/OSH';
 
+// Admin General Assembly
+import { GeneralAssembly } from '@pages/Admin/GeneralAssembly';
+
 // Member Pages
 import { MemberDashboard, MemberChangePassword } from '@pages/Member';
 
@@ -189,6 +192,9 @@ function App() {
 
           {/* OSH Management */}
           <Route path="osh" element={<OSH />} />
+
+          {/* General Assembly Management */}
+          <Route path="general-assembly" element={<GeneralAssembly />} />
         </Route>
 
         {/* Member Routes - Protected */}

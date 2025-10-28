@@ -74,6 +74,7 @@ export const changePassword = (payload: ChangePasswordPayload): Promise<AxiosRes
 // ==================== UNIONS ====================
 
 export interface Union {
+  id: number;
   union_id: number;
   union_code: string;
   name_en: string;
@@ -83,6 +84,7 @@ export interface Union {
   established_date: string;
   terms_of_election: number;
   strategic_plan_in_place: boolean;
+  general_assembly_date?: string | null;  // Date of last general assembly
   created_at?: string;
   updated_at?: string;
 }

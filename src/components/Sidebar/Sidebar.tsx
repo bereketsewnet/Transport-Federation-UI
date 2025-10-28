@@ -271,6 +271,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </svg>
       ),
     },
+    {
+      path: '/admin/general-assembly',
+      label: 'General Assembly',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M6 2a1 1 0 00-1 1v14a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H6zm2 3h4v1H8V5zm0 3h4v1H8V8zm0 3h4v1H8v-1z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
   ];
 
   // Determine which menu to show based on user role

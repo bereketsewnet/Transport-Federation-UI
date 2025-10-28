@@ -1,0 +1,2 @@
+export { GeneralAssembly } from './GeneralAssembly';
+

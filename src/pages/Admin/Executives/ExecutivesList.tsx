@@ -113,7 +113,7 @@ export const ExecutivesList: React.FC = () => {
 
   // Get union name by ID
   const getUnionName = (unionId: number) => {
-    const union = unions.find(u => u.id === unionId);
+      const union = unions.find(u => u.id === unionId);
     return union ? union.name_en : `Union ${unionId}`;
   };
 
