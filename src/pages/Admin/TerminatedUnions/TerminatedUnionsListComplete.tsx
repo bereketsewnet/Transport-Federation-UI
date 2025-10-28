@@ -79,6 +79,12 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       console.log('📋 Terminated unions loaded:', data.length);
       console.log('📋 First terminated union:', data[0]);
       
+      if (data.length > 0) {
+        console.log('📋 Fields in first union:', Object.keys(data[0]));
+        console.log('📋 terminated_date:', data[0].terminated_date);
+        console.log('📋 archived_at:', data[0].archived_at);
+      }
+      
       setTerminatedUnions(data);
       
       // Update pagination info
@@ -146,33 +152,24 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       }
     },
     {
-      key: 'termination_date',
+      key: 'terminated_date',
       label: 'Termination Date',
       sortable: true,
-      render: (value: unknown) => value ? formatDate(String(value)) : 'N/A'
+      render: (value: unknown) => value ? formatDate(String(value)) : '-'
     },
     {
       key: 'termination_reason',
       label: 'Reason',
       sortable: true,
       render: (value: unknown) => (
-        <span className={styles.reasonBadge}>{String(value || 'N/A')}</span>
+        <span className={styles.reasonBadge}>{String(value || '-')}</span>
       )
     },
     {
-      key: 'notes',
-      label: 'Notes',
-      render: (value: unknown) => (
-        <div className={styles.notes}>
-          {value ? String(value).substring(0, 100) + (String(value).length > 100 ? '...' : '') : 'No notes'}
-        </div>
-      )
-    },
-    {
-      key: 'created_at',
+      key: 'archived_at',
       label: 'Archived At',
       sortable: true,
-      render: (value: unknown) => value ? formatDate(String(value)) : 'N/A'
+      render: (value: unknown) => value ? formatDate(String(value)) : '-'
     }
   ];
 

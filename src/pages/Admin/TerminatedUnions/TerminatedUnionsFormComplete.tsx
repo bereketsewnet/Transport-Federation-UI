@@ -22,14 +22,13 @@ import styles from './TerminatedUnions.module.css';
 
 interface TerminatedUnionFormData {
   union_id: number;
-  termination_date: string;
+  terminated_date: string;
   termination_reason: string;
-  notes?: string;
 }
 
 const terminatedUnionSchema = yup.object({
   union_id: yup.number().required('Union is required').min(1, 'Please select a union'),
-  termination_date: yup.string().required('Termination date is required'),
+  terminated_date: yup.string().required('Termination date is required'),
   termination_reason: yup.string().required('Termination reason is required'),
   notes: yup.string(),
 }).required();
@@ -55,9 +54,8 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
     resolver: yupResolver(terminatedUnionSchema),
     defaultValues: {
       union_id: 0,
-      termination_date: new Date().toISOString().split('T')[0],
-      termination_reason: '',
-      notes: ''
+      terminated_date: new Date().toISOString().split('T')[0],
+      termination_reason: ''
     }
   });
 
@@ -107,11 +105,13 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
       const tuData = response.data;
       
       // Populate form with existing data
+      console.log('📋 Raw terminated union data:', tuData);
+      console.log('📋 terminated_date field:', tuData.terminated_date);
+      
       reset({
         union_id: tuData.union_id || 0,
-        termination_date: tuData.termination_date?.split('T')[0] || '',
+        terminated_date: tuData.terminated_date?.split('T')[0] || '',
         termination_reason: tuData.termination_reason || '',
-        notes: tuData.notes || '',
       });
     } catch (err) {
       console.error('💥 Error loading terminated union:', err);
@@ -133,9 +133,8 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
 
       const tuData = {
         union_id: Number(data.union_id),
-        termination_date: new Date(data.termination_date).toISOString(),
-        termination_reason: String(data.termination_reason),
-        notes: data.notes ? String(data.notes) : undefined
+        terminated_date: new Date(data.terminated_date).toISOString(),
+        termination_reason: String(data.termination_reason)
       };
 
       console.log('📤 Sending data to API:', tuData);
@@ -252,10 +251,10 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
               <FormField
                 label="Termination Date *"
                 type="date"
-                error={errors.termination_date?.message}
+                error={errors.terminated_date?.message}
                 required
                 className={styles.formField}
-                register={register('termination_date')}
+                register={register('terminated_date')}
               />
             </div>
 
@@ -283,14 +282,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
               ]}
             />
 
-            <TextArea
-              label="Notes"
-              error={errors.notes?.message}
-              className={styles.formField}
-              placeholder="Additional notes about the termination (optional)"
-              rows={5}
-              register={register('notes')}
-            />
           </div>
         </div>
 
