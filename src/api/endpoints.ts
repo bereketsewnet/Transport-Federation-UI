@@ -74,7 +74,7 @@ export const changePassword = (payload: ChangePasswordPayload): Promise<AxiosRes
 // ==================== UNIONS ====================
 
 export interface Union {
-  id: number;
+  union_id: number;
   union_code: string;
   name_en: string;
   name_am: string;
@@ -95,8 +95,8 @@ export const getUnions = (params?: UnionFilters): Promise<AxiosResponse<ApiRespo
   return apiClient.get('/api/unions', { params });
 };
 
-export const getUnion = (id: number): Promise<AxiosResponse<Union>> => {
-  return apiClient.get(`/api/unions/${id}`);
+export const getUnion = (union_id: number): Promise<AxiosResponse<Union>> => {
+  return apiClient.get(`/api/unions/${union_id}`);
 };
 
 export const createUnion = (data: Partial<Union>): Promise<AxiosResponse<Union>> => {
@@ -797,5 +797,202 @@ export const forgotPasswordStep1 = (payload: ForgotPasswordStep1Payload): Promis
 
 export const forgotPasswordStep2 = (payload: ForgotPasswordStep2Payload): Promise<AxiosResponse<ForgotPasswordStep2Response>> => {
   return publicApiClient.post('/api/auth/forgot-password/step2', payload);
+};
+
+// ==================== OSH INCIDENTS ====================
+
+export interface OSHIncident {
+  id: number;
+  unionId: number;
+  union?: {
+    union_id: number;
+    name_en: string;
+    name_am: string;
+    union_code: string;
+  };
+  accidentCategory: 'People' | 'Property' | 'Environment' | 'Process' | '';
+  dateTimeOccurred: string;
+  locationSite: string;
+  locationBuilding?: string;
+  locationArea?: string;
+  locationGpsLatitude?: number;
+  locationGpsLongitude?: number;
+  injurySeverity: 'None' | 'Minor' | 'Major' | 'Fatal';
+  damageSeverity: 'None' | 'Minor' | 'Major' | 'Severe';
+  rootCauses: string[];
+  description: string;
+  regulatoryReportRequired: boolean;
+  regulatoryReportDate?: string;
+  status: 'open' | 'investigating' | 'closed';
+  reportedBy: string;
+  reportedDate?: string;
+  investigationNotes?: string;
+  correctiveActions?: string;
+  preventiveMeasures?: string;
+  rootCauseUnsafeAct?: boolean;
+  rootCauseEquipmentFailure?: boolean;
+  rootCauseEnvironmental?: boolean;
+  rootCauseOther?: string;
+  createdAt?: string;
+  createdBy?: number;
+  updatedAt?: string;
+  updatedBy?: number;
+}
+
+export interface OSHIncidentParams extends PaginationParams {
+  union_id?: number;
+  accident_category?: string;
+  injury_severity?: string;
+  damage_severity?: string;
+  status?: string;
+  from_date?: string;
+  to_date?: string;
+  q?: string;
+}
+
+export interface OSHStatistics {
+  total_incidents: number;
+  by_category: Array<{ category: string; count: number }>;
+  by_severity: Array<{ severity: string; count: number }>;
+  by_status: Array<{ status: string; count: number }>;
+  by_month: Array<{ month: string; count: number }>;
+  regulatory_reports_required: number;
+  high_severity_count: number;
+}
+
+export const getOSHIncidents = (
+  params?: OSHIncidentParams
+): Promise<AxiosResponse<ApiResponse<OSHIncident[]>>> => {
+  return publicApiClient.get('/api/osh-incidents', { params });
+};
+
+export const getOSHIncident = (id: number): Promise<AxiosResponse<OSHIncident>> => {
+  return publicApiClient.get(`/api/osh-incidents/${id}`);
+};
+
+export const createOSHIncident = (data: Partial<OSHIncident>): Promise<AxiosResponse<OSHIncident>> => {
+  return apiClient.post('/api/osh-incidents', data);
+};
+
+export const updateOSHIncident = (id: number, data: Partial<OSHIncident>): Promise<AxiosResponse<OSHIncident>> => {
+  return apiClient.put(`/api/osh-incidents/${id}`, data);
+};
+
+export const deleteOSHIncident = (id: number): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/osh-incidents/${id}`);
+};
+
+export const getOSHStatistics = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<OSHStatistics>> => {
+  return publicApiClient.get('/api/osh-incidents/statistics', { params });
+};
+
+// ==================== OSH REPORTS ====================
+
+export interface OSHSummaryReport {
+  total_incidents: number;
+  by_category: Array<{ category: string; count: number; percentage: number }>;
+  by_severity: Array<{ severity: string; count: number; percentage: number }>;
+  by_status: Array<{ status: string; count: number; percentage: number }>;
+  regulatory_reports_required: number;
+  high_severity_count: number;
+  average_resolution_days: number;
+}
+
+export interface OSHHighSeverityReport {
+  count: number;
+  incidents: Array<{
+    id: number;
+    union_id: number;
+    accident_category: string;
+    injury_severity: string;
+    damage_severity: string;
+    date_time_occurred: string;
+    location_site: string;
+    description: string;
+    status: string;
+    regulatory_report_required: boolean;
+  }>;
+}
+
+export interface OSHRegulatoryReport {
+  count: number;
+  incidents: Array<{
+    id: number;
+    union_id: number;
+    accident_category: string;
+    injury_severity: string;
+    damage_severity: string;
+    date_time_occurred: string;
+    location_site: string;
+    description: string;
+    regulatory_report_required: boolean;
+    investigation_notes?: string;
+    corrective_actions?: string;
+  }>;
+}
+
+export interface OSHMonthlyTrends {
+  months: Array<{
+    month: string;
+    total_incidents: number;
+    by_category: Array<{ category: string; count: number }>;
+    by_severity: Array<{ severity: string; count: number }>;
+  }>;
+  trend_analysis: {
+    overall_trend: 'increasing' | 'decreasing' | 'stable';
+    trend_percentage: number;
+    peak_month: string;
+    lowest_month: string;
+  };
+}
+
+export interface OSHRootCausesAnalysis {
+  root_causes: Array<{
+    cause: string;
+    count: number;
+    percentage: number;
+    incidents: Array<{
+      id: number;
+      date_time_occurred: string;
+      description: string;
+    }>;
+  }>;
+  recommendations: Array<{
+    cause: string;
+    recommendation: string;
+    priority: 'high' | 'medium' | 'low';
+  }>;
+}
+
+export const getOSHSummaryReport = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<OSHSummaryReport>> => {
+  return apiClient.get('/api/reports/osh-summary', { params });
+};
+
+export const getOSHHighSeverityReport = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<OSHHighSeverityReport>> => {
+  return apiClient.get('/api/reports/osh-high-severity', { params });
+};
+
+export const getOSHRegulatoryReport = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<OSHRegulatoryReport>> => {
+  return apiClient.get('/api/reports/osh-regulatory-reports', { params });
+};
+
+export const getOSHMonthlyTrends = (
+  params?: { union_id?: number; months?: number }
+): Promise<AxiosResponse<OSHMonthlyTrends>> => {
+  return apiClient.get('/api/reports/osh-monthly-trends', { params });
+};
+
+export const getOSHRootCausesAnalysis = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<OSHRootCausesAnalysis>> => {
+  return apiClient.get('/api/reports/osh-root-causes', { params });
 };
 

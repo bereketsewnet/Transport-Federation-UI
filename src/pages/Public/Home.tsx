@@ -70,16 +70,13 @@ export const Home: React.FC = () => {
 
   // Fallback helpers for stat labels when CMS fields are empty/null
   const stat1Label = content
-    ? ((lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) || t('home.stats.members'))
-    : t('home.stats.members');
-  const stat2Label = content
-    ? ((lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) || t('home.stats.unions'))
+    ? ((lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) || t('home.stats.unions'))
     : t('home.stats.unions');
-  const stat3Label = content
-    ? ((lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) || t('home.stats.years'))
+  const stat2Label = content
+    ? ((lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) || t('home.stats.years'))
     : t('home.stats.years');
-  const stat4Label = content
-    ? ((lang === 'en' ? content.stat4LabelEn : content.stat4LabelAm) || t('home.stats.protection'))
+  const stat3Label = content
+    ? ((lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) || t('home.stats.protection'))
     : t('home.stats.protection');
 
   const fadeInUp = {
@@ -149,7 +146,7 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1 }}
               >
-                {content ? `${content.stat1Value.toLocaleString()}+` : '1,250+'}
+                {content ? content.stat1Value : '19'}
               </motion.h3>
               <p className={styles.statLabel}>
                 {stat1Label}
@@ -164,7 +161,7 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.1 }}
               >
-                {content ? content.stat2Value : '19'}
+                {content ? `${content.stat2Value}+` : '50+'}
               </motion.h3>
               <p className={styles.statLabel}>
                 {stat2Label}
@@ -179,25 +176,10 @@ export const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", duration: 1, delay: 0.2 }}
               >
-                {content ? `${content.stat3Value}+` : '50+'}
+                {content ? `${content.stat3Value}%` : '100%'}
               </motion.h3>
               <p className={styles.statLabel}>
                 {stat3Label}
-              </p>
-            </motion.div>
-
-            <motion.div className={styles.statCard} variants={fadeInUp}>
-              <motion.h3 
-                className={styles.statNumber}
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", duration: 1, delay: 0.3 }}
-              >
-                {content ? `${content.stat4Value}%` : '100%'}
-              </motion.h3>
-              <p className={styles.statLabel}>
-                {stat4Label}
               </p>
             </motion.div>
           </motion.div>

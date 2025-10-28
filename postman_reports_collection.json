@@ -415,9 +415,119 @@
           },
           "response": []
         }
-      ]
-    }
-  ],
+        ]
+      },
+      {
+        "name": "OSH Reports",
+        "description": "Occupational Safety and Health incident reports",
+        "item": [
+          {
+            "name": "OSH Summary Report",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/osh-summary?union_id=1&from_date=2024-01-01&to_date=2024-12-31",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "osh-summary"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "OSH High Severity Report",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/osh-high-severity?union_id=1&from_date=2024-01-01&to_date=2024-12-31",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "osh-high-severity"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "OSH Regulatory Reports",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/osh-regulatory-reports?union_id=1&from_date=2024-01-01&to_date=2024-12-31",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "osh-regulatory-reports"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "OSH Monthly Trends",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/osh-monthly-trends?union_id=1&months=12",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "osh-monthly-trends"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "months", "value": "12", "description": "Number of months to analyze (default: 12)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "OSH Root Causes Analysis",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/osh-root-causes?union_id=1&from_date=2024-01-01&to_date=2024-12-31",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "osh-root-causes"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"}
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      }
+    ],
   "variable": [
     {
       "key": "base_url",

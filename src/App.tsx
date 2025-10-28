@@ -58,6 +58,9 @@ import ArchivesFormComplete from '@pages/Admin/Archives/ArchivesFormComplete';
 import TerminatedUnionsListComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsListComplete';
 import TerminatedUnionsFormComplete from '@pages/Admin/TerminatedUnions/TerminatedUnionsFormComplete';
 
+// Admin OSH
+import { OSH } from '@pages/Admin/OSH';
+
 // Member Pages
 import { MemberDashboard, MemberChangePassword } from '@pages/Member';
 
@@ -183,6 +186,9 @@ function App() {
           <Route path="terminated-unions" element={<TerminatedUnionsListComplete />} />
           <Route path="terminated-unions/new" element={<TerminatedUnionsFormComplete />} />
           <Route path="terminated-unions/:id/edit" element={<TerminatedUnionsFormComplete />} />
+
+          {/* OSH Management */}
+          <Route path="osh" element={<OSH />} />
         </Route>
 
         {/* Member Routes - Protected */}

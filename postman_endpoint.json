@@ -865,19 +865,17 @@
       "name": "News",
       "item": [
         {
-          "name": "List news",
+          "name": "List news (public)",
           "request": {
             "method":"GET",
-            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/news?is_published=true&page=1&per_page=20","host":["{{base_url}}"],"path":["api","news"],"query":[{"key":"is_published","value":"true"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
           },
           "response": []
         },
         {
-          "name": "Get news by id",
+          "name": "Get news by id (public)",
           "request": {
             "method":"GET",
-            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/news/1","host":["{{base_url}}"],"path":["api","news","1"]}
           },
           "response": []
@@ -989,19 +987,17 @@
       "name": "Galleries & Photos",
       "item": [
         {
-          "name": "List galleries",
+          "name": "List galleries (public)",
           "request": {
             "method":"GET",
-            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/galleries?page=1&per_page=20","host":["{{base_url}}"],"path":["api","galleries"],"query":[{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
           },
           "response": []
         },
         {
-          "name": "Get gallery by id (with photos)",
+          "name": "Get gallery by id (with photos) (public)",
           "request": {
             "method":"GET",
-            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/galleries/1","host":["{{base_url}}"],"path":["api","galleries","1"]}
           },
           "response": []
@@ -1038,19 +1034,17 @@
           "response": []
         },
         {
-          "name": "List photos",
+          "name": "List photos (public)",
           "request": {
             "method":"GET",
-            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/photos?gallery_id=1&page=1&per_page=20","host":["{{base_url}}"],"path":["api","photos"],"query":[{"key":"gallery_id","value":"1"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
           },
           "response": []
         },
         {
-          "name": "Get photo by id",
+          "name": "Get photo by id (public)",
           "request": {
             "method":"GET",
-            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/photos/1","host":["{{base_url}}"],"path":["api","photos","1"]}
           },
           "response": []
@@ -1135,6 +1129,272 @@
             "header":[{"key":"Content-Type","value":"application/json"}],
             "body":{"mode":"raw","raw":"{\n  \"report_name\": \"members_by_year\",\n  \"payload\": { \"2021\": 120, \"2022\": 140 }\n}"},
             "url":{"raw":"{{base_url}}/api/reports/cache","host":["{{base_url}}"],"path":["api","reports","cache"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CMS - Content Management",
+      "item": [
+        {
+          "name": "Get home content (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/cms/home-content", "host": ["{{base_url}}"], "path": ["api", "cms", "home-content"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update home content (admin)",
+          "request": {
+            "method": "PUT",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heroTitleEn\": \"Transport & Communication Workers Federation\",\n  \"heroTitleAm\": \"የትራንስፖርትና መገናኛ ሠራተኞች ማኅበራት ፌዴሬሽን\",\n  \"heroSubtitleEn\": \"Empowering workers across Ethiopia's transport and communication sectors\",\n  \"heroSubtitleAm\": \"በኢትዮጵያ የትራንስፖርትና መገናኛ ዘርፎች ውስጥ የሰራተኞችን አቅም ማሳደግ\",\n  \"overviewEn\": \"The Industrial Federation of Transport and Communication Workers of Ethiopia (TCWF) is a national trade union federation representing workers in the transport and communication sectors.\",\n  \"overviewAm\": \"የኢትዮጵያ የትራንስፖርትና መገናኛ ሠራተኞች የኢንዱስትሪ ፌዴሬሽን (TCWF) በትራንስፖርትና መገናኛ ዘርፎች ውስጥ የሚሰሩ ሠራተኞችን የሚወክል የብሔራዊ የሠራተኛ ማኅበር ፌዴሬሽን ነው።\",\n  \"stat1Value\": 1250,\n  \"stat2Value\": 19,\n  \"stat3Value\": 50,\n  \"stat4Value\": 100\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/cms/home-content", "host": ["{{base_url}}"], "path": ["api", "cms", "home-content"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Upload hero image (admin)",
+          "request": {
+            "method": "POST",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "body": {
+              "mode": "formdata",
+              "formdata": [{"key": "image", "type": "file", "src": "/path/to/hero-image.jpg"}]
+            },
+            "url": {"raw": "{{base_url}}/api/cms/home-content/hero-image", "host": ["{{base_url}}"], "path": ["api", "cms", "home-content", "hero-image"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get about content (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/cms/about-content", "host": ["{{base_url}}"], "path": ["api", "cms", "about-content"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update about content (admin)",
+          "request": {
+            "method": "PUT",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"missionEn\": \"To organize workers in unions and federations to protect their rights and improve their working conditions.\",\n  \"missionAm\": \"ሠራተኛዉን በማኅበርና ፌዴሬሽን ውስጥ በማደራጀት የእነሱን መብት በመጠበቅና የስራ ሁኔታቸውን በማሻሻል።\",\n  \"visionEn\": \"To see workers with guaranteed rights, fair wages, and safe working conditions across all transport and communication sectors.\",\n  \"visionAm\": \"የሥራ ዋስትናው የተረጋገጠ፣ ፍትሃዊ ደሞዝ፣ እና ደህንነቱ የተጠበቀ የስራ ሁኔታ ያላቸው ሠራተኞች በሁሉም የትራንስፖርትና መገናኛ ዘርፎች ውስጥ እንዲታዩ።\",\n  \"valuesEn\": [\"Humanity\", \"Commitment\", \"Democratic Culture\", \"Transparency\", \"Unity\"],\n  \"valuesAm\": [\"ሰበዓዊነት\", \"ቁርጠኝነት\", \"የዲሞክራሲ ባህል\", \"ግልጽነት\", \"አንድነት\"]\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/cms/about-content", "host": ["{{base_url}}"], "path": ["api", "cms", "about-content"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get executives (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/cms/executives?type=executive&page=1&per_page=20", "host": ["{{base_url}}"], "path": ["api", "cms", "executives"], "query": [{"key": "type", "value": "executive"}, {"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get executive by ID (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/cms/executives/1", "host": ["{{base_url}}"], "path": ["api", "cms", "executives", "1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Create executive (admin)",
+          "request": {
+            "method": "POST",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nameEn\": \"John Doe\",\n  \"nameAm\": \"ጆን ዶ\",\n  \"positionEn\": \"Secretary General\",\n  \"positionAm\": \"ዋና ፀሀፊ\",\n  \"bioEn\": \"Bio text in English...\",\n  \"bioAm\": \"የባዮ ጽሑፍ በአማርኛ...\",\n  \"type\": \"executive\",\n  \"displayOrder\": 5\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/cms/executives", "host": ["{{base_url}}"], "path": ["api", "cms", "executives"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update executive (admin)",
+          "request": {
+            "method": "PUT",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nameEn\": \"John Doe Updated\",\n  \"positionEn\": \"Senior Secretary General\",\n  \"bioEn\": \"Updated bio text...\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/cms/executives/1", "host": ["{{base_url}}"], "path": ["api", "cms", "executives", "1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Delete executive (admin)",
+          "request": {
+            "method": "DELETE",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/cms/executives/1", "host": ["{{base_url}}"], "path": ["api", "cms", "executives", "1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Upload executive image (admin)",
+          "request": {
+            "method": "POST",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "body": {
+              "mode": "formdata",
+              "formdata": [{"key": "image", "type": "file", "src": "/path/to/executive-photo.jpg"}]
+            },
+            "url": {"raw": "{{base_url}}/api/cms/executives/1/image", "host": ["{{base_url}}"], "path": ["api", "cms", "executives", "1", "image"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get contact info (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/cms/contact-info", "host": ["{{base_url}}"], "path": ["api", "cms", "contact-info"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update contact info (admin)",
+          "request": {
+            "method": "PUT",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"addressEn\": \"123 Main Street, Addis Ababa, Ethiopia\",\n  \"addressAm\": \"አዲስ አበባ፣ ኢትዮጵያ\",\n  \"phone\": \"+251-11-XXX-XXXX\",\n  \"phone2\": \"+251-11-YYY-YYYY\",\n  \"email\": \"info@tcwf-ethiopia.org\",\n  \"fax\": \"+251-11-ZZZ-ZZZZ\",\n  \"poBox\": \"P.O. Box 1234\",\n  \"mapUrl\": \"https://maps.google.com/...\",\n  \"latitude\": 9.0320,\n  \"longitude\": 38.7469,\n  \"facebookUrl\": \"https://facebook.com/tcwf-ethiopia\",\n  \"twitterUrl\": \"https://twitter.com/tcwf-ethiopia\",\n  \"linkedinUrl\": \"https://linkedin.com/company/tcwf-ethiopia\",\n  \"telegramUrl\": \"https://t.me/tcwf-ethiopia\",\n  \"youtubeUrl\": \"https://youtube.com/tcwf-ethiopia\",\n  \"workingHoursEn\": \"Monday - Friday: 8:30 AM - 5:00 PM\",\n  \"workingHoursAm\": \"ሰኞ - አርብ: 8:30 ጠዋት - 5:00 ከሰዓት\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/cms/contact-info", "host": ["{{base_url}}"], "path": ["api", "cms", "contact-info"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OSH Incidents",
+      "item": [
+        {
+          "name": "List OSH incidents (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/osh-incidents?union_id=1&accident_category=People&injury_severity=Major&status=open&from_date=2024-01-01&to_date=2024-12-31&page=1&per_page=20", "host": ["{{base_url}}"], "path": ["api", "osh-incidents"], "query": [{"key": "union_id", "value": "1"}, {"key": "accident_category", "value": "People"}, {"key": "injury_severity", "value": "Major"}, {"key": "status", "value": "open"}, {"key": "from_date", "value": "2024-01-01"}, {"key": "to_date", "value": "2024-12-31"}, {"key": "page", "value": "1"}, {"key": "per_page", "value": "20"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get OSH incident by ID (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/osh-incidents/1", "host": ["{{base_url}}"], "path": ["api", "osh-incidents", "1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Create OSH incident (admin)",
+          "request": {
+            "method": "POST",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"union_id\": 1,\n  \"accident_category\": \"People\",\n  \"date_time_occurred\": \"2024-10-18T10:30:00Z\",\n  \"location_site\": \"Main Office Building\",\n  \"location_building\": \"Building A\",\n  \"location_area\": \"Ground Floor\",\n  \"location_gps_latitude\": 9.0320,\n  \"location_gps_longitude\": 38.7469,\n  \"injury_severity\": \"Minor\",\n  \"damage_severity\": \"None\",\n  \"root_causes\": [\"Unsafe Act\", \"Equipment Failure\"],\n  \"description\": \"Employee slipped on wet floor in the cafeteria\",\n  \"regulatory_report_required\": false,\n  \"status\": \"open\",\n  \"reported_by\": \"Safety Officer\",\n  \"investigation_notes\": \"Initial investigation completed\",\n  \"corrective_actions\": \"Install non-slip mats\",\n  \"preventive_measures\": \"Regular floor cleaning schedule\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/osh-incidents", "host": ["{{base_url}}"], "path": ["api", "osh-incidents"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update OSH incident (admin)",
+          "request": {
+            "method": "PUT",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"investigating\",\n  \"investigation_notes\": \"Updated investigation notes\",\n  \"corrective_actions\": \"Updated corrective actions\",\n  \"preventive_measures\": \"Updated preventive measures\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/api/osh-incidents/1", "host": ["{{base_url}}"], "path": ["api", "osh-incidents", "1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Delete OSH incident (admin)",
+          "request": {
+            "method": "DELETE",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/osh-incidents/1", "host": ["{{base_url}}"], "path": ["api", "osh-incidents", "1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get OSH statistics (public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/osh-incidents/statistics?union_id=1&from_date=2024-01-01&to_date=2024-12-31", "host": ["{{base_url}}"], "path": ["api", "osh-incidents", "statistics"], "query": [{"key": "union_id", "value": "1"}, {"key": "from_date", "value": "2024-01-01"}, {"key": "to_date", "value": "2024-12-31"}]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OSH Reports",
+      "item": [
+        {
+          "name": "OSH Summary Report (admin)",
+          "request": {
+            "method": "GET",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/reports/osh-summary?union_id=1&from_date=2024-01-01&to_date=2024-12-31", "host": ["{{base_url}}"], "path": ["api", "reports", "osh-summary"], "query": [{"key": "union_id", "value": "1"}, {"key": "from_date", "value": "2024-01-01"}, {"key": "to_date", "value": "2024-12-31"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "OSH High Severity Report (admin)",
+          "request": {
+            "method": "GET",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/reports/osh-high-severity?union_id=1&from_date=2024-01-01&to_date=2024-12-31", "host": ["{{base_url}}"], "path": ["api", "reports", "osh-high-severity"], "query": [{"key": "union_id", "value": "1"}, {"key": "from_date", "value": "2024-01-01"}, {"key": "to_date", "value": "2024-12-31"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "OSH Regulatory Reports (admin)",
+          "request": {
+            "method": "GET",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/reports/osh-regulatory-reports?union_id=1&from_date=2024-01-01&to_date=2024-12-31", "host": ["{{base_url}}"], "path": ["api", "reports", "osh-regulatory-reports"], "query": [{"key": "union_id", "value": "1"}, {"key": "from_date", "value": "2024-01-01"}, {"key": "to_date", "value": "2024-12-31"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "OSH Monthly Trends (admin)",
+          "request": {
+            "method": "GET",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/reports/osh-monthly-trends?union_id=1&months=12", "host": ["{{base_url}}"], "path": ["api", "reports", "osh-monthly-trends"], "query": [{"key": "union_id", "value": "1"}, {"key": "months", "value": "12"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "OSH Root Causes Analysis (admin)",
+          "request": {
+            "method": "GET",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]},
+            "url": {"raw": "{{base_url}}/api/reports/osh-root-causes?union_id=1&from_date=2024-01-01&to_date=2024-12-31", "host": ["{{base_url}}"], "path": ["api", "reports", "osh-root-causes"], "query": [{"key": "union_id", "value": "1"}, {"key": "from_date", "value": "2024-01-01"}, {"key": "to_date", "value": "2024-12-31"}]}
           },
           "response": []
         }

@@ -259,6 +259,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </svg>
       ),
     },
+    {
+      path: '/admin/osh',
+      label: 'OSH Incidents',
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+          <path
+            d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5zM8 15v-3h4v3H8zm6-1H6v-2h8v2z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
   ];
 
   // Determine which menu to show based on user role

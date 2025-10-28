@@ -26,6 +26,8 @@ import {
   getTerminatedUnionsList,
   getMembers,
   getUnions,
+  getOSHStatistics,
+  getOSHIncidents,
 } from '@api/endpoints';
 import { useExportCsv } from '@hooks/useExportCsv';
 import { useExportPdf } from '@hooks/useExportPdf';
@@ -87,7 +89,7 @@ export const Reports: React.FC = () => {
     queryFn: () => getUnions({ per_page: 1000 }),
   });
 
-  const firstUnionId = unionsList?.data?.data?.[0]?.id as number | undefined;
+  const firstUnionId = unionsList?.data?.data?.[0]?.union_id as number | undefined;
   const effectiveUnionId = useMemo(() => {
     if (selectedUnionId !== '') return selectedUnionId as number;
     return firstUnionId; // avoid defaulting to 1 to prevent 404s
@@ -165,6 +167,17 @@ export const Reports: React.FC = () => {
     queryFn: () => getMembers({ per_page: 1000 }),
   });
 
+  // OSH Data Queries
+  const { data: oshStatistics } = useQuery({
+    queryKey: ['osh-statistics'],
+    queryFn: () => getOSHStatistics(),
+  });
+
+  const { data: oshIncidents } = useQuery({
+    queryKey: ['osh-incidents'],
+    queryFn: () => getOSHIncidents({ per_page: 1000 }),
+  });
+
   // Process data (normalize)
   // const membersByYear = useMemo(() => {
   //   const byYear = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
@@ -225,7 +238,7 @@ export const Reports: React.FC = () => {
     };
 
     const unionIdToSector = new Map<number, string>();
-    unions.forEach((u) => unionIdToSector.set(u.id, normalizeSector(u.sector)));
+    unions.forEach((u) => unionIdToSector.set(u.union_id, normalizeSector(u.sector)));
 
     const defaultSectors = ['Transport', 'Communication', 'Logistics', 'Aviation', 'Maritime'];
     const sectorAgg: Record<string, { Total: number; Male: number; Female: number }> = {};
@@ -326,6 +339,57 @@ export const Reports: React.FC = () => {
       return true;
     });
   }, [expiredCBAs, dateFrom, dateTo]);
+
+  // OSH Data Processing
+  const oshIncidentsByCategory = useMemo(() => {
+    const incidents: any[] = oshIncidents?.data?.data || [];
+    const categoryCount: Record<string, number> = {};
+    
+    incidents.forEach((incident) => {
+      const category = incident.accident_category || 'Unknown';
+      categoryCount[category] = (categoryCount[category] || 0) + 1;
+    });
+    
+    return Object.entries(categoryCount).map(([category, count]) => ({
+      category,
+      count,
+    }));
+  }, [oshIncidents]);
+
+  const oshIncidentsBySeverity = useMemo(() => {
+    const incidents: any[] = oshIncidents?.data?.data || [];
+    const severityCount: Record<string, number> = {};
+    
+    incidents.forEach((incident) => {
+      const severity = incident.injury_severity || 'Unknown';
+      severityCount[severity] = (severityCount[severity] || 0) + 1;
+    });
+    
+    return Object.entries(severityCount).map(([severity, count]) => ({
+      severity,
+      count,
+    }));
+  }, [oshIncidents]);
+
+  const oshIncidentsByMonth = useMemo(() => {
+    const incidents: any[] = oshIncidents?.data?.data || [];
+    const monthCount: Record<string, number> = {};
+    
+    incidents.forEach((incident) => {
+      if (!incident.date_time_occurred) return;
+      const date = new Date(incident.date_time_occurred);
+      if (isNaN(date.getTime())) return; // Skip invalid dates
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
+    });
+    
+    return Object.entries(monthCount)
+      .map(([month, count]) => ({
+        month,
+        count,
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+  }, [oshIncidents]);
 
   // Mock data for additional reports
   const membersByAge = [
@@ -682,7 +746,7 @@ export const Reports: React.FC = () => {
                       label="Union"
                       options={[
                         { value: '', label: 'Auto' },
-                        ...unionsList.data.data.map((u: any) => ({ value: u.id, label: u.name_en }))
+                        ...unionsList.data.data.map((u: any) => ({ value: u.union_id, label: u.name_en }))
                       ]}
                       value={selectedUnionId}
                       onChange={(e) => setSelectedUnionId((e.target.value as unknown as number) || '')}
@@ -890,6 +954,171 @@ export const Reports: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* OSH Reports Section */}
+          {oshStatistics?.data && (
+            <>
+              <div className={styles.sectionTitle}>
+                <h2>Occupational Safety and Health (OSH) Reports</h2>
+              </div>
+              
+              {/* OSH KPI Cards */}
+              <div className={styles.summaryGrid}>
+                <KPICard
+                  title="Total Incidents"
+                  value={(oshStatistics.data as any)?.total_incidents?.toLocaleString() || '0'}
+                  variant="primary"
+                  icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                />
+                <KPICard
+                  title="Fatal Incidents"
+                  value={(oshStatistics.data as any)?.by_severity?.find((s: any) => s.severity === 'Fatal')?.count?.toLocaleString() || '0'}
+                  variant="danger"
+                  icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                />
+                <KPICard
+                  title="Major Incidents"
+                  value={(oshStatistics.data as any)?.by_severity?.find((s: any) => s.severity === 'Major')?.count?.toLocaleString() || '0'}
+                  variant="warning"
+                  icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                />
+              </div>
+
+              {/* OSH Charts */}
+              <div className={styles.chartsGrid}>
+                <ChartCard
+                  title="Incidents by Category"
+                  description="Distribution of incidents by accident category"
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={oshIncidentsByCategory}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ category, count, percent }) =>
+                          `${category}: ${count} (${(percent * 100).toFixed(0)}%)`
+                        }
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="count"
+                      >
+                        {oshIncidentsByCategory.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+
+                <ChartCard
+                  title="Incidents by Severity"
+                  description="Distribution of incidents by injury severity"
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={oshIncidentsBySeverity}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="severity" stroke="var(--text-muted)" />
+                      <YAxis stroke="var(--text-muted)" />
+                      <Tooltip
+                        contentStyle={{
+                          background: 'var(--bg)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="count" name="Count" fill={COLORS[1]} radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              </div>
+
+              {/* OSH Monthly Trends */}
+              {oshIncidentsByMonth.length > 0 && (
+                <div className={styles.fullWidth}>
+                  <ChartCard
+                    title="Monthly Incident Trends"
+                    description="Incident trends over time"
+                  >
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={oshIncidentsByMonth}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                        <XAxis dataKey="month" stroke="var(--text-muted)" />
+                        <YAxis stroke="var(--text-muted)" />
+                        <Tooltip
+                          contentStyle={{
+                            background: 'var(--bg)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                          }}
+                        />
+                        <Legend />
+                        <Line type="monotone" dataKey="count" name="Incidents" stroke={COLORS[2]} strokeWidth={3} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              )}
+
+              {/* OSH Incidents Table */}
+              {oshIncidents?.data?.data && oshIncidents.data.data.length > 0 && (
+                <div className={styles.tableSection}>
+                  <h3 className={styles.sectionTitle}>Recent OSH Incidents</h3>
+                  <div className={styles.table}>
+                    <div className={styles.tableWrapper}>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Union</th>
+                            <th>Category</th>
+                            <th>Severity</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {oshIncidents.data.data.slice(0, 10).map((incident: any, idx: number) => (
+                            <tr key={idx}>
+                              <td>
+                                {incident.date_time_occurred && !isNaN(new Date(incident.date_time_occurred).getTime()) 
+                                  ? format(new Date(incident.date_time_occurred), 'MMM dd, yyyy')
+                                  : 'N/A'
+                                }
+                              </td>
+                              <td>{incident.union?.name_en || 'N/A'}</td>
+                              <td>{incident.accident_category}</td>
+                              <td>
+                                <span className={`${styles.statusBadge} ${
+                                  incident.injury_severity === 'Fatal' ? styles.danger :
+                                  incident.injury_severity === 'Major' ? styles.warning :
+                                  incident.injury_severity === 'Minor' ? styles.success : styles.info
+                                }`}>
+                                  {incident.injury_severity}
+                                </span>
+                              </td>
+                              <td>{incident.location_site}</td>
+                              <td>
+                                <span className={`${styles.statusBadge} ${
+                                  incident.status === 'Closed' ? styles.success :
+                                  incident.status === 'Under Investigation' ? styles.warning : styles.info
+                                }`}>
+                                  {incident.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* Summary Statistics */}
