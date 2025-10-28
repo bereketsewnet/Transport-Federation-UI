@@ -565,6 +565,10 @@ export const getContacts = (
   return apiClient.get('/api/contacts', { params });
 };
 
+export const deleteContact = (id: number): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/contacts/${id}`, { params: { confirm: true } });
+};
+
 // ==================== VISITORS ====================
 
 export interface Visitor {

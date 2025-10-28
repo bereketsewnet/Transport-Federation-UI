@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { getContacts, Contact } from '@api/endpoints';
+import { getContacts, deleteContact, Contact } from '@api/endpoints';
+import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
+import { toast } from 'react-hot-toast';
 import { DataTable, Column } from '@components/DataTable/DataTable';
 import { useTable } from '@hooks/useTable';
 import { Button } from '@components/Button/Button';
@@ -13,6 +15,10 @@ export const ContactManager: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; contact: Contact | null }>({
+    isOpen: false,
+    contact: null,
+  });
   const { page, per_page, setPage, setPerPage } = useTable();
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
@@ -72,10 +78,33 @@ export const ContactManager: React.FC = () => {
     },
   ];
 
+  const handleDelete = async () => {
+    if (!deleteDialog.contact) return;
+
+    try {
+      await deleteContact(deleteDialog.contact.id);
+      toast.success('Contact deleted successfully');
+      setDeleteDialog({ isOpen: false, contact: null });
+      await loadContacts();
+    } catch (error) {
+      console.error('Failed to delete contact:', error);
+      toast.error('Failed to delete contact');
+    }
+  };
+
   const actions = (row: Contact) => (
-    <Button size="sm" onClick={() => setSelectedContact(row)}>
-      {t('common.view')}
-    </Button>
+    <>
+      <Button size="sm" variant="secondary" onClick={() => setSelectedContact(row)}>
+        {t('common.view')}
+      </Button>
+      <Button 
+        size="sm" 
+        variant="danger" 
+        onClick={() => setDeleteDialog({ isOpen: true, contact: row })}
+      >
+        Delete
+      </Button>
+    </>
   );
 
   return (
@@ -140,6 +169,18 @@ export const ContactManager: React.FC = () => {
           </div>
         )}
       </Modal>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, contact: null })}
+        onConfirm={handleDelete}
+        title="Delete Contact Submission"
+        message={`Are you sure you want to delete the contact submission from ${deleteDialog.contact?.name}?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 };
