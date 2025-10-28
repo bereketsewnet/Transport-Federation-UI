@@ -111,5 +111,13 @@
 .icon {
   display: inline-flex;
   align-items: center;
+  font-size: 1em;
+}
+
+/* Icon-only buttons */
+.button:has(> svg:only-child) {
+  padding: var(--spacing-2);
+  min-width: 32px;
+  min-height: 32px;
 }
 

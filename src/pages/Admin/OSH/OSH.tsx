@@ -302,7 +302,7 @@ export const OSH: React.FC = () => {
             onClick={() => handleEdit(incident)}
             title="Edit"
           >
-            <FaEdit />
+            <FaEdit size={16} />
           </Button>
           <Button
             size="sm"
@@ -310,7 +310,7 @@ export const OSH: React.FC = () => {
             onClick={() => handleDelete(incident.id)}
             title="Delete"
           >
-            <FaTrash />
+            <FaTrash size={16} />
           </Button>
         </div>
       )
