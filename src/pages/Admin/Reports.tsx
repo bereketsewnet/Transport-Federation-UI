@@ -346,7 +346,7 @@ export const Reports: React.FC = () => {
     const categoryCount: Record<string, number> = {};
     
     incidents.forEach((incident) => {
-      const category = incident.accident_category || 'Unknown';
+      const category = incident.accidentCategory || 'Unknown';
       categoryCount[category] = (categoryCount[category] || 0) + 1;
     });
     
@@ -361,7 +361,7 @@ export const Reports: React.FC = () => {
     const severityCount: Record<string, number> = {};
     
     incidents.forEach((incident) => {
-      const severity = incident.injury_severity || 'Unknown';
+      const severity = incident.injurySeverity || 'Unknown';
       severityCount[severity] = (severityCount[severity] || 0) + 1;
     });
     
@@ -376,8 +376,8 @@ export const Reports: React.FC = () => {
     const monthCount: Record<string, number> = {};
     
     incidents.forEach((incident) => {
-      if (!incident.date_time_occurred) return;
-      const date = new Date(incident.date_time_occurred);
+      if (!incident.dateTimeOccurred) return;
+      const date = new Date(incident.dateTimeOccurred);
       if (isNaN(date.getTime())) return; // Skip invalid dates
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
@@ -389,6 +389,17 @@ export const Reports: React.FC = () => {
         count,
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
+  }, [oshIncidents]);
+
+  // Computed OSH Statistics from incidents data
+  const computedOSHStatistics = useMemo(() => {
+    const incidents: any[] = oshIncidents?.data?.data || [];
+    
+    return {
+      totalIncidents: incidents.length,
+      fatalIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Fatal').length,
+      majorIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Major').length,
+    };
   }, [oshIncidents]);
 
   // Mock data for additional reports
@@ -967,19 +978,19 @@ export const Reports: React.FC = () => {
               <div className={styles.summaryGrid}>
                 <KPICard
                   title="Total Incidents"
-                  value={(oshStatistics.data as any)?.total_incidents?.toLocaleString() || '0'}
+                  value={computedOSHStatistics.totalIncidents.toLocaleString()}
                   variant="primary"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
                 <KPICard
                   title="Fatal Incidents"
-                  value={(oshStatistics.data as any)?.by_severity?.find((s: any) => s.severity === 'Fatal')?.count?.toLocaleString() || '0'}
+                  value={computedOSHStatistics.fatalIncidents.toLocaleString()}
                   variant="danger"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
                 <KPICard
                   title="Major Incidents"
-                  value={(oshStatistics.data as any)?.by_severity?.find((s: any) => s.severity === 'Major')?.count?.toLocaleString() || '0'}
+                  value={computedOSHStatistics.majorIncidents.toLocaleString()}
                   variant="warning"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
@@ -1085,23 +1096,23 @@ export const Reports: React.FC = () => {
                           {oshIncidents.data.data.slice(0, 10).map((incident: any, idx: number) => (
                             <tr key={idx}>
                               <td>
-                                {incident.date_time_occurred && !isNaN(new Date(incident.date_time_occurred).getTime()) 
-                                  ? format(new Date(incident.date_time_occurred), 'MMM dd, yyyy')
+                                {incident.dateTimeOccurred && !isNaN(new Date(incident.dateTimeOccurred).getTime()) 
+                                  ? format(new Date(incident.dateTimeOccurred), 'MMM dd, yyyy')
                                   : 'N/A'
                                 }
                               </td>
-                              <td>{incident.union?.name_en || 'N/A'}</td>
-                              <td>{incident.accident_category}</td>
+                              <td>{incident.union?.name_en || (incident.unionId ? `Union ID: ${incident.unionId}` : 'N/A')}</td>
+                              <td>{incident.accidentCategory || 'Not Set'}</td>
                               <td>
                                 <span className={`${styles.statusBadge} ${
-                                  incident.injury_severity === 'Fatal' ? styles.danger :
-                                  incident.injury_severity === 'Major' ? styles.warning :
-                                  incident.injury_severity === 'Minor' ? styles.success : styles.info
+                                  incident.injurySeverity === 'Fatal' ? styles.danger :
+                                  incident.injurySeverity === 'Major' ? styles.warning :
+                                  incident.injurySeverity === 'Minor' ? styles.success : styles.info
                                 }`}>
-                                  {incident.injury_severity}
+                                  {incident.injurySeverity}
                                 </span>
                               </td>
-                              <td>{incident.location_site}</td>
+                              <td>{incident.locationSite}</td>
                               <td>
                                 <span className={`${styles.statusBadge} ${
                                   incident.status === 'Closed' ? styles.success :
