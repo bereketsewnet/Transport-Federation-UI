@@ -121,8 +121,24 @@ export const GeneralAssembly: React.FC = () => {
       label: 'Days Since',
       render: (_value: unknown, union: Union) => {
         if (!union.general_assembly_date) return <span>-</span>;
-        const days = Math.floor((new Date().getTime() - new Date(union.general_assembly_date).getTime()) / (1000 * 60 * 60 * 24));
-        return <span className={days > 365 ? styles.overdue : styles.active}>{days} days</span>;
+        
+        // Calculate: today - assembly_date
+        // Positive = past (assembly happened X days ago)
+        // Negative = future (assembly is in X days)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const assemblyDate = new Date(union.general_assembly_date);
+        assemblyDate.setHours(0, 0, 0, 0);
+        
+        const diffTime = today.getTime() - assemblyDate.getTime();
+        const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Display: positive for past, negative for future
+        if (days >= 0) {
+          return <span className={days > 365 ? styles.overdue : styles.active}>{days} days ago</span>;
+        } else {
+          return <span className={styles.upcoming}>{Math.abs(days)} days until</span>;
+        }
       },
     },
   ];

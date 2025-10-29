@@ -123,6 +123,10 @@ export const MemberView: React.FC = () => {
           </h3>
           <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>mem_Id</span>
+              <span className={styles.infoValue}>{member.mem_id || member.id || 'N/A'}</span>
+            </div>
+            <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('members.memberCode')}</span>
               <span className={styles.infoValue}>{member.member_code}</span>
             </div>

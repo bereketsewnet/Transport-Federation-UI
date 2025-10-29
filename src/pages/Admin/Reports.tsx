@@ -28,6 +28,8 @@ import {
   getUnions,
   getOSHStatistics,
   getOSHIncidents,
+  getCBAs,
+  getUnionExecutives,
 } from '@api/endpoints';
 import { useExportCsv } from '@hooks/useExportCsv';
 import { useExportPdf } from '@hooks/useExportPdf';
@@ -98,8 +100,15 @@ export const Reports: React.FC = () => {
   const { data: execByUnion } = useQuery({
     queryKey: ['reports-executives-by-union', effectiveUnionId],
     queryFn: () => getExecutivesByUnion(Number(effectiveUnionId)),
-    enabled: typeof effectiveUnionId === 'number' && !Number.isNaN(effectiveUnionId),
+    enabled: typeof effectiveUnionId === 'number' && !Number.isNaN(effectiveUnionId) && selectedUnionId !== '',
     retry: false,
+  });
+
+  // Fetch all executives for "Overall" view
+  const { data: allExecutivesData } = useQuery({
+    queryKey: ['reports-executives-overall'],
+    queryFn: () => getUnionExecutives({ per_page: 1000 }),
+    enabled: selectedUnionId === '',
   });
 
   const { data: youthData } = useQuery({
@@ -130,6 +139,12 @@ export const Reports: React.FC = () => {
   const { data: cbaOngoing } = useQuery({
     queryKey: ['reports-cba-ongoing'],
     queryFn: getUnionsCBAOngoing,
+  });
+
+  // Fetch all CBAs to get accurate status counts from database
+  const { data: allCBAsData } = useQuery({
+    queryKey: ['all-cbas-for-status'],
+    queryFn: () => getCBAs({ per_page: 1000 }),
   });
 
   const { data: gaStatus } = useQuery({
@@ -166,6 +181,46 @@ export const Reports: React.FC = () => {
     queryKey: ['all-members-for-export'],
     queryFn: () => getMembers({ per_page: 1000 }),
   });
+
+  // Calculate overall executives gender breakdown
+  const overallExecutivesByGender = useMemo(() => {
+    const executives: any[] = allExecutivesData?.data?.data || [];
+    const members: any[] = allMembersData?.data?.data || [];
+    const genderCount: Record<string, number> = {};
+
+    // Create a map of mem_id to member sex for quick lookup
+    const memberSexMap = new Map<number, string>();
+    members.forEach((member: any) => {
+      if (member.mem_id || member.id) {
+        const memId = member.mem_id || member.id;
+        memberSexMap.set(memId, member.sex || '');
+      }
+    });
+
+    const normalizeSex = (raw: unknown): 'Male' | 'Female' | 'Unknown' => {
+      const v = String(raw || '').trim().toLowerCase();
+      if (v.startsWith('m')) return 'Male';
+      if (v.startsWith('f')) return 'Female';
+      return 'Unknown';
+    };
+
+    executives.forEach((exec: any) => {
+      // Try multiple sources: direct sex field, member object, or lookup from members map
+      let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || exec.gender || '';
+      
+      // If still empty, try to get from members map using mem_id
+      if (!sexValue && exec.mem_id) {
+        sexValue = memberSexMap.get(exec.mem_id) || '';
+      }
+      
+      const sex = normalizeSex(sexValue);
+      genderCount[sex] = (genderCount[sex] || 0) + 1;
+    });
+
+    return Object.entries(genderCount)
+      .map(([sex, count]) => ({ name: sex, value: count }))
+      .filter(item => item.value > 0);
+  }, [allExecutivesData, allMembersData]);
 
   // OSH Data Queries
   const { data: oshStatistics } = useQuery({
@@ -211,15 +266,41 @@ export const Reports: React.FC = () => {
   }, [youthData, eldersData]);
 
   const cbaStatus = useMemo(() => {
-    const expired = cbaExpiredList?.data?.count ?? 0;
-    const ongoing = cbaOngoing?.data?.count ?? 0;
-    const expiringSoon = cbaExpiringSoon?.data?.count ?? 0;
+    // Determine CBA status from expiry date: Expired (< today), Pending (<= 90 days), Signed (otherwise)
+    const allCBAs: any[] = allCBAsData?.data?.data || [];
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    const today = new Date();
+    const thresholdDays = 90;
+
+    let signed = 0;
+    let expired = 0;
+    let pending = 0;
+
+    allCBAs.forEach((cba: any) => {
+      const dateStr = cba?.next_end_date || cba?.end_date;
+      const endDate = dateStr ? new Date(dateStr) : null;
+
+      if (!endDate || isNaN(endDate.getTime())) {
+        // Fallback to DB status field if date is missing/invalid
+        const s = String(cba.status || '').toLowerCase();
+        if (s === 'expired') expired += 1;
+        else if (s === 'pending') pending += 1;
+        else signed += 1;
+        return;
+      }
+
+      const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / MS_PER_DAY);
+      if (diffDays < 0) expired += 1;
+      else if (diffDays <= thresholdDays) pending += 1;
+      else signed += 1;
+    });
+
     return [
-      { status: 'Signed', count: ongoing },
-      { status: 'Pending', count: expiringSoon },
+      { status: 'Signed', count: signed },
+      { status: 'Pending', count: pending },
       { status: 'Expired', count: expired },
     ];
-  }, [cbaExpiredList, cbaOngoing, cbaExpiringSoon]);
+  }, [allCBAsData]);
 
   // Build Members by Sector (Total/Male/Female) using members joined with unions
   const membersBySector = useMemo(() => {
@@ -403,13 +484,13 @@ export const Reports: React.FC = () => {
   }, [oshIncidents]);
 
   // Mock data for additional reports
-  const membersByAge = [
-    { age_group: 'Under 25', count: 180 },
-    { age_group: '25-35', count: 450 },
-    { age_group: '36-45', count: 380 },
-    { age_group: '46-55', count: 190 },
-    { age_group: 'Over 55', count: 50 },
-  ];
+  // const membersByAge = [
+  //   { age_group: 'Under 25', count: 180 },
+  //   { age_group: '25-35', count: 450 },
+  //   { age_group: '36-45', count: 380 },
+  //   { age_group: '46-55', count: 190 },
+  //   { age_group: 'Over 55', count: 50 },
+  // ];
 
   // NOTE: unionsBySector now comes from API above
 
@@ -484,11 +565,6 @@ export const Reports: React.FC = () => {
             <ChartCard
               title={t('reports.membersByGender')}
               description="Total members by gender distribution"
-              actions={
-                <Button size="sm" variant="ghost">
-                  Details
-                </Button>
-              }
             >
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={membersByGender}>
@@ -606,7 +682,8 @@ export const Reports: React.FC = () => {
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Members by Age Group" description="Age distribution">
+            {/* Hidden: Members by Age Group - Uncomment to show */}
+            {/* <ChartCard title="Members by Age Group" description="Age distribution">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={membersByAge}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -623,7 +700,7 @@ export const Reports: React.FC = () => {
                   <Bar dataKey="count" name="Members" fill={COLORS[3]} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </ChartCard>
+            </ChartCard> */}
           </div>
 
           {/* Row 4: Members by Sector (Stacked) */}
@@ -745,22 +822,27 @@ export const Reports: React.FC = () => {
             </div>
           )}
 
-          {/* Executives Count By Union */}
-          {execByUnion?.data?.executives_count && (
+          {/* Executives by Gender and General Assembly Status - Side by Side */}
+          {(((selectedUnionId === '' && overallExecutivesByGender.length > 0) || (selectedUnionId !== '' && execByUnion?.data?.executives_count)) || gaStatus?.data) && (
             <div className={styles.chartsGrid}>
+              {/* Executives Count By Union */}
+              {((selectedUnionId === '' && overallExecutivesByGender.length > 0) || (selectedUnionId !== '' && execByUnion?.data?.executives_count)) && (
               <ChartCard
                 title="Executives by Gender (Selected Union)"
-                description={execByUnion.data.union_name}
+                  description={selectedUnionId === '' ? 'Overall - All Unions' : execByUnion?.data?.union_name || ''}
                 actions={
                   unionsList?.data?.data ? (
                     <Select
                       label="Union"
                       options={[
-                        { value: '', label: 'Auto' },
-                        ...unionsList.data.data.map((u: any) => ({ value: u.union_id, label: u.name_en }))
-                      ]}
-                      value={selectedUnionId}
-                      onChange={(e) => setSelectedUnionId((e.target.value as unknown as number) || '')}
+                          { value: '', label: 'Overall' },
+                          ...unionsList.data.data.map((u: any) => ({ value: String(u.union_id), label: u.name_en }))
+                        ]}
+                        value={selectedUnionId === '' ? '' : String(selectedUnionId)}
+                        onChange={(e) => {
+                          const v = String(e.target.value || '');
+                          setSelectedUnionId(v === '' ? '' : Number(v));
+                        }}
                     />
                   ) : undefined
                 }
@@ -768,7 +850,10 @@ export const Reports: React.FC = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={execByUnion.data.executives_count.by_sex.map((s: any) => ({ name: s.sex, value: s.count }))}
+                        data={selectedUnionId === '' 
+                          ? overallExecutivesByGender 
+                          : execByUnion?.data?.executives_count?.by_sex?.map((s: any) => ({ name: s.sex, value: s.count })) || []
+                        }
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -777,7 +862,7 @@ export const Reports: React.FC = () => {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {execByUnion.data.executives_count.by_sex.map((_: any, index: number) => (
+                        {(selectedUnionId === '' ? overallExecutivesByGender : execByUnion?.data?.executives_count?.by_sex?.map((s: any) => ({ name: s.sex, value: s.count })) || []).map((_: any, index: number) => (
                         <Cell key={`sex-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -785,12 +870,10 @@ export const Reports: React.FC = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </ChartCard>
-            </div>
           )}
 
           {/* General Assembly Status */}
           {gaStatus?.data && (
-            <div className={styles.chartsGrid}>
               <ChartCard title="General Assembly Status" description="Conducted vs Not Conducted">
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
@@ -814,6 +897,7 @@ export const Reports: React.FC = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </ChartCard>
+              )}
             </div>
           )}
 
@@ -876,7 +960,67 @@ export const Reports: React.FC = () => {
           )}
 
           {/* Recent General Assembly (< 3 months) */}
-          {unionsGARecent?.data?.data && unionsGARecent.data.data.length > 0 && (
+          {(() => {
+            // Calculate from general_assembly_date to today, show only past 3 months (0-90 days ago)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
+            
+            // Get all data from API - API should already filter by 3 months
+            const allData = unionsGARecent?.data?.data || [];
+            
+            // Debug: Log raw data to see what we're getting
+            if (allData.length > 0) {
+              console.log('🔍 Raw GA Recent Data:', allData);
+            }
+            
+            // Map and calculate days correctly (always calculate from date to ensure correct sign)
+            // Positive = past, Negative = future
+            const recentGAData = allData.map((u: any) => {
+              let daysSince: number | null = null;
+              
+              // Always calculate from general_assembly_date (ignore API's days_since_assembly as it may be wrong)
+              if (u.general_assembly_date) {
+                try {
+                  const assemblyDate = new Date(u.general_assembly_date);
+                  if (!isNaN(assemblyDate.getTime())) {
+                    assemblyDate.setHours(0, 0, 0, 0);
+                    // Calculate: today - assembly_date
+                    // Positive = past (assembly happened X days ago)
+                    // Negative = future (assembly is in X days)
+                    const diffTime = today.getTime() - assemblyDate.getTime();
+                    daysSince = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                  }
+                } catch (e) {
+                  // Invalid date, skip
+                  return null;
+                }
+              }
+              
+              if (daysSince === null) {
+                return null;
+              }
+              
+              return {
+                ...u,
+                days_since_assembly: daysSince
+              };
+            }).filter((u: any): u is any => {
+              if (!u) return false;
+              const daysSince = Number(u.days_since_assembly);
+              // Only show past assemblies within 3 months (0-90 days ago)
+              const isValid = !isNaN(daysSince) && daysSince >= 0 && daysSince <= 90;
+              if (!isValid && daysSince !== undefined) {
+                console.log('🚫 Filtered out:', u.union_name || u.name_en, 'days_since:', daysSince);
+              }
+              return isValid;
+            });
+            
+            // Debug: Log filtered results
+            console.log('✅ Filtered GA Recent Data:', recentGAData.length, 'out of', allData.length);
+            
+            // Show table if we have data, or show message if API returned data but it was filtered out
+            if (recentGAData.length > 0) {
+              return (
             <div className={styles.tableSection}>
               <h3 className={styles.sectionTitle}>Recent General Assembly (&lt; 3 months)</h3>
               <div className={styles.table}>
@@ -890,7 +1034,7 @@ export const Reports: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {unionsGARecent.data.data.map((u: any, idx: number) => (
+                          {recentGAData.map((u: any, idx: number) => (
                         <tr key={idx}>
                           <td>{u.union_name || u.name_en}</td>
                           <td>{u.general_assembly_date}</td>
@@ -902,7 +1046,13 @@ export const Reports: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+              );
+            }
+            
+            // If API returned data but was filtered out, or API returned no data
+            // (Don't show anything if no data - this is expected behavior)
+            return null;
+          })()}
 
           {/* Terminated Unions List */}
           {terminatedList?.data?.data && terminatedList.data.data.length > 0 && (
