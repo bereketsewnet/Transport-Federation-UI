@@ -104,11 +104,11 @@ export const Reports: React.FC = () => {
     retry: false,
   });
 
-  // Fetch all executives for "Overall" view
+  // Fetch all executives for "Overall" view and summary statistics
   const { data: allExecutivesData } = useQuery({
     queryKey: ['reports-executives-overall'],
     queryFn: () => getUnionExecutives({ per_page: 1000 }),
-    enabled: selectedUnionId === '',
+    // Always enabled for summary statistics, also used for "Overall" view
   });
 
   const { data: youthData } = useQuery({
@@ -491,6 +491,39 @@ export const Reports: React.FC = () => {
   //   { age_group: '46-55', count: 190 },
   //   { age_group: 'Over 55', count: 50 },
   // ];
+
+  // Calculate Summary Statistics metrics
+  const totalExecutives = useMemo(() => {
+    const executives = allExecutivesData?.data?.data || [];
+    return executives.length;
+  }, [allExecutivesData]);
+
+  const unionsWithCBAs = useMemo(() => {
+    const cbas = allCBAsData?.data?.data || [];
+    const unionIdsWithCBA = new Set<number>();
+    cbas.forEach((cba: any) => {
+      if (cba.union_id) {
+        unionIdsWithCBA.add(cba.union_id);
+      }
+    });
+    return unionIdsWithCBA.size;
+  }, [allCBAsData]);
+
+  const unionsWithGeneralAssembly = useMemo(() => {
+    const unions = unionsList?.data?.data || [];
+    return unions.filter((u: any) => u.general_assembly_date && u.general_assembly_date !== null).length;
+  }, [unionsList]);
+
+  const totalOrganizations = useMemo(() => {
+    const unions = unionsList?.data?.data || [];
+    const organizations = new Set<string>();
+    unions.forEach((u: any) => {
+      if (u.organization) {
+        organizations.add(u.organization.trim());
+      }
+    });
+    return organizations.size;
+  }, [unionsList]);
 
   // NOTE: unionsBySector now comes from API above
 
@@ -1287,22 +1320,20 @@ export const Reports: React.FC = () => {
             <h3 className={styles.sectionTitle}>Summary Statistics</h3>
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
-                <h4>Total Active Members</h4>
-                <p className={styles.summaryValue}>{
-                  ((membersData?.data as any)?.summary?.grand_total || 0).toLocaleString()
-                }</p>
+                <h4>Total Executive Members</h4>
+                <p className={styles.summaryValue}>{totalExecutives.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Youth Members (&lt;35)</h4>
-                <p className={styles.summaryValue}>{(youthData?.data?.total ?? 0).toLocaleString()}</p>
+                <h4>Unions with CBAs</h4>
+                <p className={styles.summaryValue}>{unionsWithCBAs.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Total Unions</h4>
-                <p className={styles.summaryValue}>{(unionsSummary?.data?.total_unions ?? 0).toLocaleString()}</p>
+                <h4>Unions with General Assembly</h4>
+                <p className={styles.summaryValue}>{unionsWithGeneralAssembly.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Terminated Unions</h4>
-                <p className={styles.summaryValue}>{(terminatedCount?.data?.total_terminated ?? 0).toLocaleString()}</p>
+                <h4>Total Organizations</h4>
+                <p className={styles.summaryValue}>{totalOrganizations.toLocaleString()}</p>
               </div>
             </div>
           </div>
