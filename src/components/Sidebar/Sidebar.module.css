@@ -95,6 +95,26 @@
   white-space: nowrap;
 }
 
+.sectionDivider {
+  margin: var(--spacing-4) 0 var(--spacing-2) 0;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-top: 1px solid var(--border);
+}
+
+.sectionDivider:first-child {
+  margin-top: 0;
+  border-top: none;
+}
+
+.sectionDividerText {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
 @media (max-width: 1023px) {
   .sidebar {
     transform: translateX(-100%);
