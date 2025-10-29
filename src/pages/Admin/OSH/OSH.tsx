@@ -12,6 +12,7 @@ import { Button } from '@components/Button/Button';
 import { DataTable } from '@components/DataTable/DataTable';
 import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import { Loading } from '@components/Loading/Loading';
+import { Modal } from '@components/Modal/Modal';
 import { 
   FaPlus, 
   FaEdit, 
@@ -19,7 +20,8 @@ import {
   FaExclamationTriangle,
   FaShieldAlt,
   FaMapMarkerAlt,
-  FaUser
+  FaUser,
+  FaEye
 } from 'react-icons/fa';
 import { formatDate } from '@utils/formatters';
 import { OSHForm } from './OSHForm';
@@ -35,6 +37,7 @@ export const OSH: React.FC = () => {
   const [editingIncident, setEditingIncident] = useState<OSHIncident | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [selectedIncident, setSelectedIncident] = useState<OSHIncident | null>(null);
   const [filters, setFilters] = useState<OSHIncidentParams>({
     page: 1,
     per_page: 1000  // Get all incidents for statistics
@@ -252,28 +255,14 @@ export const OSH: React.FC = () => {
       key: 'description',
       title: 'Description',
       label: 'Description',
-      width: '300px',
+      width: '250px',
       render: (_value: unknown, incident: OSHIncident) => (
         <div className={styles.detailItem}>
-          <span className={styles.detailValue}>
-            {incident.description && incident.description.length > 100 
-              ? `${incident.description.substring(0, 100)}...` 
+          <span className={`${styles.detailValue} ${styles.truncatedText}`} title={incident.description || ''}>
+            {incident.description && incident.description.length > 50
+              ? `${incident.description.substring(0, 50)}...` 
               : incident.description || 'No description'}
           </span>
-          {incident.rootCauses && incident.rootCauses.length > 0 && (
-            <div className={styles.rootCausesList}>
-              {incident.rootCauses.slice(0, 2).map((cause, index) => (
-                <span key={index} className={styles.rootCauseTag}>
-                  {cause}
-                </span>
-              ))}
-              {incident.rootCauses.length > 2 && (
-                <span className={styles.rootCauseTag}>
-                  +{incident.rootCauses.length - 2} more
-                </span>
-              )}
-            </div>
-          )}
         </div>
       )
     },
@@ -283,9 +272,11 @@ export const OSH: React.FC = () => {
       label: 'Reported By',
       width: '150px',
       render: (_value: unknown, incident: OSHIncident) => (
-        <span className={styles.detailValue}>
+        <span className={`${styles.detailValue} ${styles.truncatedText}`} title={incident.reportedBy || ''}>
           <FaUser className="mr-1" />
-          {incident.reportedBy}
+          {incident.reportedBy && incident.reportedBy.length > 25
+            ? `${incident.reportedBy.substring(0, 25)}...`
+            : incident.reportedBy || 'N/A'}
         </span>
       )
     },
@@ -293,9 +284,17 @@ export const OSH: React.FC = () => {
       key: 'actions',
       title: 'Actions',
       label: 'Actions',
-      width: '120px',
+      width: '160px',
       render: (_value: unknown, incident: OSHIncident) => (
         <div className={styles.incidentActions}>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => setSelectedIncident(incident)}
+            title="View Details"
+          >
+            <FaEye size={16} />
+          </Button>
           <Button
             size="sm"
             variant="secondary"
@@ -494,6 +493,117 @@ export const OSH: React.FC = () => {
         cancelText="Cancel"
         variant="danger"
       />
+
+      {/* View Details Modal */}
+      <Modal
+        isOpen={selectedIncident !== null}
+        onClose={() => setSelectedIncident(null)}
+        title="OSH Incident Details"
+        size="lg"
+      >
+        {selectedIncident && (
+          <div className={styles.incidentDetails}>
+            <div className={styles.detailRow}>
+              <strong>Date:</strong>
+              <span>{formatDate(selectedIncident.dateTimeOccurred) || 'N/A'}</span>
+            </div>
+            <div className={styles.detailRow}>
+              <strong>Union:</strong>
+              <span>{selectedIncident.union?.name_en || (selectedIncident.unionId ? `Union ID: ${selectedIncident.unionId}` : 'N/A')}</span>
+            </div>
+            <div className={styles.detailRow}>
+              <strong>Category:</strong>
+              <span>{selectedIncident.accidentCategory || 'Not Set'}</span>
+            </div>
+            <div className={styles.detailRow}>
+              <strong>Severity:</strong>
+              <span>
+                <span className={`${styles.statusBadge} ${getSeverityColor(selectedIncident.injurySeverity)}`}>
+                  {selectedIncident.injurySeverity || 'N/A'}
+                </span>
+              </span>
+            </div>
+            <div className={styles.detailRow}>
+              <strong>Status:</strong>
+              <span>
+                <span className={`${styles.statusBadge} ${getStatusColor(selectedIncident.status)}`}>
+                  {selectedIncident.status || 'N/A'}
+                </span>
+              </span>
+            </div>
+            <div className={styles.detailRow}>
+              <strong>Location Site:</strong>
+              <span>{selectedIncident.locationSite || 'N/A'}</span>
+            </div>
+            {selectedIncident.locationBuilding && (
+              <div className={styles.detailRow}>
+                <strong>Building:</strong>
+                <span>{selectedIncident.locationBuilding}</span>
+              </div>
+            )}
+            {selectedIncident.locationArea && (
+              <div className={styles.detailRow}>
+                <strong>Area:</strong>
+                <span>{selectedIncident.locationArea}</span>
+              </div>
+            )}
+            <div className={styles.detailRow}>
+              <strong>Reported By:</strong>
+              <span>{selectedIncident.reportedBy || 'N/A'}</span>
+            </div>
+            {selectedIncident.reportedDate && (
+              <div className={styles.detailRow}>
+                <strong>Reported Date:</strong>
+                <span>{formatDate(selectedIncident.reportedDate) || selectedIncident.reportedDate}</span>
+              </div>
+            )}
+            <div className={styles.detailSection}>
+              <strong>Description:</strong>
+              <div className={styles.detailText}>{selectedIncident.description || 'No description provided'}</div>
+            </div>
+            {selectedIncident.rootCauses && selectedIncident.rootCauses.length > 0 && (
+              <div className={styles.detailSection}>
+                <strong>Root Causes:</strong>
+                <ul className={styles.detailList}>
+                  {selectedIncident.rootCauses.map((cause: string, idx: number) => (
+                    <li key={idx}>{cause}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {selectedIncident.investigationNotes && (
+              <div className={styles.detailSection}>
+                <strong>Investigation Notes:</strong>
+                <div className={styles.detailText}>{selectedIncident.investigationNotes}</div>
+              </div>
+            )}
+            {selectedIncident.correctiveActions && (
+              <div className={styles.detailSection}>
+                <strong>Corrective Actions:</strong>
+                <div className={styles.detailText}>{selectedIncident.correctiveActions}</div>
+              </div>
+            )}
+            {selectedIncident.preventiveMeasures && (
+              <div className={styles.detailSection}>
+                <strong>Preventive Measures:</strong>
+                <div className={styles.detailText}>{selectedIncident.preventiveMeasures}</div>
+              </div>
+            )}
+            {selectedIncident.regulatoryReportRequired && (
+              <div className={styles.detailRow}>
+                <strong>Regulatory Report Required:</strong>
+                <span>Yes</span>
+              </div>
+            )}
+            {selectedIncident.regulatoryReportDate && (
+              <div className={styles.detailRow}>
+                <strong>Regulatory Report Date:</strong>
+                <span>{formatDate(selectedIncident.regulatoryReportDate) || selectedIncident.regulatoryReportDate}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

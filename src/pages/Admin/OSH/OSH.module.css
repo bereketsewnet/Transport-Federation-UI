@@ -237,6 +237,77 @@
   font-weight: 500;
 }
 
+.truncatedText {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: break-word;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailRow strong {
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 180px;
+  flex-shrink: 0;
+}
+
+.detailRow span {
+  text-align: right;
+  flex: 1;
+}
+
+.detailSection {
+  margin: var(--spacing-4) 0;
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detailSection:last-child {
+  border-bottom: none;
+}
+
+.detailSection strong {
+  display: block;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.detailText {
+  font-size: var(--text-sm);
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.detailList {
+  list-style: disc;
+  padding-left: var(--spacing-6);
+  margin: var(--spacing-2) 0;
+}
+
+.detailList li {
+  font-size: var(--text-sm);
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-1);
+}
+
 .rootCausesList {
   display: flex;
   flex-wrap: wrap;
