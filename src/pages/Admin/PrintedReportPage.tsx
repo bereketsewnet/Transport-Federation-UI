@@ -527,9 +527,55 @@ const PrintedReportPage: React.FC = () => {
     return result;
   }, [allMembersData, eldersData, youthByGender]);
 
-  // Executives by selected union
+  // Calculate overall executives gender breakdown (for "Overall" option)
+  const overallExecutivesByGender = useMemo(() => {
+    const executives: any[] = allExecutivesData?.data?.data || [];
+    const members: any[] = allMembersData?.data?.data || [];
+    const genderCount: Record<string, number> = {};
+
+    // Create a map of mem_id to member sex for quick lookup
+    const memberSexMap = new Map<number, string>();
+    members.forEach((member: any) => {
+      if (member.mem_id || member.id) {
+        const memId = member.mem_id || member.id;
+        memberSexMap.set(memId, member.sex || '');
+      }
+    });
+
+    const normalizeSex = (raw: unknown): 'Male' | 'Female' | 'Unknown' => {
+      const v = String(raw || '').trim().toLowerCase();
+      if (v.startsWith('m')) return 'Male';
+      if (v.startsWith('f')) return 'Female';
+      return 'Unknown';
+    };
+
+    executives.forEach((exec: any) => {
+      // Try multiple sources: direct sex field, member object, or lookup from members map
+      let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || exec.gender || '';
+      
+      // If still empty, try to get from members map using mem_id
+      if (!sexValue && exec.mem_id) {
+        sexValue = memberSexMap.get(exec.mem_id) || '';
+      }
+      
+      const sex = normalizeSex(sexValue);
+      genderCount[sex] = (genderCount[sex] || 0) + 1;
+    });
+
+    return Object.entries(genderCount)
+      .map(([sex, count]) => ({ name: sex, value: count }))
+      .filter(item => item.value > 0);
+  }, [allExecutivesData, allMembersData]);
+
+  // Executives by selected union (or overall if no union selected)
   const executivesBySelectedUnion = useMemo(() => {
-    if (!selectedUnionId || !execByUnion?.data?.data) return [];
+    // If "Overall" is selected (empty string), return overall data
+    if (!selectedUnionId || selectedUnionId === '') {
+      return overallExecutivesByGender;
+    }
+    
+    // If specific union selected, get data from execByUnion
+    if (!execByUnion?.data?.data) return [];
     
     const executives: any[] = execByUnion.data.data;
     const members: any[] = allMembersData?.data?.data || [];
@@ -561,7 +607,7 @@ const PrintedReportPage: React.FC = () => {
     return Object.entries(genderCount)
       .map(([sex, count]) => ({ name: sex, value: count }))
       .filter(item => item.value > 0);
-  }, [execByUnion, allMembersData, selectedUnionId]);
+  }, [execByUnion, allMembersData, selectedUnionId, overallExecutivesByGender]);
 
   // Strategic plan counts
   const strategicPlanStats = useMemo(() => {
@@ -648,39 +694,6 @@ const PrintedReportPage: React.FC = () => {
       .map(([sector, vals]) => ({ sector, ...vals }))
       .sort((a, b) => a.sector.localeCompare(b.sector));
   }, [allMembersData, unionsList]);
-
-  const overallExecutivesByGender = useMemo(() => {
-    const executives: any[] = allExecutivesData?.data?.data || [];
-    const members: any[] = allMembersData?.data?.data || [];
-    const genderCount: Record<string, number> = {};
-
-    const memberSexMap = new Map<number, string>();
-    members.forEach((member: any) => {
-      if (member.mem_id || member.id) {
-        memberSexMap.set(member.mem_id || member.id, member.sex || '');
-      }
-    });
-
-    const normalizeSex = (raw: unknown): 'Male' | 'Female' | 'Unknown' => {
-      const v = String(raw || '').trim().toLowerCase();
-      if (v.startsWith('m')) return 'Male';
-      if (v.startsWith('f')) return 'Female';
-      return 'Unknown';
-    };
-
-    executives.forEach((exec: any) => {
-      let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || exec.gender || '';
-      if (!sexValue && exec.mem_id) {
-        sexValue = memberSexMap.get(exec.mem_id) || '';
-      }
-      const sex = normalizeSex(sexValue);
-      genderCount[sex] = (genderCount[sex] || 0) + 1;
-    });
-
-    return Object.entries(genderCount)
-      .map(([sex, count]) => ({ name: sex, value: count }))
-      .filter(item => item.value > 0);
-  }, [allExecutivesData, allMembersData]);
 
   const totalExecutives = useMemo(() => {
     return (allExecutivesData?.data?.data || []).length;
@@ -1359,11 +1372,33 @@ const PrintedReportPage: React.FC = () => {
             )}
 
             {/* 3.5 Executives by Selected Union (Report 7) */}
-            {selectedUnionId && executivesBySelectedUnion.length > 0 && (
+            {(allExecutivesData?.data?.data || execByUnion?.data?.data) && (
               <div className={styles.reportItem}>
                 <h3 className={styles.reportQuestion}>3.5 (Report 7) Executive Committee by Selected Union</h3>
-                <p style={{ marginBottom: '10px' }}>
-                  <strong>Union:</strong> {unionsList?.data?.data?.find((u: any) => String(u.union_id) === selectedUnionId)?.name_en || selectedUnionId}
+                <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <label htmlFor="union-select-report7" style={{ fontSize: '14px', fontWeight: 500 }}>Select Union:</label>
+                  <div style={{ minWidth: '200px' }}>
+                    <Select
+                      id="union-select-report7"
+                      value={selectedUnionId}
+                      onChange={(e) => setSelectedUnionId(e.target.value)}
+                      options={[
+                        { value: '', label: 'Overall' },
+                        ...(unionsList?.data?.data || []).map((u: any) => ({
+                          value: String(u.union_id || u.id),
+                          label: u.name_en || u.name || `Union ${u.union_id || u.id}`
+                        }))
+                      ]}
+                    />
+                  </div>
+                </div>
+                <p style={{ marginBottom: '10px', fontSize: '14px', color: '#666' }}>
+                  <strong>
+                    {selectedUnionId === '' || !selectedUnionId
+                      ? 'Overall - All Unions'
+                      : unionsList?.data?.data?.find((u: any) => String(u.union_id || u.id) === selectedUnionId)?.name_en || `Union ${selectedUnionId}`
+                    }
+                  </strong>
                 </p>
                 <div className={styles.chartContainer}>
                   <ResponsiveContainer width="100%" height={250}>
@@ -1388,31 +1423,40 @@ const PrintedReportPage: React.FC = () => {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className={styles.dataTable}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Gender</th>
-                        <th>Count</th>
-                        <th>Percentage</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {executivesBySelectedUnion.map((item, idx) => (
-                        <tr key={idx}>
-                          <td><strong>{item.name}</strong></td>
-                          <td>{item.value.toLocaleString()}</td>
-                          <td>{executivesBySelectedUnion.reduce((sum, e) => sum + e.value, 0) > 0 ? ((item.value / executivesBySelectedUnion.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(2) : 0}%</td>
+                {executivesBySelectedUnion && executivesBySelectedUnion.length > 0 ? (
+                  <div className={styles.dataTable}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Gender</th>
+                          <th>Count</th>
+                          <th>Percentage</th>
                         </tr>
-                      ))}
-                      <tr className={styles.totalRow}>
-                        <td><strong>Total</strong></td>
-                        <td><strong>{executivesBySelectedUnion.reduce((sum, e) => sum + e.value, 0).toLocaleString()}</strong></td>
-                        <td><strong>100%</strong></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {executivesBySelectedUnion.map((item, idx) => (
+                          <tr key={idx}>
+                            <td><strong>{item.name}</strong></td>
+                            <td>{item.value.toLocaleString()}</td>
+                            <td>{executivesBySelectedUnion.reduce((sum, e) => sum + e.value, 0) > 0 ? ((item.value / executivesBySelectedUnion.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(2) : 0}%</td>
+                          </tr>
+                        ))}
+                        <tr className={styles.totalRow}>
+                          <td><strong>Total</strong></td>
+                          <td><strong>{executivesBySelectedUnion.reduce((sum, e) => sum + e.value, 0).toLocaleString()}</strong></td>
+                          <td><strong>100%</strong></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    {selectedUnionId === '' || !selectedUnionId
+                      ? 'No executives found.'
+                      : 'No executives found for the selected union.'
+                    }
+                  </p>
+                )}
               </div>
             )}
           </div>
