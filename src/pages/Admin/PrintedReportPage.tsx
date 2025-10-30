@@ -161,19 +161,6 @@ const PrintedReportPage: React.FC = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    console.log('🔍 DEBUG: Expiring CBAs Filter');
-    console.log('📅 Today:', today.toISOString().split('T')[0]);
-    console.log('⏱️ Selected Period (days):', cbaExpiringDays);
-    console.log('📊 Total CBAs to check:', all.length);
-    console.log('📋 All CBAs data:', all.map((c: any) => ({
-      id: c.id || c.cba_id,
-      union_id: c.union_id,
-      next_end_date: c.next_end_date,
-      end_date: c.end_date,
-      registration_date: c.registration_date,
-      status: c.status
-    })));
-
     // Helper function to parse date string and avoid timezone issues
     const parseDateString = (dateStr: string): Date | null => {
       if (!dateStr) return null;
@@ -199,13 +186,11 @@ const PrintedReportPage: React.FC = () => {
     const filtered = all.filter((cba: any) => {
       const endStr = cba.next_end_date || cba.end_date;
       if (!endStr) {
-        console.log('❌ CBA ID', cba.id || cba.cba_id, '- No end date');
         return false;
       }
       
       const endDate = parseDateString(endStr);
       if (!endDate) {
-        console.log('❌ CBA ID', cba.id || cba.cba_id, '- Invalid end date:', endStr);
         return false;
       }
       
@@ -220,43 +205,8 @@ const PrintedReportPage: React.FC = () => {
       // Include both future expiring (0 to cbaExpiringDays) AND recently expired (within last cbaExpiringDays days)
       const isIncluded = Math.abs(diffDays) <= cbaExpiringDays;
       
-      // Log all CBAs for debugging
-      const year = endDate.getFullYear();
-      const month = String(endDate.getMonth() + 1).padStart(2, '0');
-      const day = String(endDate.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-      
-      console.log(`📄 CBA ${cba.id || cba.cba_id}:`, {
-        'End Date String': endStr,
-        'End Date Parsed': formattedDate,
-        'Days Until Expiry': diffDays,
-        'Selected Period': cbaExpiringDays,
-        'Is Included': isIncluded,
-        'Union': unionName
-      });
-      
-      if (endStr.includes('2025-10-07') || endStr.includes('Oct 07') || endStr.includes('2025/10/07') || endStr.includes('07/10/2025') || formattedDate === '2025-10-07') {
-        console.log('🎯 FOUND Oct 07, 2025 CBA:');
-        console.log('  - CBA ID:', cba.id || cba.cba_id);
-        console.log('  - Union:', unionName);
-        console.log('  - End Date String:', endStr);
-        console.log('  - End Date Parsed:', formattedDate);
-        console.log('  - Days Until Expiry:', diffDays);
-        console.log('  - Selected Period:', cbaExpiringDays);
-        console.log('  - Is Included?', isIncluded);
-        console.log('  - Condition check:', {
-          'Math.abs(diffDays)': Math.abs(diffDays),
-          'Math.abs(diffDays) <= cbaExpiringDays': Math.abs(diffDays) <= cbaExpiringDays,
-          'diffDays': diffDays,
-          'cbaExpiringDays': cbaExpiringDays
-        });
-      }
-      
       return isIncluded;
     });
-
-    console.log('✅ Filtered CBAs count:', filtered.length);
-    console.log('📋 Filtered CBA IDs:', filtered.map((c: any) => c.id || c.cba_id));
 
     // Map union information and calculate days remaining
     const result = filtered.map((cba: any) => {
@@ -280,7 +230,6 @@ const PrintedReportPage: React.FC = () => {
       };
     }).filter((item: any) => item !== null);
 
-    console.log('📊 Final result count:', result.length);
     return result;
   }, [allCBAsData, unionsList, cbaExpiringDays]);
 
@@ -364,16 +313,33 @@ const PrintedReportPage: React.FC = () => {
     ];
   }, [youthData, eldersData]);
 
-  // Youth under 35 by gender (separate charts)
+  // Youth under 35 by gender - Use API data if available, otherwise calculate
   const youthByGender = useMemo(() => {
+    // First try to use API data if available
+    const apiData = youthData?.data?.by_sex || [];
+    if (apiData.length > 0) {
+      const result = apiData.map((item: any) => ({
+        name: item.sex === 'Male' || item.sex === 'male' || String(item.sex || '').toLowerCase().startsWith('m') ? 'Male' : 'Female',
+        value: item.count || item.cnt || 0
+      })).filter(item => item.value > 0);
+      return result;
+    }
+    
+    // Fallback to calculating from all members
     const members: any[] = allMembersData?.data?.data || [];
     const today = new Date();
     const genderCount = { Male: 0, Female: 0 };
+    let totalProcessed = 0;
+    let skippedNoBirthdate = 0;
     
     members.forEach((m: any) => {
       const birthdate = m.birthdate ? new Date(m.birthdate) : null;
-      if (!birthdate) return;
+      if (!birthdate || isNaN(birthdate.getTime())) {
+        skippedNoBirthdate += 1;
+        return;
+      }
       
+      totalProcessed += 1;
       let age = today.getFullYear() - birthdate.getFullYear();
       const monthDiff = today.getMonth() - birthdate.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
@@ -387,22 +353,41 @@ const PrintedReportPage: React.FC = () => {
       }
     });
     
-    return [
+    const result = [
       { name: 'Male', value: genderCount.Male },
       { name: 'Female', value: genderCount.Female },
     ].filter(item => item.value > 0);
-  }, [allMembersData]);
+    
+    return result;
+  }, [allMembersData, youthData]);
 
-  // Elders above 35 by gender (separate charts)
+  // Elders above 35 by gender - Use API data if available, otherwise calculate
   const eldersByGender = useMemo(() => {
+    // First try to use API data if available
+    const apiData = eldersData?.data?.by_sex || [];
+    if (apiData.length > 0) {
+      const result = apiData.map((item: any) => ({
+        name: item.sex === 'Male' || item.sex === 'male' || String(item.sex || '').toLowerCase().startsWith('m') ? 'Male' : 'Female',
+        value: item.count || item.cnt || 0
+      })).filter(item => item.value > 0);
+      return result;
+    }
+    
+    // Fallback to calculating from all members
     const members: any[] = allMembersData?.data?.data || [];
     const today = new Date();
     const genderCount = { Male: 0, Female: 0 };
+    let totalProcessed = 0;
+    let skippedNoBirthdate = 0;
     
     members.forEach((m: any) => {
       const birthdate = m.birthdate ? new Date(m.birthdate) : null;
-      if (!birthdate) return;
+      if (!birthdate || isNaN(birthdate.getTime())) {
+        skippedNoBirthdate += 1;
+        return;
+      }
       
+      totalProcessed += 1;
       let age = today.getFullYear() - birthdate.getFullYear();
       const monthDiff = today.getMonth() - birthdate.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
@@ -416,11 +401,13 @@ const PrintedReportPage: React.FC = () => {
       }
     });
     
-    return [
+    const result = [
       { name: 'Male', value: genderCount.Male },
       { name: 'Female', value: genderCount.Female },
     ].filter(item => item.value > 0);
-  }, [allMembersData]);
+    
+    return result;
+  }, [allMembersData, eldersData, youthByGender]);
 
   // Executives by selected union
   const executivesBySelectedUnion = useMemo(() => {
@@ -816,131 +803,135 @@ const PrintedReportPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 1.3 Youth Under 35 by Gender - Separate Charts */}
-            <div className={styles.reportItem}>
-              <h3 className={styles.reportQuestion}>1.3 Youth Members Under 35 by Gender</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                {/* Under 35 Male */}
-                <div>
-                  <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Male (&lt;35)</h4>
-                  <div className={styles.chartContainer}>
-                    <ResponsiveContainer width="100%" height={250}>
+            {/* 1.3 Youth Under 35 by Gender - Combined Chart */}
+            {youthByGender && youthByGender.length > 0 && (() => {
+              const total = youthByGender.reduce((sum, item) => sum + item.value, 0);
+              const dataWithPercent = youthByGender.map(item => ({
+                ...item,
+                percent: total > 0 ? ((item.value / total) * 100).toFixed(2) : '0.00'
+              }));
+              
+              return (
+                <div className={styles.reportItem}>
+                  <h3 className={styles.reportQuestion}>1.3 Youth Members Under 35 by Gender</h3>
+                  <div className={styles.chartContainer} style={{ marginBottom: '20px' }}>
+                    <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
-                          data={youthByGender.filter(item => item.name === 'Male')}
+                          data={dataWithPercent}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, value }) => `${name}: ${value}`}
-                          outerRadius={80}
+                          label={({ name, value, payload }) => `${name}: ${value} (${payload.percent}%)`}
+                          outerRadius={100}
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {youthByGender.filter(item => item.name === 'Male').map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[0]} />
+                          {dataWithPercent.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip formatter={(value: number, name: string, props: any) => [
+                          `${value} (${props.payload.percent}%)`,
+                          name
+                        ]} />
+                        <Legend />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  <div style={{ textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>
-                    Total: {youthByGender.find(item => item.name === 'Male')?.value || 0}
+                  <div className={styles.dataTable}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Number</th>
+                          <th>Percent (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dataWithPercent.map((item, index) => (
+                          <tr key={index}>
+                            <td>{item.name}</td>
+                            <td>{item.value.toLocaleString()}</td>
+                            <td>{item.percent}%</td>
+                          </tr>
+                        ))}
+                        <tr style={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>
+                          <td>Total</td>
+                          <td>{total.toLocaleString()}</td>
+                          <td>100.00%</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                {/* Under 35 Female */}
-                <div>
-                  <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Female (&lt;35)</h4>
-                  <div className={styles.chartContainer}>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <PieChart>
-                        <Pie
-                          data={youthByGender.filter(item => item.name === 'Female')}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, value }) => `${name}: ${value}`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {youthByGender.filter(item => item.name === 'Female').map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[1]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div style={{ textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>
-                    Total: {youthByGender.find(item => item.name === 'Female')?.value || 0}
-                  </div>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
 
-            {/* 1.4 Elders Above 35 by Gender - Separate Charts */}
-            <div className={styles.reportItem}>
-              <h3 className={styles.reportQuestion}>1.4 Elders Above 35 by Gender</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                {/* Above 35 Male */}
-                <div>
-                  <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Male (≥35)</h4>
-                  <div className={styles.chartContainer}>
-                    <ResponsiveContainer width="100%" height={250}>
+            {/* 1.4 Elders Above 35 by Gender - Combined Chart */}
+            {eldersByGender && eldersByGender.length > 0 && (() => {
+              const total = eldersByGender.reduce((sum, item) => sum + item.value, 0);
+              const dataWithPercent = eldersByGender.map(item => ({
+                ...item,
+                percent: total > 0 ? ((item.value / total) * 100).toFixed(2) : '0.00'
+              }));
+              
+              return (
+                <div className={styles.reportItem}>
+                  <h3 className={styles.reportQuestion}>1.4 Elders Above 35 by Gender</h3>
+                  <div className={styles.chartContainer} style={{ marginBottom: '20px' }}>
+                    <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
-                          data={eldersByGender.filter(item => item.name === 'Male')}
+                          data={dataWithPercent}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, value }) => `${name}: ${value}`}
-                          outerRadius={80}
+                          label={({ name, value, payload }) => `${name}: ${value} (${payload.percent}%)`}
+                          outerRadius={100}
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {eldersByGender.filter(item => item.name === 'Male').map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[0]} />
+                          {dataWithPercent.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip formatter={(value: number, name: string, props: any) => [
+                          `${value} (${props.payload.percent}%)`,
+                          name
+                        ]} />
+                        <Legend />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  <div style={{ textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>
-                    Total: {eldersByGender.find(item => item.name === 'Male')?.value || 0}
+                  <div className={styles.dataTable}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Number</th>
+                          <th>Percent (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dataWithPercent.map((item, index) => (
+                          <tr key={index}>
+                            <td>{item.name}</td>
+                            <td>{item.value.toLocaleString()}</td>
+                            <td>{item.percent}%</td>
+                          </tr>
+                        ))}
+                        <tr style={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>
+                          <td>Total</td>
+                          <td>{total.toLocaleString()}</td>
+                          <td>100.00%</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                {/* Above 35 Female */}
-                <div>
-                  <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Female (≥35)</h4>
-                  <div className={styles.chartContainer}>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <PieChart>
-                        <Pie
-                          data={eldersByGender.filter(item => item.name === 'Female')}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, value }) => `${name}: ${value}`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {eldersByGender.filter(item => item.name === 'Female').map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[1]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div style={{ textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>
-                    Total: {eldersByGender.find(item => item.name === 'Female')?.value || 0}
-                  </div>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -1420,10 +1411,8 @@ const PrintedReportPage: React.FC = () => {
                     <table>
                       <thead>
                         <tr>
-                          <th>Union ID</th>
                           <th>Union Code</th>
                           <th>Union Name (EN)</th>
-                          <th>Union Name (AM)</th>
                           <th>Sector</th>
                           <th>Organization</th>
                         </tr>
@@ -1431,10 +1420,8 @@ const PrintedReportPage: React.FC = () => {
                       <tbody>
                         {unionsWithoutCBA.map((union: any, index: number) => (
                           <tr key={index}>
-                            <td>{union.union_id}</td>
                             <td>{union.union_code || 'N/A'}</td>
                             <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={union.name_en}>{union.name_en || 'N/A'}</td>
-                            <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={union.name_am}>{union.name_am || 'N/A'}</td>
                             <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={union.sector}>{union.sector || 'N/A'}</td>
                             <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={union.organization}>{union.organization || 'N/A'}</td>
                           </tr>
