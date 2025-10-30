@@ -55,6 +55,7 @@ const PrintedReportPage: React.FC = () => {
   const [executiveExpiryDate, setExecutiveExpiryDate] = useState<string>(dateTo);
   const [selectedUnionId, setSelectedUnionId] = useState<string>('');
   const [cbaExpiringDays, setCbaExpiringDays] = useState<number>(90); // Default 3 months
+  const [executiveFilterDays, setExecutiveFilterDays] = useState<string>('all'); // 'all', '1', '7', '30', etc.
 
   // Fetch all data
   const { data: membersData, isLoading: loadingMembers } = useQuery({
@@ -67,7 +68,7 @@ const PrintedReportPage: React.FC = () => {
     queryFn: getUnionsSummary,
   });
 
-  const { data: execRemaining } = useQuery({
+  const { data: execRemaining, isLoading: loadingExecRemaining, error: execRemainingError } = useQuery({
     queryKey: ['reports-executives-remaining'],
     queryFn: getExecutivesRemainingDays,
   });
@@ -75,7 +76,7 @@ const PrintedReportPage: React.FC = () => {
   const { data: execExpiringBefore } = useQuery({
     queryKey: ['reports-executives-expiring-before', executiveExpiryDate],
     queryFn: () => getExecutivesExpiringBefore(executiveExpiryDate),
-    enabled: !!executiveExpiryDate,
+    enabled: false, // We'll filter client-side instead
   });
 
   const { data: unionsList } = useQuery({
@@ -83,12 +84,134 @@ const PrintedReportPage: React.FC = () => {
     queryFn: () => getUnions({ per_page: 1000 }),
   });
 
-  
-
   const { data: allExecutivesData } = useQuery({
     queryKey: ['reports-executives-overall'],
     queryFn: () => getUnionExecutives({ per_page: 1000 }),
+    enabled: true, // Always fetch
   });
+
+  const { data: allMembersData } = useQuery({
+    queryKey: ['all-members-for-export'],
+    queryFn: () => getMembers({ per_page: 1000 }),
+  });
+
+  // Helper function to get organization from union data
+  const getUnionOrganization = useMemo(() => {
+    const unions: any[] = unionsList?.data?.data || [];
+    const unionMap = new Map<number, string>();
+    unions.forEach((u: any) => {
+      if (u.union_id) {
+        unionMap.set(u.union_id, u.organization || 'N/A');
+      }
+    });
+    return (unionId: number) => unionMap.get(unionId) || 'N/A';
+  }, [unionsList]);
+
+  // Filter executives by remaining days - use execRemaining API first, fallback to allExecutivesData
+  const filteredExecutives = useMemo(() => {
+    // Try API data first
+    let allExecutives: any[] = execRemaining?.data?.data || [];
+    
+    
+    // Fallback to allExecutivesData if API returned empty
+    if (allExecutives.length === 0 && allExecutivesData?.data?.data) {
+      const executivesFromAPI: any[] = allExecutivesData.data.data || [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Calculate remaining days for each executive
+      allExecutives = executivesFromAPI.map((exec: any) => {
+        const appointedDate = exec.appointed_date ? new Date(exec.appointed_date) : null;
+        const termLengthYears = exec.term_length_years || 0;
+        
+        let daysRemaining = null;
+        let termEndDate = null;
+        let status = 'Unknown';
+        
+        if (appointedDate && !isNaN(appointedDate.getTime()) && termLengthYears > 0) {
+          termEndDate = new Date(appointedDate);
+          termEndDate.setFullYear(termEndDate.getFullYear() + termLengthYears);
+          termEndDate.setHours(0, 0, 0, 0);
+          
+          const diffTime = termEndDate.getTime() - today.getTime();
+          daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (daysRemaining < 0) {
+            status = 'Expired';
+          } else if (daysRemaining === 0) {
+            status = 'Expires Today';
+          } else if (daysRemaining <= 30) {
+            status = 'Expiring Soon';
+          } else {
+            status = 'Active';
+          }
+        }
+        
+        // Get member name - lookup from allMembersData using mem_id
+        let fullName = 'N/A';
+        if (exec.mem_id && allMembersData?.data?.data) {
+          const members: any[] = allMembersData.data.data;
+          const member = members.find((m: any) => (m.mem_id || m.id) === exec.mem_id);
+          if (member) {
+            const firstName = member.first_name || '';
+            const fatherName = member.father_name || '';
+            const surname = member.surname || '';
+            const nameParts = [firstName, fatherName, surname].filter(part => part && part.trim());
+            fullName = nameParts.length > 0 ? nameParts.join(' ') : 'N/A';
+          }
+        }
+        
+        // Fallback to exec.member if available
+        if (fullName === 'N/A' && exec.member) {
+          const firstName = exec.member.first_name || exec.member.name || '';
+          const fatherName = exec.member.father_name || '';
+          const surname = exec.member.surname || exec.member.last_name || '';
+          const nameParts = [firstName, fatherName, surname].filter(part => part && part.trim());
+          fullName = nameParts.length > 0 ? nameParts.join(' ') : 'N/A';
+        }
+        
+        // Get union name from unionsList
+        const unions: any[] = unionsList?.data?.data || [];
+        const union = unions.find((u: any) => u.union_id === exec.union_id);
+        const unionName = union?.name_en || union?.name || exec.union?.name_en || exec.union_name || `Union ID: ${exec.union_id}`;
+        
+        return {
+          id: exec.id,
+          union_id: exec.union_id,
+          union_name: unionName,
+          mem_id: exec.mem_id,
+          executive_name: fullName,
+          sex: exec.sex || exec.member?.sex || exec.member_data?.sex || '',
+          position: exec.position || exec.designation || 'N/A',
+          appointed_date: exec.appointed_date,
+          term_end_date: termEndDate ? termEndDate.toISOString().split('T')[0] : null,
+          days_remaining: daysRemaining,
+          status: status
+        };
+      });
+      
+    }
+    
+    if (executiveFilterDays === 'all') {
+      return allExecutives;
+    }
+    
+    const filterDays = Number(executiveFilterDays);
+    if (isNaN(filterDays) || filterDays < 0) {
+      return allExecutives;
+    }
+    
+    // Filter executives with days_remaining <= filterDays (executives expiring within the period)
+    const filtered = allExecutives.filter((e: any) => {
+      const daysRemaining = e.days_remaining;
+      // Include executives with days_remaining >= 0 and <= filterDays
+      const included = daysRemaining !== undefined && daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= filterDays;
+      return included;
+    });
+    
+    
+    return filtered;
+  }, [execRemaining, executiveFilterDays, allExecutivesData, unionsList, allMembersData]);
 
   const { data: youthData } = useQuery({
     queryKey: ['reports-members-under-35'],
@@ -247,11 +370,6 @@ const PrintedReportPage: React.FC = () => {
   const { data: terminatedList } = useQuery({
     queryKey: ['reports-terminated-unions-list'],
     queryFn: getTerminatedUnionsList,
-  });
-
-  const { data: allMembersData } = useQuery({
-    queryKey: ['all-members-for-export'],
-    queryFn: () => getMembers({ per_page: 1000 }),
   });
 
   const { data: oshStatistics } = useQuery({
@@ -1171,71 +1289,72 @@ const PrintedReportPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 3.3 Executives Remaining Days */}
-            {execRemaining?.data?.data && execRemaining.data.data.length > 0 && (
-              <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>3.3 Executives Remaining Term Days</h3>
-                <div className={styles.dataTable}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Union</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Term Ends</th>
-                        <th>Days Left</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {execRemaining.data.data.slice(0, 20).map((e: any, idx: number) => (
-                        <tr key={idx}>
-                          <td>{e.union_name}</td>
-                          <td>{e.executive_name}</td>
-                          <td>{e.position}</td>
-                          <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
-                          <td>{e.days_remaining}</td>
-                          <td>{e.status}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {execRemaining.data.data.length > 20 && (
-                    <p className={styles.tableNote}>*Showing first 20 of {execRemaining.data.data.length} records</p>
-                  )}
-                </div>
-              </div>
-            )}
 
-            {/* 3.4 Executives Expiring Before Date (Report 6) */}
-            {execExpiringBefore?.data?.data && execExpiringBefore.data.data.length > 0 && (
+            {/* 3.4 (Report 5 & 6) Executives Remaining Days */}
+            {(execRemaining?.data?.data || allExecutivesData?.data?.data) && (
               <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>3.4 (Report 6) Executives Expiring Before {format(new Date(executiveExpiryDate), 'MMM dd, yyyy')}</h3>
-                <div className={styles.dataTable}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Union</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Term Ends</th>
-                        <th>Days Left</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {execExpiringBefore.data.data.map((e: any, idx: number) => (
-                        <tr key={idx}>
-                          <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={e.union_name}>{e.union_name}</td>
-                          <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={e.executive_name}>{e.executive_name}</td>
-                          <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={e.position}>{e.position}</td>
-                          <td>{format(new Date(e.term_end_date), 'MMM dd, yyyy')}</td>
-                          <td>{e.days_remaining}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <p className={styles.tableNote}>Total: {execExpiringBefore.data.data.length} executives</p>
+                <h3 className={styles.reportQuestion}>3.4 (Report 5 & 6) List All Executives Who Their Remaining Date is Less Than (Specific Period)</h3>
+                <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <label htmlFor="executive-filter-period" style={{ fontSize: '14px', fontWeight: 500 }}>Filter by Period:</label>
+                  <div style={{ minWidth: '200px' }}>
+                    <Select
+                      id="executive-filter-period"
+                      value={executiveFilterDays}
+                      onChange={(e) => setExecutiveFilterDays(e.target.value)}
+                      options={[
+                        { value: 'all', label: 'All' },
+                        { value: '1', label: '1 Day' },
+                        { value: '7', label: '1 Week' },
+                        { value: '30', label: '1 Month' },
+                        { value: '90', label: '3 Months' },
+                        { value: '180', label: '6 Months' },
+                        { value: '365', label: '1 Year' },
+                        { value: '730', label: '2 Years' },
+                        { value: '1460', label: '4 Years' },
+                        { value: '1825', label: '5 Years' },
+                        { value: '3650', label: '10 Years' },
+                      ]}
+                    />
+                  </div>
                 </div>
+                {filteredExecutives && filteredExecutives.length > 0 ? (
+                  <>
+                    <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                      <p className={styles.kpiLabel}>Total Count</p>
+                      <p className={styles.kpiValue}>{filteredExecutives.length}</p>
+                    </div>
+                    <div className={styles.dataTable}>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Organization</th>
+                            <th>Union Name</th>
+                            <th>Executive Name</th>
+                            <th>Position</th>
+                            <th>Term End Date</th>
+                            <th>Days Remaining</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredExecutives.map((e: any, idx: number) => (
+                            <tr key={idx}>
+                              <td>{getUnionOrganization(e.union_id)}</td>
+                              <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={e.union_name || 'N/A'}>{e.union_name || 'N/A'}</td>
+                              <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={e.executive_name || 'N/A'}>{e.executive_name || 'N/A'}</td>
+                              <td style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={e.position || 'N/A'}>{e.position || 'N/A'}</td>
+                              <td>{e.term_end_date ? format(new Date(e.term_end_date), 'MMM dd, yyyy') : 'N/A'}</td>
+                              <td>{e.days_remaining !== undefined && e.days_remaining !== null ? e.days_remaining : 'N/A'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    No executives found for the selected period.
+                  </p>
+                )}
               </div>
             )}
 
