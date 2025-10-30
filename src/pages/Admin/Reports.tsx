@@ -16,13 +16,13 @@ import {
   getMembersUnder35,
   getMembersAbove35,
   getUnionsCBAExpiredList,
-  getUnionsCBAExpiringSoon,
-  getUnionsCBAOngoing,
+  // getUnionsCBAExpiringSoon,
+  // getUnionsCBAOngoing,
   getGeneralAssemblyStatus,
   getUnionsNoGeneralAssembly,
   getUnionsAssemblyOnDate,
   getUnionsAssemblyRecent,
-  getTerminatedUnionsCount,
+  // getTerminatedUnionsCount,
   getTerminatedUnionsList,
   getMembers,
   getUnions,
@@ -31,8 +31,6 @@ import {
   getCBAs,
   getUnionExecutives,
 } from '@api/endpoints';
-import { useExportCsv } from '@hooks/useExportCsv';
-import { useExportPdf } from '@hooks/useExportPdf';
 import {
   BarChart,
   Bar,
@@ -55,8 +53,6 @@ const COLORS = ['#0B63D3', '#E53935', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'
 
 export const Reports: React.FC = () => {
   const { t } = useTranslation();
-  const { exportToCsv } = useExportCsv();
-  const { exportToPdf } = useExportPdf();
   const navigate = useNavigate();
 
   // Filters
@@ -131,15 +127,15 @@ export const Reports: React.FC = () => {
     queryFn: getUnionsCBAExpiredList,
   });
 
-  const { data: cbaExpiringSoon } = useQuery({
-    queryKey: ['reports-cba-expiring-soon', 90],
-    queryFn: () => getUnionsCBAExpiringSoon(90),
-  });
+  // const { data: cbaExpiringSoon } = useQuery({
+  //   queryKey: ['reports-cba-expiring-soon', 90],
+  //   queryFn: () => getUnionsCBAExpiringSoon(90),
+  // });
 
-  const { data: cbaOngoing } = useQuery({
-    queryKey: ['reports-cba-ongoing'],
-    queryFn: getUnionsCBAOngoing,
-  });
+  // const { data: cbaOngoing } = useQuery({
+  //   queryKey: ['reports-cba-ongoing'],
+  //   queryFn: getUnionsCBAOngoing,
+  // });
 
   // Fetch all CBAs to get accurate status counts from database
   const { data: allCBAsData } = useQuery({
@@ -167,10 +163,10 @@ export const Reports: React.FC = () => {
     queryFn: () => getUnionsAssemblyRecent(3),
   });
 
-  const { data: terminatedCount } = useQuery({
-    queryKey: ['reports-terminated-unions-count'],
-    queryFn: getTerminatedUnionsCount,
-  });
+  // const { data: terminatedCount } = useQuery({
+  //   queryKey: ['reports-terminated-unions-count'],
+  //   queryFn: getTerminatedUnionsCount,
+  // });
 
   const { data: terminatedList } = useQuery({
     queryKey: ['reports-terminated-unions-list'],
@@ -531,15 +527,6 @@ export const Reports: React.FC = () => {
 
   // NOTE: cbaStatus now comes from API above
 
-  const handleExportMembersSummary = () => {
-    const exportData = allMembersData?.data?.data || [];
-    exportToCsv('members-summary', exportData);
-  };
-
-  const handleExportMembersPdf = () => {
-    const exportData = allMembersData?.data?.data || [];
-    exportToPdf('members-report', exportData, undefined, 'Members Summary Report');
-  };
 
   const isLoading = loadingMembers || loadingCBAExpired;
 
@@ -556,11 +543,8 @@ export const Reports: React.FC = () => {
           <p className={styles.subtitle}>Comprehensive federation reports and analytics</p>
         </div>
         <div className={styles.headerActions}>
-          <Button variant="secondary" onClick={handleExportMembersSummary}>
-            {t('reports.exportToCsv')}
-          </Button>
-          <Button variant="secondary" onClick={handleExportMembersPdf}>
-            {t('reports.exportToPdf')}
+          <Button variant="primary" onClick={() => navigate('/admin/printed-report')}>
+            Print Report
           </Button>
         </div>
       </div>

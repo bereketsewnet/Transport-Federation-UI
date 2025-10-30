@@ -20,6 +20,7 @@ import Contact from '@pages/Public/Contact';
 // Admin Pages
 import Dashboard from '@pages/Admin/Dashboard';
 import Reports from '@pages/Admin/Reports';
+import PrintedReportPage from '@pages/Admin/PrintedReportPage';
 import { MembersList, MemberForm, MemberView } from '@pages/Admin/Members';
 import { ErrorBoundary } from '@components/ErrorBoundary';
 
@@ -126,6 +127,7 @@ function App() {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="printed-report" element={<PrintedReportPage />} />
           
           {/* Members Management */}
           <Route path="members" element={

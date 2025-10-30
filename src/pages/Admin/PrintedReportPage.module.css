@@ -1,0 +1,413 @@
+/* Print Report Page Styles - Optimized for A4 Paper */
+
+.printContainer {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: var(--spacing-6);
+}
+
+.printControls {
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.reportContent {
+  max-width: 210mm; /* A4 width */
+  margin: 0 auto;
+  background: white;
+}
+
+/* Page Break - Each page is A4 sized */
+.page {
+  width: 210mm;
+  min-height: 297mm; /* A4 height */
+  padding: 20mm;
+  margin-bottom: 10mm;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  page-break-after: always;
+  page-break-inside: avoid;
+}
+
+.page:last-child {
+  page-break-after: auto;
+}
+
+/* Cover Page */
+.coverPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 40mm 20mm;
+}
+
+.mainTitle {
+  font-size: 48px;
+  font-weight: 700;
+  color: #0B63D3;
+  margin: 0 0 var(--spacing-4) 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.subTitle {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 var(--spacing-8) 0;
+  text-decoration: underline;
+}
+
+.reportDate {
+  margin: var(--spacing-6) 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.reportDate p {
+  margin: var(--spacing-2) 0;
+}
+
+.summaryBox {
+  margin-top: var(--spacing-8);
+  padding: var(--spacing-6);
+  background: #f8f9fa;
+  border: 2px solid #0B63D3;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 500px;
+}
+
+.summaryBox h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0B63D3;
+  margin: 0 0 var(--spacing-4) 0;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.summaryStats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+}
+
+.summaryStat {
+  text-align: center;
+  padding: var(--spacing-3);
+  background: white;
+  border-radius: var(--radius);
+}
+
+.statLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-2);
+}
+
+.statValue {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0B63D3;
+}
+
+/* Section Styles */
+.section {
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0B63D3;
+  margin: 0 0 var(--spacing-6) 0;
+  padding-bottom: var(--spacing-2);
+  border-bottom: 3px solid #0B63D3;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.reportItem {
+  margin-bottom: var(--spacing-8);
+  page-break-inside: avoid;
+}
+
+.reportQuestion {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 var(--spacing-4) 0;
+  text-decoration: underline;
+}
+
+/* Chart Containers */
+.chartContainer {
+  width: 100%;
+  margin: var(--spacing-4) 0;
+  page-break-inside: avoid;
+}
+
+/* Tables */
+.dataTable {
+  margin: var(--spacing-4) 0;
+  page-break-inside: avoid;
+}
+
+.dataTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.dataTable th {
+  background: #0B63D3;
+  color: white;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  border: 1px solid #0a52b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dataTable td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  font-size: 11px;
+}
+
+.dataTable tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.dataTable tbody tr:hover {
+  background: #e9ecef;
+}
+
+.totalRow {
+  background: #e3f2fd !important;
+  font-weight: 700;
+}
+
+.totalRow td {
+  border-top: 2px solid #0B63D3;
+  font-weight: 700;
+}
+
+.tableNote {
+  font-size: 10px;
+  font-style: italic;
+  color: #666;
+  margin-top: var(--spacing-2);
+  text-align: right;
+}
+
+/* KPI Boxes */
+.kpiBox {
+  text-align: center;
+  padding: var(--spacing-6);
+  background: linear-gradient(135deg, #0B63D3 0%, #0a52b0 100%);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-4) 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.kpiLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.kpiValue {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.kpiSubtext {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: var(--spacing-2) 0 0 0;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-4);
+  margin: var(--spacing-4) 0;
+}
+
+/* Summary Grid */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-4);
+  margin: var(--spacing-6) 0;
+}
+
+.summaryCard {
+  padding: var(--spacing-4);
+  background: #f8f9fa;
+  border: 2px solid #0B63D3;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.summaryCard h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.summaryValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0B63D3;
+  margin: 0;
+}
+
+/* Page Footer */
+.pageFooter {
+  margin-top: var(--spacing-8);
+  padding-top: var(--spacing-4);
+  border-top: 2px solid #ddd;
+  text-align: center;
+  font-size: 10px;
+  color: #666;
+}
+
+.pageFooter p {
+  margin: var(--spacing-1) 0;
+}
+
+/* Print Styles */
+@media print {
+  /* Hide layout components when printing */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide header, sidebar, and other UI elements */
+  header,
+  aside,
+  .menuToggle,
+  [class*="Header"],
+  [class*="Sidebar"] {
+    display: none !important;
+  }
+
+  .printContainer {
+    background: white;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+
+  .printControls {
+    display: none !important;
+  }
+
+  .page {
+    margin: 0;
+    padding: 20mm;
+    box-shadow: none;
+    page-break-after: always;
+    width: 210mm;
+    min-height: 297mm;
+  }
+
+  .page:last-child {
+    page-break-after: auto;
+  }
+
+  .reportContent {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  /* Ensure charts print */
+  .chartContainer {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure tables don't break awkwardly */
+  .dataTable {
+    page-break-inside: avoid;
+  }
+
+  .dataTable table {
+    font-size: 9px;
+  }
+
+  .dataTable th,
+  .dataTable td {
+    padding: 6px 8px;
+  }
+
+  /* Optimize fonts for print */
+  body {
+    font-size: 11px;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* Hide background colors on print (save ink) */
+  .kpiBox {
+    background: white !important;
+    border: 2px solid #0B63D3 !important;
+  }
+
+  .kpiLabel,
+  .kpiValue {
+    color: #0B63D3 !important;
+  }
+
+  .dataTable th {
+    background: white !important;
+    color: #0B63D3 !important;
+    border: 2px solid #0B63D3 !important;
+  }
+}
+
+/* Screen Styles (when not printing) */
+@media screen {
+  .page {
+    margin-bottom: 20px;
+  }
+}
+
