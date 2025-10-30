@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/Button/Button';
 import { Loading } from '@components/Loading/Loading';
+import { Select } from '@components/Select/Select';
 import {
   getMembersSummaryFull,
   getUnionsSummary,
@@ -152,6 +153,136 @@ const PrintedReportPage: React.FC = () => {
       };
     });
   }, [allCBAsData, unionsList]);
+
+  // Build expiring CBAs list - Filter by end date within selected period
+  const expiringCBAsFiltered = useMemo(() => {
+    const all: any[] = allCBAsData?.data?.data || [];
+    const unions: any[] = unionsList?.data?.data || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    console.log('🔍 DEBUG: Expiring CBAs Filter');
+    console.log('📅 Today:', today.toISOString().split('T')[0]);
+    console.log('⏱️ Selected Period (days):', cbaExpiringDays);
+    console.log('📊 Total CBAs to check:', all.length);
+    console.log('📋 All CBAs data:', all.map((c: any) => ({
+      id: c.id || c.cba_id,
+      union_id: c.union_id,
+      next_end_date: c.next_end_date,
+      end_date: c.end_date,
+      registration_date: c.registration_date,
+      status: c.status
+    })));
+
+    // Helper function to parse date string and avoid timezone issues
+    const parseDateString = (dateStr: string): Date | null => {
+      if (!dateStr) return null;
+      
+      // Try parsing different formats
+      // Format: YYYY-MM-DD or YYYY/MM/DD
+      const dateMatch = dateStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (dateMatch) {
+        const year = parseInt(dateMatch[1], 10);
+        const month = parseInt(dateMatch[2], 10) - 1; // Months are 0-indexed
+        const day = parseInt(dateMatch[3], 10);
+        return new Date(year, month, day, 0, 0, 0, 0);
+      }
+      
+      // Fallback to standard Date parsing
+      const parsed = new Date(dateStr);
+      if (isNaN(parsed.getTime())) return null;
+      parsed.setHours(0, 0, 0, 0);
+      return parsed;
+    };
+
+    // Filter CBAs that expire within the selected period
+    const filtered = all.filter((cba: any) => {
+      const endStr = cba.next_end_date || cba.end_date;
+      if (!endStr) {
+        console.log('❌ CBA ID', cba.id || cba.cba_id, '- No end date');
+        return false;
+      }
+      
+      const endDate = parseDateString(endStr);
+      if (!endDate) {
+        console.log('❌ CBA ID', cba.id || cba.cba_id, '- Invalid end date:', endStr);
+        return false;
+      }
+      
+      // Calculate days until expiry (negative means already expired)
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      const union = unions.find((u: any) => u.union_id === cba.union_id);
+      const unionName = union?.name_en || union?.name || `Union ${cba.union_id}`;
+      
+      // Include CBAs that expire within the selected period
+      // Include both future expiring (0 to cbaExpiringDays) AND recently expired (within last cbaExpiringDays days)
+      const isIncluded = Math.abs(diffDays) <= cbaExpiringDays;
+      
+      // Log all CBAs for debugging
+      const year = endDate.getFullYear();
+      const month = String(endDate.getMonth() + 1).padStart(2, '0');
+      const day = String(endDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      
+      console.log(`📄 CBA ${cba.id || cba.cba_id}:`, {
+        'End Date String': endStr,
+        'End Date Parsed': formattedDate,
+        'Days Until Expiry': diffDays,
+        'Selected Period': cbaExpiringDays,
+        'Is Included': isIncluded,
+        'Union': unionName
+      });
+      
+      if (endStr.includes('2025-10-07') || endStr.includes('Oct 07') || endStr.includes('2025/10/07') || endStr.includes('07/10/2025') || formattedDate === '2025-10-07') {
+        console.log('🎯 FOUND Oct 07, 2025 CBA:');
+        console.log('  - CBA ID:', cba.id || cba.cba_id);
+        console.log('  - Union:', unionName);
+        console.log('  - End Date String:', endStr);
+        console.log('  - End Date Parsed:', formattedDate);
+        console.log('  - Days Until Expiry:', diffDays);
+        console.log('  - Selected Period:', cbaExpiringDays);
+        console.log('  - Is Included?', isIncluded);
+        console.log('  - Condition check:', {
+          'Math.abs(diffDays)': Math.abs(diffDays),
+          'Math.abs(diffDays) <= cbaExpiringDays': Math.abs(diffDays) <= cbaExpiringDays,
+          'diffDays': diffDays,
+          'cbaExpiringDays': cbaExpiringDays
+        });
+      }
+      
+      return isIncluded;
+    });
+
+    console.log('✅ Filtered CBAs count:', filtered.length);
+    console.log('📋 Filtered CBA IDs:', filtered.map((c: any) => c.id || c.cba_id));
+
+    // Map union information and calculate days remaining
+    const result = filtered.map((cba: any) => {
+      const union = unions.find((u: any) => u.union_id === cba.union_id);
+      const endStr = cba.next_end_date || cba.end_date;
+      const endDate = parseDateString(endStr);
+      if (!endDate) {
+        return null;
+      }
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return {
+        ...cba,
+        union_name: union?.name_en || union?.name || `Union ID: ${cba.union_id}`,
+        union_code: union?.union_code || 'N/A',
+        organization: union?.organization || cba.organization || 'N/A',
+        days_remaining: diffDays,
+        days_until_expiry: diffDays,
+        days_left: diffDays,
+      };
+    }).filter((item: any) => item !== null);
+
+    console.log('📊 Final result count:', result.length);
+    return result;
+  }, [allCBAsData, unionsList, cbaExpiringDays]);
 
   const { data: unionsNoGA } = useQuery({
     queryKey: ['reports-unions-no-ga'],
@@ -1316,44 +1447,60 @@ const PrintedReportPage: React.FC = () => {
             })()}
 
             {/* 4.5 Report 14: CBA Expiring Soon */}
-            {cbaExpiringSoon?.data?.data && cbaExpiringSoon.data.data.length > 0 && (
-              <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>4.5 (Report 14) Unions with CBA Expiring Soon (Within {cbaExpiringDays} days)</h3>
-                <p style={{ marginBottom: '10px', fontSize: '14px', color: '#666' }}>
-                  <strong>Warning Period:</strong> {cbaExpiringDays === 1 ? '1 day' : cbaExpiringDays === 7 ? '1 week' : cbaExpiringDays === 30 ? '1 month' : cbaExpiringDays === 90 ? '3 months' : cbaExpiringDays === 180 ? '6 months' : cbaExpiringDays === 365 ? '12 months' : cbaExpiringDays === 730 ? '24 months' : `${cbaExpiringDays} days`}
-                </p>
-                <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
-                  <p className={styles.kpiLabel}>Total Count</p>
-                  <p className={styles.kpiValue}>{cbaExpiringSoon.data.count || cbaExpiringSoon.data.data.length}</p>
-                </div>
-                <div className={styles.dataTable}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Union ID</th>
-                        <th>Union Code</th>
-                        <th>Union Name</th>
-                        <th>CBA End Date</th>
-                        <th>Days Until Expiry</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cbaExpiringSoon.data.data.map((item: any, index: number) => (
-                        <tr key={index}>
-                          <td>{item.union_id || item.id}</td>
-                          <td>{item.union_code || 'N/A'}</td>
-                          <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.union_name || item.name_en || 'N/A'}>{item.union_name || item.name_en || 'N/A'}</td>
-                          <td>{item.next_end_date || item.end_date ? format(new Date(item.next_end_date || item.end_date), 'MMM dd, yyyy') : 'N/A'}</td>
-                          <td>{item.days_until_expiry !== undefined ? item.days_until_expiry : item.days_left !== undefined ? item.days_left : 'N/A'}</td>
-                          <td>Pending</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            <div className={styles.reportItem}>
+              <h3 className={styles.reportQuestion}>4.5 (Report 14) Unions with CBA Expiring Soon</h3>
+              <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <label htmlFor="cba-expiring-period" style={{ fontSize: '14px', fontWeight: 500 }}>Filter by Period:</label>
+                <Select
+                  id="cba-expiring-period"
+                  value={cbaExpiringDays.toString()}
+                  onChange={(e) => setCbaExpiringDays(Number(e.target.value))}
+                  options={[
+                    { value: '30', label: '1 Month' },
+                    { value: '90', label: '3 Months' },
+                    { value: '180', label: '6 Months' },
+                    { value: '365', label: '1 Year' },
+                  ]}
+                  style={{ minWidth: '150px' }}
+                />
               </div>
-            )}
+              {expiringCBAsFiltered && expiringCBAsFiltered.length > 0 ? (
+                <>
+                  <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                    <p className={styles.kpiLabel}>Total Count</p>
+                    <p className={styles.kpiValue}>{expiringCBAsFiltered.length}</p>
+                  </div>
+                  <div className={styles.dataTable}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Organization</th>
+                          <th>Union Name</th>
+                          <th>Renewal Date</th>
+                          <th>End Date</th>
+                          <th>Days Until Expiry</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {expiringCBAsFiltered.map((item: any, index: number) => (
+                          <tr key={index}>
+                            <td>{item.organization || 'N/A'}</td>
+                            <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.union_name || item.name_en || 'N/A'}>
+                              {item.union_name || item.name_en || 'N/A'}
+                            </td>
+                            <td>{item.registration_date ? format(new Date(item.registration_date), 'MMM dd, yyyy') : 'N/A'}</td>
+                            <td>{item.next_end_date || item.end_date ? format(new Date(item.next_end_date || item.end_date), 'MMM dd, yyyy') : 'N/A'}</td>
+                            <td>{item.days_remaining !== undefined ? item.days_remaining : item.days_until_expiry !== undefined ? item.days_until_expiry : item.days_left !== undefined ? item.days_left : 'N/A'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (
+                <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>No CBAs expiring within the selected period.</p>
+              )}
+            </div>
 
             {/* 4.6 Report 15: CBA Ongoing */}
             {ongoingCBAs && ongoingCBAs.length > 0 && (
