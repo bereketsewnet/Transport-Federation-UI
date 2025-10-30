@@ -59,7 +59,7 @@ export const CBAsFormComplete: React.FC = () => {
     defaultValues: {
       union_id: 0,
       duration_years: 3,
-      status: '',
+      status: 'Signed',
       registration_date: new Date().toISOString().split('T')[0],
       next_end_date: '',
       round: ''
@@ -314,9 +314,9 @@ export const CBAsFormComplete: React.FC = () => {
                 className={styles.formField}
                 options={[
                   { value: '', label: 'Select Status' },
-                  { value: 'signed', label: 'Signed' },
-                  { value: 'expired', label: 'Expired' },
-                  { value: 'pending', label: 'Pending' }
+                  { value: 'Signed', label: 'Signed' },
+                  { value: 'Ongoing', label: 'Ongoing' },
+                  { value: 'Not-Signed', label: 'Not-Signed' }
                 ]}
               />
 

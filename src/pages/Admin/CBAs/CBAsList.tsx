@@ -131,6 +131,19 @@ export const CBAsList: React.FC = () => {
     return diffDays;
   };
 
+  // Derive unified status based on dates
+  const getDerivedStatus = (cba: CBA): 'Signed' | 'Not-Signed' | 'Ongoing' => {
+    const now = new Date();
+    const start = cba.start_date ? new Date(cba.start_date) : undefined;
+    const end = (cba as any).next_end_date ? new Date((cba as any).next_end_date as unknown as string) : (cba.end_date ? new Date(cba.end_date) : undefined);
+    if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return 'Not-Signed';
+    }
+    if (start > now) return 'Signed';
+    if (start <= now && end >= now) return 'Ongoing';
+    return 'Not-Signed';
+  };
+
   // Table columns configuration
   const columns = [
     {
@@ -183,11 +196,15 @@ export const CBAsList: React.FC = () => {
       key: 'status',
       label: t('cbas.status'),
       sortable: true,
-      render: (value: unknown) => (
-        <span className={`${styles.statusBadge} ${styles[String(value)]}`}>
-          {t(`cbas.statuses.${String(value)}`)}
-        </span>
-      )
+      render: (_value: unknown, row: CBA) => {
+        const status = getDerivedStatus(row);
+        const cls = status === 'Ongoing' ? styles.active : status === 'Signed' ? styles.pending : styles.expired;
+        return (
+          <span className={`${styles.statusBadge} ${cls}`}>
+            {status}
+          </span>
+        );
+      }
     },
     {
       key: 'created_at',
@@ -284,10 +301,9 @@ export const CBAsList: React.FC = () => {
             className={styles.filterSelect}
             options={[
               { value: '', label: t('cbas.allStatuses') },
-              { value: 'active', label: t('cbas.statuses.active') },
-              { value: 'expired', label: t('cbas.statuses.expired') },
-              { value: 'pending', label: t('cbas.statuses.pending') },
-              { value: 'negotiating', label: t('cbas.statuses.negotiating') }
+              { value: 'Signed', label: 'Signed' },
+              { value: 'Ongoing', label: 'Ongoing' },
+              { value: 'Not-Signed', label: 'Not-Signed' }
             ]}
           />
 

@@ -62,7 +62,7 @@ export const CBAsForm: React.FC = () => {
     defaultValues: {
       start_date: new Date().toISOString().split('T')[0],
       end_date: new Date(new Date().getFullYear() + 3, new Date().getMonth(), new Date().getDate()).toISOString().split('T')[0],
-      status: 'active'
+      status: 'Signed'
     }
   });
 
@@ -229,10 +229,9 @@ export const CBAsForm: React.FC = () => {
                 required
                 className={styles.formField}
                 options={[
-                  { value: 'active', label: t('cbas.statuses.active') },
-                  { value: 'expired', label: t('cbas.statuses.expired') },
-                  { value: 'pending', label: t('cbas.statuses.pending') },
-                  { value: 'negotiating', label: t('cbas.statuses.negotiating') }
+                  { value: 'Signed', label: 'Signed' },
+                  { value: 'Ongoing', label: 'Ongoing' },
+                  { value: 'Not-Signed', label: 'Not-Signed' }
                 ]}
               />
             </div>

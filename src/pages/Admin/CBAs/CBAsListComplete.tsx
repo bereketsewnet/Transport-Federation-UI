@@ -86,14 +86,40 @@ export const CBAsListComplete: React.FC = () => {
         page: currentPage,
         per_page: pageSize,
         q: searchTerm,
-        ...filters
+        // do not send our derived status to API; we'll filter client-side
+        ...Object.fromEntries(Object.entries(filters).filter(([k]) => !(k === 'status' && ['Signed','Ongoing','Not-Signed'].includes(String(filters.status))))),
+        // keep legacy backend status if user typed one manually
+        ...(filters.status && ['signed','expired','pending'].includes(String(filters.status).toLowerCase()) ? { status: filters.status } : {})
       };
 
       console.log('📊 Loading CBAs with params:', params);
       const response = await getCBAs(params);
       console.log('✅ CBAs response:', response);
       
-      const cbasData = response.data.data || [];
+      let cbasData: CBA[] = response.data.data || [];
+
+      // helper to unify status using DB value first, otherwise derive from dates
+      const unifyStatus = (cba: any): 'Signed'|'Ongoing'|'Not-Signed' => {
+        const raw = String(cba?.status || '').toLowerCase();
+        if (raw === 'signed') return 'Signed';
+        if (raw === 'ongoing') return 'Ongoing';
+        if (raw === 'not-signed' || raw === 'notsigned' || raw === 'not_signed') return 'Not-Signed';
+        const today = new Date();
+        const startStr = cba?.registration_date || cba?.start_date;
+        const endStr = cba?.next_end_date || cba?.end_date;
+        const start = startStr ? new Date(startStr) : null;
+        const end = endStr ? new Date(endStr) : null;
+        if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return 'Not-Signed';
+        if (start > today) return 'Signed';
+        if (start <= today && end >= today) return 'Ongoing';
+        return 'Not-Signed';
+      };
+
+      // client-side filter for new statuses
+      if (filters.status && ['Signed','Ongoing','Not-Signed'].includes(String(filters.status))) {
+        const wanted = String(filters.status) as 'Signed'|'Ongoing'|'Not-Signed';
+        cbasData = cbasData.filter(c => unifyStatus(c) === wanted);
+      }
       console.log('📋 CBAs loaded:', cbasData.length);
       console.log('📋 First CBA:', cbasData[0]);
       
@@ -174,19 +200,25 @@ export const CBAsListComplete: React.FC = () => {
       key: 'status',
       label: t('cbas.status'),
       sortable: true,
-      render: (value: unknown) => {
-        const status = String(value || '').toLowerCase();
-        let badgeClass = styles.statusBadge;
-        
-        if (status === 'signed') badgeClass += ` ${styles.signed}`;
-        else if (status === 'expired') badgeClass += ` ${styles.expired}`;
-        else if (status === 'pending') badgeClass += ` ${styles.pending}`;
-        
-        return (
-          <span className={badgeClass}>
-            {String(value || 'N/A')}
-          </span>
-        );
+      render: (_value: unknown, row: any) => {
+        const normalized = (() => {
+          const raw = String(row?.status || '').toLowerCase();
+          if (raw === 'signed') return 'Signed';
+          if (raw === 'ongoing') return 'Ongoing';
+          if (raw === 'not-signed' || raw === 'notsigned' || raw === 'not_signed') return 'Not-Signed';
+          const today = new Date();
+          const startStr = row?.registration_date || row?.start_date;
+          const endStr = row?.next_end_date || row?.end_date;
+          const start = startStr ? new Date(startStr) : null;
+          const end = endStr ? new Date(endStr) : null;
+          if (start && end && !isNaN(start.getTime()) && !isNaN(end.getTime())) {
+            if (start > today) return 'Signed';
+            if (start <= today && end >= today) return 'Ongoing';
+          }
+          return 'Not-Signed';
+        })();
+        const badgeClass = `${styles.statusBadge} ${normalized === 'Ongoing' ? styles.active : normalized === 'Signed' ? styles.pending : styles.expired}`;
+        return <span className={badgeClass}>{normalized}</span>;
       }
     },
     {
@@ -301,9 +333,9 @@ export const CBAsListComplete: React.FC = () => {
           className={styles.filterSelect}
           options={[
             { value: '', label: 'All Statuses' },
-            { value: 'signed', label: 'Signed' },
-            { value: 'expired', label: 'Expired' },
-            { value: 'pending', label: 'Pending' }
+            { value: 'Signed', label: 'Signed' },
+            { value: 'Ongoing', label: 'Ongoing' },
+            { value: 'Not-Signed', label: 'Not-Signed' }
           ]}
         />
 

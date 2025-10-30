@@ -262,39 +262,49 @@ export const Reports: React.FC = () => {
   }, [youthData, eldersData]);
 
   const cbaStatus = useMemo(() => {
-    // Determine CBA status from expiry date: Expired (< today), Pending (<= 90 days), Signed (otherwise)
+    // Normalize using DB status first, then derive from dates
     const allCBAs: any[] = allCBAsData?.data?.data || [];
-    const MS_PER_DAY = 24 * 60 * 60 * 1000;
     const today = new Date();
-    const thresholdDays = 90;
-
     let signed = 0;
-    let expired = 0;
-    let pending = 0;
+    let notSigned = 0;
+    let ongoing = 0;
+
+    const normalizeFromDb = (raw: unknown): 'Signed' | 'Ongoing' | 'Not-Signed' | null => {
+      const v = String(raw || '').toLowerCase();
+      if (!v) return null;
+      if (v === 'signed') return 'Signed';
+      if (v === 'ongoing' || v === 'active') return 'Ongoing';
+      if (v === 'not-signed' || v === 'notsigned' || v === 'not_signed' || v === 'expired') return 'Not-Signed';
+      if (v === 'pending') return 'Signed'; // treat as pre-start signed
+      return null;
+    };
 
     allCBAs.forEach((cba: any) => {
-      const dateStr = cba?.next_end_date || cba?.end_date;
-      const endDate = dateStr ? new Date(dateStr) : null;
-
-      if (!endDate || isNaN(endDate.getTime())) {
-        // Fallback to DB status field if date is missing/invalid
-        const s = String(cba.status || '').toLowerCase();
-        if (s === 'expired') expired += 1;
-        else if (s === 'pending') pending += 1;
-        else signed += 1;
+      const dbNorm = normalizeFromDb(cba?.status);
+      if (dbNorm) {
+        if (dbNorm === 'Signed') signed += 1;
+        else if (dbNorm === 'Ongoing') ongoing += 1;
+        else notSigned += 1;
         return;
       }
 
-      const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / MS_PER_DAY);
-      if (diffDays < 0) expired += 1;
-      else if (diffDays <= thresholdDays) pending += 1;
-      else signed += 1;
+      const startStr = cba?.registration_date || cba?.start_date;
+      const endStr = cba?.next_end_date || cba?.end_date;
+      const start = startStr ? new Date(startStr) : null;
+      const end = endStr ? new Date(endStr) : null;
+      if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+        notSigned += 1;
+        return;
+      }
+      if (start > today) signed += 1;
+      else if (start <= today && end >= today) ongoing += 1;
+      else notSigned += 1;
     });
 
     return [
       { status: 'Signed', count: signed },
-      { status: 'Pending', count: pending },
-      { status: 'Expired', count: expired },
+      { status: 'Ongoing', count: ongoing },
+      { status: 'Not-Signed', count: notSigned },
     ];
   }, [allCBAsData]);
 

@@ -82,6 +82,8 @@ const PrintedReportPage: React.FC = () => {
     queryFn: () => getUnions({ per_page: 1000 }),
   });
 
+  
+
   const { data: allExecutivesData } = useQuery({
     queryKey: ['reports-executives-overall'],
     queryFn: () => getUnionExecutives({ per_page: 1000 }),
@@ -127,6 +129,29 @@ const PrintedReportPage: React.FC = () => {
     queryKey: ['reports-general-assembly-status'],
     queryFn: getGeneralAssemblyStatus,
   });
+
+  // Build ongoing CBAs list - ONLY status = "Ongoing"
+  const ongoingCBAs = useMemo(() => {
+    const all: any[] = allCBAsData?.data?.data || [];
+    const unions: any[] = unionsList?.data?.data || [];
+    
+    // Filter ONLY by status = "Ongoing" (case-insensitive)
+    const filtered = all.filter((item: any) => {
+      const dbStatus = String(item.status || '').toLowerCase().trim();
+      // Only include if status is explicitly "ongoing" or "active" (which maps to Ongoing)
+      return dbStatus === 'ongoing' || dbStatus === 'active';
+    });
+    
+    // Map union information
+    return filtered.map((cba: any) => {
+      const union = unions.find((u: any) => u.union_id === cba.union_id);
+      return {
+        ...cba,
+        union_name: union?.name_en || union?.name || `Union ID: ${cba.union_id}`,
+        union_code: union?.union_code || 'N/A',
+      };
+    });
+  }, [allCBAsData, unionsList]);
 
   const { data: unionsNoGA } = useQuery({
     queryKey: ['reports-unions-no-ga'],
@@ -321,36 +346,48 @@ const PrintedReportPage: React.FC = () => {
 
   const cbaStatus = useMemo(() => {
     const allCBAs: any[] = allCBAsData?.data?.data || [];
-    const MS_PER_DAY = 24 * 60 * 60 * 1000;
     const today = new Date();
-    const thresholdDays = 90;
 
     let signed = 0;
-    let expired = 0;
-    let pending = 0;
+    let notSigned = 0;
+    let ongoing = 0;
+
+    const normalizeFromDb = (raw: unknown): 'Signed' | 'Ongoing' | 'Not-Signed' | null => {
+      const v = String(raw || '').toLowerCase();
+      if (!v) return null;
+      if (v === 'signed') return 'Signed';
+      if (v === 'ongoing' || v === 'active') return 'Ongoing';
+      if (v === 'not-signed' || v === 'notsigned' || v === 'not_signed' || v === 'expired') return 'Not-Signed';
+      if (v === 'pending') return 'Signed';
+      return null;
+    };
 
     allCBAs.forEach((cba: any) => {
-      const dateStr = cba?.next_end_date || cba?.end_date;
-      const endDate = dateStr ? new Date(dateStr) : null;
-
-      if (!endDate || isNaN(endDate.getTime())) {
-        const s = String(cba.status || '').toLowerCase();
-        if (s === 'expired') expired += 1;
-        else if (s === 'pending') pending += 1;
-        else signed += 1;
+      const dbNorm = normalizeFromDb(cba?.status);
+      if (dbNorm) {
+        if (dbNorm === 'Signed') signed += 1;
+        else if (dbNorm === 'Ongoing') ongoing += 1;
+        else notSigned += 1;
         return;
       }
 
-      const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / MS_PER_DAY);
-      if (diffDays < 0) expired += 1;
-      else if (diffDays <= thresholdDays) pending += 1;
-      else signed += 1;
+      const startStr = cba?.registration_date || cba?.start_date;
+      const endStr = cba?.next_end_date || cba?.end_date;
+      const start = startStr ? new Date(startStr) : null;
+      const end = endStr ? new Date(endStr) : null;
+      if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+        notSigned += 1;
+        return;
+      }
+      if (start > today) signed += 1;
+      else if (start <= today && end >= today) ongoing += 1;
+      else notSigned += 1;
     });
 
     return [
       { status: 'Signed', count: signed },
-      { status: 'Pending', count: pending },
-      { status: 'Expired', count: expired },
+      { status: 'Ongoing', count: ongoing },
+      { status: 'Not-Signed', count: notSigned },
     ];
   }, [allCBAsData]);
 
@@ -1319,12 +1356,12 @@ const PrintedReportPage: React.FC = () => {
             )}
 
             {/* 4.6 Report 15: CBA Ongoing */}
-            {cbaOngoing?.data?.data && cbaOngoing.data.data.length > 0 && (
+            {ongoingCBAs && ongoingCBAs.length > 0 && (
               <div className={styles.reportItem}>
                 <h3 className={styles.reportQuestion}>4.6 (Report 15) Unions with Ongoing Collective Bargaining Agreement</h3>
                 <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
                   <p className={styles.kpiLabel}>Total Count</p>
-                  <p className={styles.kpiValue}>{cbaOngoing.data.count || cbaOngoing.data.data.length}</p>
+                  <p className={styles.kpiValue}>{ongoingCBAs.length}</p>
                 </div>
                 <div className={styles.dataTable}>
                   <table>
@@ -1339,13 +1376,13 @@ const PrintedReportPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {cbaOngoing.data.data.map((item: any, index: number) => (
+                      {ongoingCBAs.map((item: any, index: number) => (
                         <tr key={index}>
                           <td>{item.union_id || item.id}</td>
                           <td>{item.union_code || 'N/A'}</td>
                           <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.union_name || item.name_en || 'N/A'}>{item.union_name || item.name_en || 'N/A'}</td>
-                          <td>{item.start_date || item.begin_date ? format(new Date(item.start_date || item.begin_date), 'MMM dd, yyyy') : 'N/A'}</td>
-                          <td>{item.next_end_date || item.end_date ? format(new Date(item.next_end_date || item.end_date), 'MMM dd, yyyy') : 'N/A'}</td>
+                          <td>{(item.registration_date || item.start_date || item.begin_date) ? format(new Date(item.registration_date || item.start_date || item.begin_date), 'MMM dd, yyyy') : 'N/A'}</td>
+                          <td>{(item.next_end_date || item.end_date) ? format(new Date(item.next_end_date || item.end_date), 'MMM dd, yyyy') : 'N/A'}</td>
                           <td>Ongoing</td>
                         </tr>
                       ))}
