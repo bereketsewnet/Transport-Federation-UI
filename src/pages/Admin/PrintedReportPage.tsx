@@ -56,6 +56,7 @@ const PrintedReportPage: React.FC = () => {
   const [selectedUnionId, setSelectedUnionId] = useState<string>('');
   const [cbaExpiringDays, setCbaExpiringDays] = useState<number>(90); // Default 3 months
   const [executiveFilterDays, setExecutiveFilterDays] = useState<string>('all'); // 'all', '1', '7', '30', etc.
+  const [selectedUnionForAccidents, setSelectedUnionForAccidents] = useState<string>(''); // For Report 24
 
   // Fetch all data
   const { data: membersData, isLoading: loadingMembers } = useQuery({
@@ -786,6 +787,55 @@ const PrintedReportPage: React.FC = () => {
       majorIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Major').length,
     };
   }, [oshIncidents]);
+
+  // Report 23: Monthly Incident Trends (Last 5 Years)
+  const oshIncidentsByMonthLast5Years = useMemo(() => {
+    const incidents: any[] = oshIncidents?.data?.data || [];
+    const today = new Date();
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(today.getFullYear() - 5);
+    fiveYearsAgo.setHours(0, 0, 0, 0);
+    
+    const monthCount: Record<string, number> = {};
+    
+    incidents.forEach((incident) => {
+      if (!incident.dateTimeOccurred) return;
+      const date = new Date(incident.dateTimeOccurred);
+      if (isNaN(date.getTime())) return; // Skip invalid dates
+      
+      // Only include incidents from the last 5 years
+      if (date >= fiveYearsAgo && date <= today) {
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
+      }
+    });
+    
+    return Object.entries(monthCount)
+      .map(([month, count]) => ({
+        month,
+        count,
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+  }, [oshIncidents]);
+
+  // Report 24: Filter incidents by union
+  const filteredAccidentsByUnion = useMemo(() => {
+    const incidents: any[] = oshIncidents?.data?.data || [];
+    
+    if (!selectedUnionForAccidents || selectedUnionForAccidents === '') {
+      // Show all accidents if no union selected
+      return incidents;
+    }
+    
+    const unionId = Number(selectedUnionForAccidents);
+    if (isNaN(unionId)) return incidents;
+    
+    // Filter by union_id
+    return incidents.filter((incident: any) => {
+      const incidentUnionId = incident.union_id || incident.unionId || incident.union?.union_id || incident.union?.id;
+      return Number(incidentUnionId) === unionId;
+    });
+  }, [oshIncidents, selectedUnionForAccidents]);
 
   const handlePrint = () => {
     window.print();
@@ -1941,6 +1991,126 @@ const PrintedReportPage: React.FC = () => {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
+                </div>
+              )}
+
+              {/* Report 23: Monthly Incident Trends (Last 5 Years) */}
+              {oshIncidentsByMonthLast5Years.length > 0 && (
+                <div className={styles.reportItem}>
+                  <h3 className={styles.reportQuestion}>7.4 (Report 23) Number of Accidents That Happened in the Last 5 Years</h3>
+                  <div className={styles.chartContainer}>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={oshIncidentsByMonthLast5Years}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="count" name="Incidents" stroke={COLORS[2]} strokeWidth={3} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className={styles.dataTable}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Month</th>
+                          <th>Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {oshIncidentsByMonthLast5Years.map((item, idx) => (
+                          <tr key={idx}>
+                            <td><strong>{item.month}</strong></td>
+                            <td>{item.count.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                        <tr className={styles.totalRow}>
+                          <td><strong>Total</strong></td>
+                          <td><strong>{oshIncidentsByMonthLast5Years.reduce((sum, item) => sum + item.count, 0).toLocaleString()}</strong></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Report 24: List Accidents by Union */}
+              {oshIncidents?.data?.data && (
+                <div className={styles.reportItem}>
+                  <h3 className={styles.reportQuestion}>7.5 (Report 24) List Accidents That Happened in the Following Union</h3>
+                  <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <label htmlFor="union-select-accidents" style={{ fontSize: '14px', fontWeight: 500 }}>Select Union:</label>
+                    <div style={{ minWidth: '200px' }}>
+                      <Select
+                        id="union-select-accidents"
+                        value={selectedUnionForAccidents}
+                        onChange={(e) => setSelectedUnionForAccidents(e.target.value)}
+                        options={[
+                          { value: '', label: 'All Unions' },
+                          ...(unionsList?.data?.data || []).map((u: any) => ({
+                            value: String(u.union_id || u.id),
+                            label: u.name_en || u.name || `Union ${u.union_id || u.id}`
+                          }))
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  {filteredAccidentsByUnion.length > 0 ? (
+                    <>
+                      <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                        <p className={styles.kpiLabel}>Total Accidents</p>
+                        <p className={styles.kpiValue}>{filteredAccidentsByUnion.length.toLocaleString()}</p>
+                      </div>
+                      <div className={styles.dataTable}>
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Date</th>
+                              <th>Union</th>
+                              <th>Category</th>
+                              <th>Severity</th>
+                              <th>Location</th>
+                              <th>Status</th>
+                              <th>Reported By</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredAccidentsByUnion.map((incident: any, idx: number) => (
+                              <tr key={idx}>
+                                <td>
+                                  {incident.dateTimeOccurred && !isNaN(new Date(incident.dateTimeOccurred).getTime())
+                                    ? format(new Date(incident.dateTimeOccurred), 'MMM dd, yyyy')
+                                    : 'N/A'}
+                                </td>
+                                <td>
+                                  {incident.union?.name_en || 
+                                   (incident.union_id ? `Union ID: ${incident.union_id}` : 
+                                    (incident.unionId ? `Union ID: ${incident.unionId}` : 'N/A'))}
+                                </td>
+                                <td>{incident.accidentCategory || 'Not Set'}</td>
+                                <td>{incident.injurySeverity || 'Unknown'}</td>
+                                <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={incident.locationSite || ''}>
+                                  {incident.locationSite || 'N/A'}
+                                </td>
+                                <td>{incident.status || 'N/A'}</td>
+                                <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={incident.reportedBy || ''}>
+                                  {incident.reportedBy || 'N/A'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  ) : (
+                    <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                      {selectedUnionForAccidents === '' || !selectedUnionForAccidents
+                        ? 'No accidents found.'
+                        : 'No accidents found for the selected union.'
+                      }
+                    </p>
+                  )}
                 </div>
               )}
             </div>
