@@ -58,6 +58,7 @@ const PrintedReportPage: React.FC = () => {
   const [cbaExpiringDays, setCbaExpiringDays] = useState<number>(90); // Default 3 months
   const [executiveFilterDays, setExecutiveFilterDays] = useState<string>('all'); // 'all', '1', '7', '30', etc.
   const [selectedUnionForAccidents, setSelectedUnionForAccidents] = useState<string>(''); // For Report 24
+  const [gaUpcomingDays, setGaUpcomingDays] = useState<number>(90); // For Report 18 - Default 3 months
 
   // Fetch all data
   const { data: membersData, isLoading: loadingMembers } = useQuery({
@@ -818,6 +819,43 @@ const PrintedReportPage: React.FC = () => {
       return u.days_since_assembly >= 0 && u.days_since_assembly <= 90;
     });
   }, [unionsGARecent]);
+
+  // Report 18: Unions with upcoming General Assembly meetings (future dates)
+  const upcomingGAData = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const allUnions: any[] = unionsList?.data?.data || [];
+
+    return allUnions
+      .map((u: any) => {
+        if (!u.general_assembly_date) return null;
+        
+        try {
+          const assemblyDate = new Date(u.general_assembly_date);
+          if (isNaN(assemblyDate.getTime())) return null;
+          
+          assemblyDate.setHours(0, 0, 0, 0);
+          const diffTime = assemblyDate.getTime() - today.getTime();
+          const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          
+          // Only include future dates (positive daysUntil)
+          // Filter by selected period (within gaUpcomingDays)
+          if (daysUntil > 0 && daysUntil <= gaUpcomingDays) {
+            return {
+              ...u,
+              days_until_assembly: daysUntil,
+              union_name: u.name_en || u.name || `Union ${u.union_id || u.id}`,
+            };
+          }
+          
+          return null;
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter((u: any): u is any => u !== null)
+      .sort((a: any, b: any) => a.days_until_assembly - b.days_until_assembly); // Sort by days until (ascending)
+  }, [unionsList, gaUpcomingDays]);
 
   const oshIncidentsByCategory = useMemo(() => {
     const incidents: any[] = oshIncidents?.data?.data || [];
@@ -2019,6 +2057,77 @@ const PrintedReportPage: React.FC = () => {
                     <p className={styles.tableNote}>*Showing first 20 of {recentGAData.length} records</p>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* 5.5 Report 18: Upcoming General Assembly Meetings */}
+            {unionsList?.data?.data && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>5.5 (Report 18) List Unions Those Last Congress/General Assembly Meeting is Within (Future Dates)</h3>
+                <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <label htmlFor="ga-upcoming-period" style={{ fontSize: '14px', fontWeight: 500 }}>Filter by Period:</label>
+                  <div style={{ minWidth: '200px' }}>
+                    <Select
+                      id="ga-upcoming-period"
+                      value={gaUpcomingDays.toString()}
+                      onChange={(e) => setGaUpcomingDays(Number(e.target.value))}
+                      options={[
+                        { value: '1', label: '1 Day Until' },
+                        { value: '7', label: '1 Week Until' },
+                        { value: '21', label: '3 Weeks Until' },
+                        { value: '30', label: '1 Month Until' },
+                        { value: '90', label: '3 Months Until' },
+                        { value: '180', label: '6 Months Until' },
+                        { value: '365', label: '1 Year Until' },
+                        { value: '1095', label: '3 Years Until' },
+                        { value: '1825', label: '5 Years Until' },
+                        { value: '2190', label: '6 Years Until' },
+                      ]}
+                    />
+                  </div>
+                </div>
+                {upcomingGAData.length > 0 ? (
+                  <>
+                    <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                      <p className={styles.kpiLabel}>Total Unions</p>
+                      <p className={styles.kpiValue}>{upcomingGAData.length.toLocaleString()}</p>
+                    </div>
+                    <div className={styles.dataTable}>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Union Code</th>
+                            <th>Union Name</th>
+                            <th>Sector</th>
+                            <th>Organization</th>
+                            <th>Assembly Date</th>
+                            <th>Days Until</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {upcomingGAData.map((u: any, idx: number) => (
+                            <tr key={idx}>
+                              <td>{u.union_code || 'N/A'}</td>
+                              <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={u.union_name || 'N/A'}>
+                                {u.union_name || 'N/A'}
+                              </td>
+                              <td>{u.sector || 'N/A'}</td>
+                              <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={u.organization || 'N/A'}>
+                                {u.organization || 'N/A'}
+                              </td>
+                              <td>{u.general_assembly_date ? format(new Date(u.general_assembly_date), 'MMM dd, yyyy') : 'N/A'}</td>
+                              <td>{u.days_until_assembly}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    No upcoming general assembly meetings found within the selected period.
+                  </p>
+                )}
               </div>
             )}
           </div>
