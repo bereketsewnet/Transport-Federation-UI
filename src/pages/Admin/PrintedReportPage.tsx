@@ -38,7 +38,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { format } from 'date-fns';
-import { FaPrint, FaArrowLeft } from 'react-icons/fa';
+import { FaPrint, FaArrowLeft, FaSync, FaTimes } from 'react-icons/fa';
 import styles from './PrintedReportPage.module.css';
 
 const COLORS = ['#0B63D3', '#E53935', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
@@ -1156,15 +1156,17 @@ const PrintedReportPage: React.FC = () => {
             variant="primary" 
             onClick={handleRegenerate}
             style={{ whiteSpace: 'nowrap' }}
+            title="Regenerate"
           >
-            Regenerate
+            <FaSync />
           </Button>
           <Button 
             variant="secondary" 
             onClick={handleResetFilter}
             style={{ whiteSpace: 'nowrap' }}
+            title="Reset Filter"
           >
-            Reset Filter
+            <FaTimes />
           </Button>
         </div>
 
