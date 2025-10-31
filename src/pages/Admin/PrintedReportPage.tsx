@@ -54,6 +54,7 @@ const PrintedReportPage: React.FC = () => {
   // State for filters
   const [executiveExpiryDate, setExecutiveExpiryDate] = useState<string>(dateTo);
   const [selectedUnionId, setSelectedUnionId] = useState<string>('');
+  const [selectedUnionIdForReport31, setSelectedUnionIdForReport31] = useState<string>(''); // For Report 3.1
   const [cbaExpiringDays, setCbaExpiringDays] = useState<number>(90); // Default 3 months
   const [executiveFilterDays, setExecutiveFilterDays] = useState<string>('all'); // 'all', '1', '7', '30', etc.
   const [selectedUnionForAccidents, setSelectedUnionForAccidents] = useState<string>(''); // For Report 24
@@ -243,6 +244,12 @@ const PrintedReportPage: React.FC = () => {
     queryKey: ['reports-executives-by-union', selectedUnionId],
     queryFn: () => getUnionExecutives({ union_id: Number(selectedUnionId), per_page: 1000 }),
     enabled: !!selectedUnionId && selectedUnionId !== '',
+  });
+
+  const { data: execByUnionForReport31 } = useQuery({
+    queryKey: ['reports-executives-by-union-report31', selectedUnionIdForReport31],
+    queryFn: () => getUnionExecutives({ union_id: Number(selectedUnionIdForReport31), per_page: 1000 }),
+    enabled: !!selectedUnionIdForReport31 && selectedUnionIdForReport31 !== '',
   });
 
   const { data: allCBAsData } = useQuery({
@@ -568,7 +575,7 @@ const PrintedReportPage: React.FC = () => {
       .filter(item => item.value > 0);
   }, [allExecutivesData, allMembersData]);
 
-  // Executives by selected union (or overall if no union selected)
+  // Executives by selected union (or overall if no union selected) - For Report 7
   const executivesBySelectedUnion = useMemo(() => {
     // If "Overall" is selected (empty string), return overall data
     if (!selectedUnionId || selectedUnionId === '') {
@@ -609,6 +616,48 @@ const PrintedReportPage: React.FC = () => {
       .map(([sex, count]) => ({ name: sex, value: count }))
       .filter(item => item.value > 0);
   }, [execByUnion, allMembersData, selectedUnionId, overallExecutivesByGender]);
+
+  // Executives by selected union for Report 3.1 (or overall if no union selected)
+  const executivesBySelectedUnionForReport31 = useMemo(() => {
+    // If "Overall" is selected (empty string), return overall data
+    if (!selectedUnionIdForReport31 || selectedUnionIdForReport31 === '') {
+      return overallExecutivesByGender;
+    }
+    
+    // If specific union selected, get data from execByUnionForReport31
+    if (!execByUnionForReport31?.data?.data) return [];
+    
+    const executives: any[] = execByUnionForReport31.data.data;
+    const members: any[] = allMembersData?.data?.data || [];
+    const genderCount: Record<string, number> = {};
+    
+    const memberSexMap = new Map<number, string>();
+    members.forEach((member: any) => {
+      if (member.mem_id || member.id) {
+        memberSexMap.set(member.mem_id || member.id, member.sex || '');
+      }
+    });
+    
+    const normalizeSex = (raw: unknown): string => {
+      const v = String(raw || '').trim().toLowerCase();
+      if (v.startsWith('m')) return 'Male';
+      if (v.startsWith('f')) return 'Female';
+      return 'Unknown';
+    };
+    
+    executives.forEach((exec: any) => {
+      let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || '';
+      if (!sexValue && exec.mem_id) {
+        sexValue = memberSexMap.get(exec.mem_id) || '';
+      }
+      const sex = normalizeSex(sexValue);
+      genderCount[sex] = (genderCount[sex] || 0) + 1;
+    });
+    
+    return Object.entries(genderCount)
+      .map(([sex, count]) => ({ name: sex, value: count }))
+      .filter(item => item.value > 0);
+  }, [execByUnionForReport31, allMembersData, selectedUnionIdForReport31, overallExecutivesByGender]);
 
   // Strategic plan counts
   const strategicPlanStats = useMemo(() => {
@@ -699,6 +748,17 @@ const PrintedReportPage: React.FC = () => {
   const totalExecutives = useMemo(() => {
     return (allExecutivesData?.data?.data || []).length;
   }, [allExecutivesData]);
+
+  // Total executives count for Report 3.1 (overall or by union)
+  const totalExecutivesForReport31 = useMemo(() => {
+    if (!selectedUnionIdForReport31 || selectedUnionIdForReport31 === '') {
+      return totalExecutives;
+    }
+    
+    if (!execByUnionForReport31?.data?.data) return 0;
+    
+    return execByUnionForReport31.data.data.length;
+  }, [selectedUnionIdForReport31, execByUnionForReport31, totalExecutives]);
 
   const unionsWithCBAs = useMemo(() => {
     const cbas = allCBAsData?.data?.data || [];
@@ -1292,12 +1352,99 @@ const PrintedReportPage: React.FC = () => {
             <h2 className={styles.sectionTitle}>3. Executive Statistics</h2>
             
             {/* 3.1 Total Executives */}
-            <div className={styles.reportItem}>
-              <h3 className={styles.reportQuestion}>3.1 Total Number of Executives</h3>
-              <div className={styles.kpiBox}>
-                <p className={styles.kpiValue}>{totalExecutives.toLocaleString()}</p>
+            {(allExecutivesData?.data?.data || execByUnionForReport31?.data?.data) && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>3.1 Total Number of Executives</h3>
+                <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <label htmlFor="union-select-report31" style={{ fontSize: '14px', fontWeight: 500 }}>Select Union:</label>
+                  <div style={{ minWidth: '200px' }}>
+                    <Select
+                      id="union-select-report31"
+                      value={selectedUnionIdForReport31}
+                      onChange={(e) => setSelectedUnionIdForReport31(e.target.value)}
+                      options={[
+                        { value: '', label: 'Overall' },
+                        ...(unionsList?.data?.data || []).map((u: any) => ({
+                          value: String(u.union_id || u.id),
+                          label: u.name_en || u.name || `Union ${u.union_id || u.id}`
+                        }))
+                      ]}
+                    />
+                  </div>
+                </div>
+                <p style={{ marginBottom: '10px', fontSize: '14px', color: '#666' }}>
+                  <strong>
+                    {selectedUnionIdForReport31 === '' || !selectedUnionIdForReport31
+                      ? 'Overall - All Unions'
+                      : unionsList?.data?.data?.find((u: any) => String(u.union_id || u.id) === selectedUnionIdForReport31)?.name_en || `Union ${selectedUnionIdForReport31}`
+                    }
+                  </strong>
+                </p>
+                <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                  <p className={styles.kpiLabel}>Total Executives</p>
+                  <p className={styles.kpiValue}>{totalExecutivesForReport31.toLocaleString()}</p>
+                </div>
+                {executivesBySelectedUnionForReport31 && executivesBySelectedUnionForReport31.length > 0 ? (
+                  <>
+                    <div className={styles.chartContainer}>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={executivesBySelectedUnionForReport31}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value, percent }) =>
+                              `${name}: ${value} (${(percent * 100).toFixed(1)}%)`
+                            }
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {executivesBySelectedUnionForReport31.map((_, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className={styles.dataTable}>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Gender</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {executivesBySelectedUnionForReport31.map((item, idx) => (
+                            <tr key={idx}>
+                              <td><strong>{item.name}</strong></td>
+                              <td>{item.value.toLocaleString()}</td>
+                              <td>{totalExecutivesForReport31 > 0 ? ((item.value / totalExecutivesForReport31) * 100).toFixed(2) : 0}%</td>
+                            </tr>
+                          ))}
+                          <tr className={styles.totalRow}>
+                            <td><strong>Total</strong></td>
+                            <td><strong>{totalExecutivesForReport31.toLocaleString()}</strong></td>
+                            <td><strong>100%</strong></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    {selectedUnionIdForReport31 === '' || !selectedUnionIdForReport31
+                      ? 'No executives found.'
+                      : 'No executives found for the selected union.'
+                    }
+                  </p>
+                )}
               </div>
-            </div>
+            )}
 
             {/* 3.2 Executives by Gender */}
             <div className={styles.reportItem}>
@@ -1395,7 +1542,7 @@ const PrintedReportPage: React.FC = () => {
                             <th>Executive Name</th>
                             <th>Position</th>
                             <th>Term End Date</th>
-                            <th>Days Remaining</th>
+                            <th>daysLeft</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1714,18 +1861,16 @@ const PrintedReportPage: React.FC = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>Union ID</th>
                         <th>Union Code</th>
                         <th>Union Name</th>
-                        <th>CBA Start Date</th>
-                        <th>CBA End Date</th>
+                        <th>startDate</th>
+                        <th>endDate</th>
                         <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {ongoingCBAs.map((item: any, index: number) => (
                         <tr key={index}>
-                          <td>{item.union_id || item.id}</td>
                           <td>{item.union_code || 'N/A'}</td>
                           <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.union_name || item.name_en || 'N/A'}>{item.union_name || item.name_en || 'N/A'}</td>
                           <td>{(item.registration_date || item.start_date || item.begin_date) ? format(new Date(item.registration_date || item.start_date || item.begin_date), 'MMM dd, yyyy') : 'N/A'}</td>
@@ -1900,19 +2045,21 @@ const PrintedReportPage: React.FC = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Sector</th>
                         <th>Terminated Date</th>
+                        <th>Reason</th>
                       </tr>
                     </thead>
                     <tbody>
                       {terminatedList.data.data.map((u: any, idx: number) => (
                         <tr key={idx}>
-                          <td>{u.id}</td>
                           <td>{u.name_en}</td>
                           <td>{u.sector}</td>
                           <td>{u.terminated_date}</td>
+                          <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', wordWrap: 'break-word' }} title={u.reason || u.termination_reason || 'N/A'}>
+                            {u.reason || u.termination_reason || 'N/A'}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -2123,28 +2270,43 @@ const PrintedReportPage: React.FC = () => {
             <h2 className={styles.sectionTitle}>Summary Statistics</h2>
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
-                <h4>Total Executive Members</h4>
-                <p className={styles.summaryValue}>{totalExecutives.toLocaleString()}</p>
+                <h4>Youth Members (&lt;35)</h4>
+                <p className={styles.summaryValue}>{(youthData?.data?.total || 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Unions with CBAs</h4>
-                <p className={styles.summaryValue}>{unionsWithCBAs.toLocaleString()}</p>
+                <h4>Elders (≥35)</h4>
+                <p className={styles.summaryValue}>{(eldersData?.data?.total || 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Unions with General Assembly</h4>
-                <p className={styles.summaryValue}>{unionsWithGeneralAssembly.toLocaleString()}</p>
+                <h4>Terminated Unions</h4>
+                <p className={styles.summaryValue}>{(terminatedList?.data?.data?.length || 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Total Organizations</h4>
-                <p className={styles.summaryValue}>{totalOrganizations.toLocaleString()}</p>
+                <h4>Expired CBAs</h4>
+                <p className={styles.summaryValue}>{(expiredCBAs?.length || 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Total Members</h4>
-                <p className={styles.summaryValue}>{totalMembers.toLocaleString()}</p>
+                <h4>OSH Incidents</h4>
+                <p className={styles.summaryValue}>{(computedOSHStatistics?.totalIncidents || 0).toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Total Unions</h4>
-                <p className={styles.summaryValue}>{totalUnions.toLocaleString()}</p>
+                <h4>Unions Without CBA</h4>
+                <p className={styles.summaryValue}>{(() => {
+                  const unionsWithCBA = new Set<number>();
+                  (allCBAsData?.data?.data || []).forEach((cba: any) => {
+                    if (cba.union_id) unionsWithCBA.add(cba.union_id);
+                  });
+                  const unionsWithoutCBA = (unionsList?.data?.data || []).filter((u: any) => !unionsWithCBA.has(u.union_id || u.id));
+                  return unionsWithoutCBA.length;
+                })().toLocaleString()}</p>
+              </div>
+              <div className={styles.summaryCard}>
+                <h4>Unions Without General Assembly</h4>
+                <p className={styles.summaryValue}>{(unionsNoGA?.data?.data?.length || 0).toLocaleString()}</p>
+              </div>
+              <div className={styles.summaryCard}>
+                <h4>Unions with Strategic Plan</h4>
+                <p className={styles.summaryValue}>{strategicPlanStats.withPlan.toLocaleString()}</p>
               </div>
             </div>
           </div>
