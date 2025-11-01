@@ -38,7 +38,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { format } from 'date-fns';
-import { FaPrint, FaArrowLeft, FaSync, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaSync, FaTimes } from 'react-icons/fa';
 import styles from './PrintedReportPage.module.css';
 
 const COLORS = ['#0B63D3', '#E53935', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
@@ -55,6 +55,7 @@ const PrintedReportPage: React.FC = () => {
   const [executiveFilterDays, setExecutiveFilterDays] = useState<string>('all'); // 'all', '1', '7', '30', etc.
   const [selectedUnionForAccidents, setSelectedUnionForAccidents] = useState<string>(''); // For Report 24
   const [gaUpcomingDays, setGaUpcomingDays] = useState<number>(90); // For Report 18 - Default 3 months
+  const [printPhase, setPrintPhase] = useState<'all' | 'phase2'>('all'); // Print phase selection
   
   // Global date filter for all reports
   const [filterStartDate, setFilterStartDate] = useState<string>(''); // Empty = show all data
@@ -1086,7 +1087,17 @@ const PrintedReportPage: React.FC = () => {
   }, [oshIncidents, selectedUnionForAccidents, filteredOSHIncidents, filterStartDate, filterEndDate]);
 
   const handlePrint = () => {
+    // Add data attribute to body to indicate which phase to print
+    if (printPhase === 'phase2') {
+      document.body.setAttribute('data-print-phase', 'phase2');
+    } else {
+      document.body.removeAttribute('data-print-phase');
+    }
     window.print();
+    // Clean up after printing
+    setTimeout(() => {
+      document.body.removeAttribute('data-print-phase');
+    }, 1000);
   };
 
   const handleRegenerate = () => {
@@ -1110,52 +1121,51 @@ const PrintedReportPage: React.FC = () => {
     <div className={styles.printContainer}>
       {/* Print Button - Hidden when printing */}
       <div className={styles.printControls}>
-        <Button variant="secondary" onClick={() => navigate('/admin/reports')}>
-          <FaArrowLeft className="mr-2" />
-          Back to Reports
+        <Button variant="secondary" onClick={() => navigate('/admin/reports')} title="Back to Reports">
+          <FaArrowLeft />
         </Button>
         
         {/* Date Filter Section */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '10px', 
-          flexWrap: 'wrap',
-          padding: '10px',
+          gap: '8px', 
+          flexWrap: 'nowrap',
+          padding: '8px 10px',
           backgroundColor: '#f8f9fa',
           borderRadius: '8px',
           border: '1px solid #dee2e6'
         }}>
-          <label style={{ fontSize: '14px', fontWeight: 500, whiteSpace: 'nowrap' }}>Start Date:</label>
+          <label style={{ fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap', marginRight: '4px' }}>Start Date:</label>
           <input
             type="date"
             value={filterStartDate}
             onChange={(e) => setFilterStartDate(e.target.value)}
             style={{
-              padding: '8px 12px',
+              padding: '6px 8px',
               border: '1px solid #ccc',
               borderRadius: '4px',
-              fontSize: '14px',
-              minWidth: '150px'
+              fontSize: '13px',
+              width: '130px'
             }}
           />
-          <label style={{ fontSize: '14px', fontWeight: 500, whiteSpace: 'nowrap' }}>End Date:</label>
+          <label style={{ fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap', marginLeft: '8px', marginRight: '4px' }}>End Date:</label>
           <input
             type="date"
             value={filterEndDate}
             onChange={(e) => setFilterEndDate(e.target.value)}
             style={{
-              padding: '8px 12px',
+              padding: '6px 8px',
               border: '1px solid #ccc',
               borderRadius: '4px',
-              fontSize: '14px',
-              minWidth: '150px'
+              fontSize: '13px',
+              width: '130px'
             }}
           />
           <Button 
             variant="primary" 
             onClick={handleRegenerate}
-            style={{ whiteSpace: 'nowrap' }}
+            style={{ whiteSpace: 'nowrap', padding: '6px 8px', minWidth: 'auto' }}
             title="Regenerate"
           >
             <FaSync />
@@ -1163,23 +1173,34 @@ const PrintedReportPage: React.FC = () => {
           <Button 
             variant="secondary" 
             onClick={handleResetFilter}
-            style={{ whiteSpace: 'nowrap' }}
+            style={{ whiteSpace: 'nowrap', padding: '6px 8px', minWidth: 'auto' }}
             title="Reset Filter"
           >
             <FaTimes />
           </Button>
         </div>
 
+        {/* Phase Selection */}
+        <Select
+          id="print-phase"
+          value={printPhase}
+          onChange={(e) => setPrintPhase(e.target.value as 'all' | 'phase2')}
+          options={[
+            { value: 'all', label: 'All Pages' },
+            { value: 'phase2', label: 'Phase 2' },
+          ]}
+          style={{ width: '140px' }}
+        />
+
         <Button variant="primary" onClick={handlePrint}>
-          <FaPrint className="mr-2" />
-          Print Report
+          Print
         </Button>
       </div>
 
       {/* Report Content */}
       <div className={styles.reportContent}>
-        {/* Cover Page */}
-        <div className={styles.page}>
+        {/* Cover Page - Phase 1 */}
+        <div className={styles.page} data-print-phase="phase1">
           <div className={styles.coverPage}>
             <h1 className={styles.mainTitle}>Transport Federation</h1>
             <h2 className={styles.subTitle}>Comprehensive Reports</h2>
@@ -1211,8 +1232,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Report Section 1: Member Statistics */}
-        <div className={styles.page}>
+        {/* Report Section 1: Member Statistics - Phase 1 */}
+        <div className={styles.page} data-print-phase="phase1">
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>1. Member Statistics</h2>
             
@@ -1431,8 +1452,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Report Section 2: Union Statistics */}
-        <div className={styles.page}>
+        {/* Report Section 2: Union Statistics - Phase 1 */}
+        <div className={styles.page} data-print-phase="phase1">
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>2. Union Statistics</h2>
             
@@ -1601,8 +1622,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Report Section 3: Executive Statistics */}
-        <div className={styles.page}>
+        {/* Report Section 3: Executive Statistics - Phase 1 */}
+        <div className={styles.page} data-print-phase="phase1">
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>3. Executive Statistics</h2>
             
@@ -1914,8 +1935,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Report Section 4: CBA Statistics */}
-        <div className={styles.page}>
+        {/* Report Section 4: CBA Statistics - Phase 1 */}
+        <div className={styles.page} data-print-phase="phase1">
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>4. Collective Bargaining Agreement (CBA) Statistics</h2>
             
@@ -2143,8 +2164,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Report Section 5: General Assembly Statistics */}
-        <div className={styles.page}>
+        {/* Report Section 5: General Assembly Statistics - Phase 1 */}
+        <div className={styles.page} data-print-phase="phase1">
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>5. General Assembly Statistics</h2>
             
@@ -2352,9 +2373,9 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Report Section 6: Terminated Unions (Report 19) */}
+        {/* Report Section 6: Terminated Unions (Report 19) - Phase 1 */}
         {terminatedList?.data?.data && terminatedList.data.data.length > 0 && (
-          <div className={styles.page}>
+          <div className={styles.page} data-print-phase="phase1">
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>6. Terminated Unions (Report 19)</h2>
               
@@ -2398,9 +2419,9 @@ const PrintedReportPage: React.FC = () => {
           </div>
         )}
 
-        {/* Report Section 7: OSH Reports */}
+        {/* Report Section 7: OSH Reports - Phase 2 */}
         {oshStatistics?.data && (
-          <div className={styles.page}>
+          <div className={styles.page} data-print-phase="phase2">
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>7. Occupational Safety and Health (OSH) Reports</h2>
               
@@ -2592,8 +2613,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         )}
 
-        {/* Summary Statistics Page */}
-        <div className={styles.page}>
+        {/* Summary Statistics Page - Phase 2 */}
+        <div className={styles.page} data-print-phase="phase2">
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Summary Statistics</h2>
             <div className={styles.summaryGrid}>
@@ -2633,8 +2654,8 @@ const PrintedReportPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className={styles.pageFooter}>
+        {/* Footer - Phase 2 */}
+        <div className={styles.pageFooter} data-print-phase="phase2">
           <p>Report Generated by Transport Federation Management System</p>
           <p>Date: {format(new Date(), 'MMMM dd, yyyy HH:mm')}</p>
         </div>

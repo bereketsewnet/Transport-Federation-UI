@@ -69,3 +69,10 @@
   }
 } */
 
+@media print {
+  /* Hide hamburger menu button when printing */
+  .menuToggle {
+    display: none !important;
+  }
+}
+

@@ -16,7 +16,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   gap: var(--spacing-3);
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
@@ -316,6 +317,16 @@
     color-adjust: exact !important;
   }
 
+  /* Phase-based printing - When printing Phase 2, hide Phase 1 sections */
+  body[data-print-phase="phase2"] [data-print-phase="phase1"] {
+    display: none !important;
+  }
+
+  /* Show all sections when printing all pages (default - no phase selected) */
+  body:not([data-print-phase]) [data-print-phase] {
+    display: block !important;
+  }
+
   /* Hide layout components when printing */
   @page {
     size: A4 portrait;
@@ -332,10 +343,64 @@
   /* Hide header, sidebar, and other UI elements */
   header,
   aside,
-  .menuToggle,
   [class*="Header"],
   [class*="Sidebar"],
   [class*="Nav"] {
+    display: none !important;
+  }
+
+  /* Hide hamburger menu button when printing */
+  .menuToggle,
+  button[class*="menuToggle"],
+  button[aria-label="Toggle menu"] {
+    display: none !important;
+  }
+
+  /* Hide all filters and selectors in report sections when printing */
+  /* Hide Select components */
+  .reportItem select,
+  .reportItem [class*="Select"],
+  .section select,
+  .section [class*="Select"] {
+    display: none !important;
+  }
+
+  /* Hide filter container divs - common pattern: flex container with marginBottom that contains Select */
+  /* This targets the wrapper divs that contain the filter controls */
+  .reportItem > div[style*="display: flex"][style*="marginBottom"],
+  .reportItem > div[style*="display: flex"][style*="margin-bottom"],
+  .reportItem > div[style*="display: 'flex'"][style*="marginBottom"],
+  .reportItem > div[style*="display: 'flex'"][style*="margin-bottom"],
+  .section > div[style*="display: flex"][style*="marginBottom"],
+  .section > div[style*="display: flex"][style*="margin-bottom"] {
+    display: none !important;
+  }
+
+  /* Hide divs containing Select components (more reliable with :has selector) */
+  .reportItem div:has(select),
+  .reportItem div:has([class*="Select"]),
+  .section div:has(select),
+  .section div:has([class*="Select"]) {
+    display: none !important;
+  }
+
+  /* Hide labels that are siblings or ancestors of Select components (filter labels) */
+  .reportItem label:has(+ select),
+  .reportItem label:has(+ [class*="Select"]),
+  .reportItem label:has(~ select),
+  .reportItem label:has(~ [class*="Select"]),
+  .section label:has(+ select),
+  .section label:has(+ [class*="Select"]),
+  .section label:has(~ select),
+  .section label:has(~ [class*="Select"]) {
+    display: none !important;
+  }
+
+  /* Alternative: Hide labels that are inside filter containers (divs with Select) */
+  .reportItem div:has(select) label,
+  .reportItem div:has([class*="Select"]) label,
+  .section div:has(select) label,
+  .section div:has([class*="Select"]) label {
     display: none !important;
   }
 
@@ -619,5 +684,18 @@
   .page {
     margin-bottom: 20px;
   }
+
+  /* Optional: Hide sections on screen when previewing a specific phase */
+  /* This is optional - users can see all sections on screen, then select phase for printing */
+  /* Uncomment below if you want screen preview to match print phase */
+  /*
+  body[data-print-phase="phase1"] .reportContent [data-print-phase="phase2"] {
+    display: none;
+  }
+
+  body[data-print-phase="phase2"] .reportContent [data-print-phase="phase1"] {
+    display: none;
+  }
+  */
 }
 
