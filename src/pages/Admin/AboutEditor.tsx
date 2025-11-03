@@ -25,6 +25,7 @@ type Language = 'en' | 'am';
 interface AboutContentState {
   mission: { en: string; am: string };
   vision: { en: string; am: string };
+  description: { en: string; am: string };
   values: { en: string[]; am: string[] };
   history: { en: string; am: string };
   objectives: { en: string[]; am: string[] };
@@ -47,6 +48,7 @@ export const AboutEditor: React.FC = () => {
   const [content, setContent] = useState<AboutContentState>({
     mission: { en: '', am: '' },
     vision: { en: '', am: '' },
+    description: { en: '', am: '' },
     values: { en: [], am: [] },
     history: { en: '', am: '' },
     objectives: { en: [], am: [] },
@@ -120,6 +122,7 @@ export const AboutEditor: React.FC = () => {
         setContent({
           mission: { en: about.missionEn || '', am: about.missionAm || '' },
           vision: { en: about.visionEn || '', am: about.visionAm || '' },
+          description: { en: about.descriptionEn || '', am: about.descriptionAm || '' },
           values: { 
             en: parseArray(about.valuesEn), 
             am: parseArray(about.valuesAm) 
@@ -353,6 +356,8 @@ export const AboutEditor: React.FC = () => {
         missionAm: content.mission.am,
         visionEn: content.vision.en,
         visionAm: content.vision.am,
+        descriptionEn: content.description.en,
+        descriptionAm: content.description.am,
         valuesEn: content.values.en,
         valuesAm: content.values.am,
         historyEn: content.history.en,
@@ -450,6 +455,20 @@ export const AboutEditor: React.FC = () => {
               }))}
               rows={4}
               placeholder={`Enter vision statement in ${currentLang === 'en' ? 'English' : 'Amharic'}...`}
+            />
+          </div>
+
+          {/* Description */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>About Us Description</h3>
+            <TextArea
+              value={content.description[currentLang]}
+              onChange={(e) => setContent(prev => ({
+                ...prev,
+                description: { ...prev.description, [currentLang]: e.target.value }
+              }))}
+              rows={6}
+              placeholder={`Enter about us description in ${currentLang === 'en' ? 'English' : 'Amharic'}...`}
             />
           </div>
 

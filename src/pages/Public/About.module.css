@@ -80,6 +80,33 @@
   margin-bottom: var(--spacing-20);
 }
 
+/* Description Section - Simple Paragraph Style */
+.descriptionSection {
+  margin-bottom: var(--spacing-16);
+  padding: var(--spacing-8) 0;
+}
+
+.descriptionContent {
+  max-width: 100%;
+}
+
+.descriptionText {
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0;
+  text-align: left;
+  white-space: pre-line;
+}
+
+.descriptionText p {
+  margin-bottom: var(--spacing-4);
+}
+
+.descriptionText p:last-child {
+  margin-bottom: 0;
+}
+
 .sectionGrid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -610,6 +637,16 @@
 
   .section {
     margin-bottom: var(--spacing-12);
+  }
+
+  .descriptionSection {
+    margin-bottom: var(--spacing-10);
+    padding: var(--spacing-6) 0;
+  }
+
+  .descriptionText {
+    font-size: clamp(0.938rem, 2vw, 1.063rem);
+    line-height: 1.75;
   }
 
   .sectionTitle {

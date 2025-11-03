@@ -1186,8 +1186,8 @@ const PrintedReportPage: React.FC = () => {
           value={printPhase}
           onChange={(e) => setPrintPhase(e.target.value as 'all' | 'phase2')}
           options={[
-            { value: 'all', label: 'All Pages' },
-            { value: 'phase2', label: 'Phase 2' },
+            { value: 'all', label: 'part 1' },
+            { value: 'phase2', label: 'Part 2' },
           ]}
           style={{ width: '140px' }}
         />

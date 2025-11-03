@@ -78,6 +78,7 @@ export const About: React.FC = () => {
         setContent({
           mission: { en: about.missionEn || '', am: about.missionAm || '' },
           vision: { en: about.visionEn || '', am: about.visionAm || '' },
+          description: { en: about.descriptionEn || '', am: about.descriptionAm || '' },
           values: { en: parseArray(about.valuesEn), am: parseArray(about.valuesAm) },
           history: { en: about.historyEn || '', am: about.historyAm || '' },
           objectives: { en: parseArray(about.objectivesEn), am: parseArray(about.objectivesAm) },
@@ -191,6 +192,24 @@ export const About: React.FC = () => {
       </motion.section>
 
       <div className={styles.content}>
+        {/* About Us Description Section */}
+        {content.description[lang] && (
+          <motion.section
+            className={styles.descriptionSection}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={sectionVariants}
+            transition={{ duration: 0.6 }}
+          >
+            <div className={styles.descriptionContent}>
+              <div className={styles.descriptionText} style={{ whiteSpace: 'pre-line' }}>
+                {content.description[lang]}
+              </div>
+            </div>
+          </motion.section>
+        )}
+
         {/* Mission Section */}
         <motion.section
           className={styles.section}

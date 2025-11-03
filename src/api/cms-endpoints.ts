@@ -56,6 +56,8 @@ export interface AboutContent {
   missionAm: string;
   visionEn: string;
   visionAm: string;
+  descriptionEn?: string | null;
+  descriptionAm?: string | null;
   valuesEn: string[];
   valuesAm: string[];
   historyEn: string;
@@ -79,6 +81,8 @@ export interface AboutContentUpdate {
   missionAm?: string;
   visionEn?: string;
   visionAm?: string;
+  descriptionEn?: string;
+  descriptionAm?: string;
   valuesEn?: string[];
   valuesAm?: string[];
   historyEn?: string;
