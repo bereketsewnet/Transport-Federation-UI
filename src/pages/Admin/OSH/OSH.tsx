@@ -66,7 +66,7 @@ export const OSH: React.FC = () => {
       const response = await getOSHStatistics();
       setStatistics(response.data);
     } catch (err) {
-      console.error('Error fetching statistics:', err);
+      console.error('Error fetching statistics:', err, statistics);
       setStatistics(null);
     } finally {
       setStatisticsLoading(false);

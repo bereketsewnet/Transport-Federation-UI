@@ -69,15 +69,15 @@ export const Home: React.FC = () => {
   }
 
   // Fallback helpers for stat labels when CMS fields are empty/null
-  const stat1Label = content
-    ? ((lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) || t('home.stats.unions'))
-    : t('home.stats.unions');
-  const stat2Label = content
-    ? ((lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) || t('home.stats.years'))
-    : t('home.stats.years');
-  const stat3Label = content
-    ? ((lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) || t('home.stats.protection'))
-    : t('home.stats.protection');
+  // const stat1Label = content
+  //   ? ((lang === 'en' ? content.stat1LabelEn : content.stat1LabelAm) || t('home.stats.unions'))
+  //   : t('home.stats.unions');
+  // const stat2Label = content
+  //   ? ((lang === 'en' ? content.stat2LabelEn : content.stat2LabelAm) || t('home.stats.years'))
+  //   : t('home.stats.years');
+  // const stat3Label = content
+  //   ? ((lang === 'en' ? content.stat3LabelEn : content.stat3LabelAm) || t('home.stats.protection'))
+  //   : t('home.stats.protection');
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },

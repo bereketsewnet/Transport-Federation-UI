@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { getArchives, deleteArchive } from '@api/endpoints';
 import { DataTable, Column } from '@components/DataTable/DataTable';
@@ -25,7 +25,7 @@ interface ArchivedMember {
 }
 
 export const ArchivedMembers: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const [archivedMembers, setArchivedMembers] = useState<ArchivedMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; member: ArchivedMember | null }>({
@@ -44,16 +44,20 @@ export const ArchivedMembers: React.FC = () => {
       console.log('📊 Archived members API response:', response);
       console.log('📊 Response data:', response.data);
       
-      const membersData = response.data.data || [];
-      console.log('📋 Number of archived members:', membersData.length);
-      
-      if (membersData.length > 0) {
-        console.log('📋 First archived member:', membersData[0]);
-        console.log('📋 Fields in first member:', Object.keys(membersData[0]));
-        console.log('📋 resigned_date value:', membersData[0].resigned_date);
-        console.log('📋 archived_at value:', membersData[0].archived_at);
-      }
-      
+      const membersData: ArchivedMember[] = (response.data.data || []).map((item: any) => ({
+        id: Number(item.id),
+        mem_id: item.mem_id !== undefined ? Number(item.mem_id) : undefined,
+        union_id: item.union_id !== undefined ? Number(item.union_id) : undefined,
+        member_code: String(item.member_code || ''),
+        first_name: String(item.first_name || ''),
+        father_name: String(item.father_name || ''),
+        surname: String(item.surname || ''),
+        resigned_date: item.resigned_date ? String(item.resigned_date) : undefined,
+        reason: item.reason ? String(item.reason) : undefined,
+        archived_at: item.archived_at ? String(item.archived_at) : undefined,
+        registry_date: item.registry_date ? String(item.registry_date) : undefined,
+      }));
+
       setArchivedMembers(membersData);
     } catch (error) {
       console.error('Failed to fetch archived members:', error);
@@ -113,7 +117,7 @@ export const ArchivedMembers: React.FC = () => {
       <Button 
         size="sm" 
         variant="secondary" 
-        onClick={() => toast.info('Edit functionality coming soon')}
+        onClick={() => toast.success('Edit functionality coming soon')}
       >
         Edit
       </Button>
@@ -158,7 +162,7 @@ export const ArchivedMembers: React.FC = () => {
           title="Delete Archived Member"
           message={`Are you sure you want to delete archived member ${deleteDialog.member?.first_name} ${deleteDialog.member?.surname}?`}
           onConfirm={handleDelete}
-          onCancel={() => setDeleteDialog({ isOpen: false, member: null })}
+          onClose={() => setDeleteDialog({ isOpen: false, member: null })}
         />
       </motion.div>
     </div>

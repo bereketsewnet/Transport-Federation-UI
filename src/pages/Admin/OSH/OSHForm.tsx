@@ -250,25 +250,31 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
       console.log('accidentCategory value:', formData.accidentCategory, typeof formData.accidentCategory);
 
       // Create a completely clean copy of the data
-      const submitData = {
+      const submitData: Partial<OSHIncident> = {
         unionId: Number(formData.unionId) || 0,
-        accidentCategory: String(formData.accidentCategory || ''),
+        accidentCategory: (formData.accidentCategory || '') as OSHIncident['accidentCategory'],
         dateTimeOccurred: String(formData.dateTimeOccurred || ''),
         locationSite: String(formData.locationSite || ''),
-        locationBuilding: String(formData.locationBuilding || ''),
-        locationArea: String(formData.locationArea || ''),
-        locationGpsLatitude: formData.locationGpsLatitude ? Number(formData.locationGpsLatitude) : undefined,
-        locationGpsLongitude: formData.locationGpsLongitude ? Number(formData.locationGpsLongitude) : undefined,
-        injurySeverity: String(formData.injurySeverity || ''),
-        damageSeverity: String(formData.damageSeverity || ''),
-        rootCauses: Array.isArray(formData.rootCauses) ? formData.rootCauses.filter(cause => typeof cause === 'string' && cause.trim() !== '') : [],
+        locationBuilding: formData.locationBuilding ? String(formData.locationBuilding) : undefined,
+        locationArea: formData.locationArea ? String(formData.locationArea) : undefined,
+        locationGpsLatitude: formData.locationGpsLatitude !== undefined && formData.locationGpsLatitude !== null
+          ? Number(formData.locationGpsLatitude)
+          : undefined,
+        locationGpsLongitude: formData.locationGpsLongitude !== undefined && formData.locationGpsLongitude !== null
+          ? Number(formData.locationGpsLongitude)
+          : undefined,
+        injurySeverity: (formData.injurySeverity || 'None') as OSHIncident['injurySeverity'],
+        damageSeverity: (formData.damageSeverity || 'None') as OSHIncident['damageSeverity'],
+        rootCauses: Array.isArray(formData.rootCauses)
+          ? formData.rootCauses.filter((cause): cause is string => typeof cause === 'string' && cause.trim() !== '')
+          : [],
         description: String(formData.description || ''),
         regulatoryReportRequired: Boolean(formData.regulatoryReportRequired),
-        status: String(formData.status || ''),
+        status: (formData.status || 'open') as OSHIncident['status'],
         reportedBy: String(formData.reportedBy || ''),
-        investigationNotes: String(formData.investigationNotes || ''),
-        correctiveActions: String(formData.correctiveActions || ''),
-        preventiveMeasures: String(formData.preventiveMeasures || '')
+        investigationNotes: formData.investigationNotes ? String(formData.investigationNotes) : undefined,
+        correctiveActions: formData.correctiveActions ? String(formData.correctiveActions) : undefined,
+        preventiveMeasures: formData.preventiveMeasures ? String(formData.preventiveMeasures) : undefined,
       };
 
       console.log('Submit data:', submitData);

@@ -71,19 +71,9 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         q: searchTerm
       };
 
-      console.log('📊 Loading terminated unions with params:', params);
       const response = await getTerminatedUnions(params);
-      console.log('✅ Terminated unions response:', response);
       
       const data = response.data.data || [];
-      console.log('📋 Terminated unions loaded:', data.length);
-      console.log('📋 First terminated union:', data[0]);
-      
-      if (data.length > 0) {
-        console.log('📋 Fields in first union:', Object.keys(data[0]));
-        console.log('📋 terminated_date:', data[0].terminated_date);
-        console.log('📋 archived_at:', data[0].archived_at);
-      }
       
       setTerminatedUnions(data);
       

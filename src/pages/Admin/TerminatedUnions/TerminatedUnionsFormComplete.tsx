@@ -14,7 +14,7 @@ import {
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
-import { TextArea } from '@components/TextArea/TextArea';
+// import { TextArea } from '@components/TextArea/TextArea';
 import { Select } from '@components/Select/Select';
 import { Loading } from '@components/Loading/Loading';
 import { toast } from 'react-hot-toast';
@@ -22,13 +22,13 @@ import styles from './TerminatedUnions.module.css';
 
 interface TerminatedUnionFormData {
   union_id: number;
-  terminated_date: string;
+  termination_date: string;
   termination_reason: string;
 }
 
 const terminatedUnionSchema = yup.object({
   union_id: yup.number().required('Union is required').min(1, 'Please select a union'),
-  terminated_date: yup.string().required('Termination date is required'),
+  termination_date: yup.string().required('Termination date is required'),
   termination_reason: yup.string().required('Termination reason is required'),
   notes: yup.string(),
 }).required();
@@ -54,7 +54,7 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
     resolver: yupResolver(terminatedUnionSchema),
     defaultValues: {
       union_id: 0,
-      terminated_date: new Date().toISOString().split('T')[0],
+      termination_date: new Date().toISOString().split('T')[0],
       termination_reason: ''
     }
   });
@@ -101,16 +101,12 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
       
       console.log('🔍 Loading terminated union for edit, ID:', tu_id);
       const response = await getTerminatedUnion(tu_id);
-      console.log('✅ Terminated union data for edit:', response.data);
       const tuData = response.data;
       
-      // Populate form with existing data
-      console.log('📋 Raw terminated union data:', tuData);
-      console.log('📋 terminated_date field:', tuData.terminated_date);
       
       reset({
         union_id: tuData.union_id || 0,
-        terminated_date: tuData.terminated_date?.split('T')[0] || '',
+        termination_date: tuData.termination_date?.split('T')[0] || '',
         termination_reason: tuData.termination_reason || '',
       });
     } catch (err) {
@@ -123,9 +119,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
   };
 
   const onSubmit = async (data: TerminatedUnionFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    console.log('❌ Form errors:', errors);
     
     try {
       setError('');
@@ -133,7 +126,7 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
 
       const tuData = {
         union_id: Number(data.union_id),
-        terminated_date: new Date(data.terminated_date).toISOString(),
+        termination_date: new Date(data.termination_date).toISOString(),
         termination_reason: String(data.termination_reason)
       };
 
@@ -251,10 +244,10 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
               <FormField
                 label="Termination Date *"
                 type="date"
-                error={errors.terminated_date?.message}
+                error={errors.termination_date?.message}
                 required
                 className={styles.formField}
-                register={register('terminated_date')}
+                register={register('termination_date')}
               />
             </div>
 

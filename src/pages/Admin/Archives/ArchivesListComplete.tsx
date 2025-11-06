@@ -113,12 +113,12 @@ export const ArchivesListComplete: React.FC = () => {
     }
   };
 
-  // Handle download
-  const handleDownload = (archive: Archive) => {
-    if (archive.file_url) {
-      window.open(archive.file_url, '_blank');
-    }
-  };
+  // // Handle download
+  // const handleDownload = (archive: Archive) => {
+  //   if (archive.file_url) {
+  //     window.open(archive.file_url, '_blank');
+  //   }
+  // };
 
   // Table columns configuration
   const columns: Column<Archive>[] = [
