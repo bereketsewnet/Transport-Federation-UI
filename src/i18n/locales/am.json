@@ -62,6 +62,7 @@
     "members": "አባላት",
     "unions": "ማህበራት",
     "executives": "አመራሮች",
+    "orgLeaders": "የድርጅት አመራሮች",
     "cbas": "የጋራ ስምምነቶች",
     "archives": "ሰነዶች",
     "terminatedUnions": "የተሰረዙ ማህበራት",
@@ -278,6 +279,59 @@
       "secretary": "ፀሃፊ",
       "treasurer": "ገንዘብ ያዥ",
       "member": "አባል"
+    }
+  },
+  "orgLeaders": {
+    "title": "የድርጅት አመራሮች አስተዳደር",
+    "subtitle": "የእያንዳንዱ ማህበር ድርጅት አመራሮችን አስተዳድር",
+    "addLeader": "አመራር ጨምር",
+    "editLeader": "አመራር አርትዕ",
+    "createSubtitle": "አዲስ የድርጅት አመራር ይመዝግቡ",
+    "editSubtitle": "የድርጅት አመራር መረጃ አሻሽል",
+    "searchPlaceholder": "አመራሮችን ፈልግ...",
+    "filterByUnion": "በማህበር አጣራ",
+    "filterBySector": "በዘርፍ አጣራ",
+    "allUnions": "ሁሉም ማህበራት",
+    "allSectors": "ሁሉም ዘርፎች",
+    "emptyState": "የድርጅት አመራሮች አልተገኙም",
+    "deleteTitle": "አመራር ሰርዝ",
+    "deleteConfirmation": "ይህን የድርጅት አመራር መሰረዝ እርግጠኛ ነዎት? ይህ እርምጃ ሊመለስ አይችልም።",
+    "table": {
+      "name": "አመራር",
+      "union": "ማህበር",
+      "phone": "ስልክ",
+      "email": "ኢሜል",
+      "sector": "ዘርፍ",
+      "organization": "ድርጅት"
+    },
+    "sections": {
+      "basicInfo": "መሰረታዊ መረጃ",
+      "contactInfo": "የመገናኛ መረጃ",
+      "additionalInfo": "ተጨማሪ መረጃ"
+    },
+    "fields": {
+      "union": "ማህበር",
+      "title": "ርዕስ",
+      "firstName": "ስም",
+      "fatherName": "የአባት ስም",
+      "surname": "የአያት ስም",
+      "position": "የሥራ መደብ",
+      "phone": "ስልክ",
+      "email": "ኢሜል",
+      "sector": "ዘርፍ",
+      "organization": "ድርጅት"
+    },
+    "placeholders": {
+      "selectUnion": "ማህበር ይምረጡ",
+      "selectTitle": "ርዕስ ይምረጡ",
+      "firstName": "ምሳሌ፡ ያሬድ",
+      "fatherName": "ምሳሌ፡ በቀለ",
+      "surname": "ምሳሌ፡ ታደሰ",
+      "position": "ምሳሌ፡ አጠቃላይ አስተዳዳሪ",
+      "phone": "ምሳሌ፡ +251911000000",
+      "email": "ምሳሌ፡ leader@example.com",
+      "sector": "ምሳሌ፡ ኮሙኒኬሽን",
+      "organization": "ምሳሌ፡ የኢትዮጵያ አየር መንገድ"
     }
   },
   "cbas": {

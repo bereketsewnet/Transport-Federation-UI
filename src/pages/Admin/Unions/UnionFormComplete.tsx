@@ -28,6 +28,16 @@ interface UnionFormData {
   strategic_plan_in_place: boolean;
 }
 
+const SECTOR_OPTIONS = [
+  'Aviation',
+  'Railway',
+  'Urban Transport',
+  'Road',
+  'Maritime maritime',
+  'Communication',
+] as const;
+const DEFAULT_SECTOR = SECTOR_OPTIONS[0];
+
 // Make strategic_plan_in_place optional (not required for registration)
 const unionSchema = yup.object({
   name_en: yup.string().required('Union name (English) is required'),
@@ -62,8 +72,8 @@ export const UnionFormComplete: React.FC = () => {
       name_en: '',
       name_am: '',
       union_code: '',
-      sector: '',
-      organization: '',
+      sector: DEFAULT_SECTOR,
+      organization: DEFAULT_SECTOR,
       established_date: new Date().toISOString().split('T')[0],
       terms_of_election: 4,
       strategic_plan_in_place: false
@@ -101,8 +111,10 @@ export const UnionFormComplete: React.FC = () => {
         name_en: unionData.name_en || '',
         name_am: unionData.name_am || '',
         union_code: unionData.union_code || '',
-        sector: unionData.sector || '',
-        organization: unionData.organization || '',
+        sector:
+          SECTOR_OPTIONS.find((option) => option === unionData.sector) || DEFAULT_SECTOR,
+        organization:
+          SECTOR_OPTIONS.find((option) => option === unionData.organization) || DEFAULT_SECTOR,
         established_date: unionData.established_date?.split('T')[0] || '',
         terms_of_election: unionData.terms_of_election || 4,
         strategic_plan_in_place: unionData.strategic_plan_in_place || false,
@@ -242,35 +254,38 @@ export const UnionFormComplete: React.FC = () => {
                 placeholder="TCU-001"
                 register={register('union_code')}
               />
-              <FormField
+              <Select
                 label="Organization *"
+                value={watchedValues.organization || DEFAULT_SECTOR}
+                onChange={(e) => {
+                  console.log('🔄 Organization selected:', e.target.value);
+                  setValue('organization', e.target.value, { shouldValidate: true });
+                }}
                 error={errors.organization?.message}
                 required
                 className={styles.formField}
-                placeholder="Transport & Communication Federation"
-                register={register('organization')}
+                options={SECTOR_OPTIONS.map((option) => ({
+                  value: option,
+                  label: option,
+                }))}
               />
             </div>
 
             <div className={styles.formRow}>
               <Select
                 label={t('unions.sector') + ' *'}
-                value={watchedValues.sector || ''}
+                value={watchedValues.sector || DEFAULT_SECTOR}
                 onChange={(e) => {
                   console.log('🔄 Sector selected:', e.target.value);
-                  setValue('sector', e.target.value);
+                  setValue('sector', e.target.value, { shouldValidate: true });
                 }}
                 error={errors.sector?.message}
                 required
                 className={styles.formField}
-                options={[
-                  { value: '', label: t('unions.selectSector') },
-                  { value: 'Transport', label: 'Transport' },
-                  { value: 'Communication', label: 'Communication' },
-                  { value: 'Logistics', label: 'Logistics' },
-                  { value: 'Aviation', label: 'Aviation' },
-                  { value: 'Maritime', label: 'Maritime' }
-                ]}
+                options={SECTOR_OPTIONS.map((option) => ({
+                  value: option,
+                  label: option,
+                }))}
               />
               <FormField
                 label="Established Date *"

@@ -30,6 +30,9 @@ import {
   getOSHIncidents,
   getCBAs,
   getUnionExecutives,
+  getOrganizationLeadersSummary,
+  getOrganizationLeadersReportList,
+  OrganizationLeadersReportRow,
 } from '@api/endpoints';
 import {
   BarChart,
@@ -72,6 +75,11 @@ export const Reports: React.FC = () => {
     queryFn: getUnionsSummary,
   });
 
+  const { data: organizationLeadersSummary } = useQuery({
+    queryKey: ['reports-organization-leaders-summary'],
+    queryFn: getOrganizationLeadersSummary,
+  });
+
   const { data: execRemaining } = useQuery({
     queryKey: ['reports-executives-remaining'],
     queryFn: getExecutivesRemainingDays,
@@ -85,6 +93,11 @@ export const Reports: React.FC = () => {
   const { data: unionsList } = useQuery({
     queryKey: ['reports-unions-list'],
     queryFn: () => getUnions({ per_page: 1000 }),
+  });
+
+  const { data: organizationLeadersList } = useQuery({
+    queryKey: ['reports-organization-leaders-list'],
+    queryFn: () => getOrganizationLeadersReportList({ per_page: 10 }),
   });
 
   const firstUnionId = unionsList?.data?.data?.[0]?.union_id as number | undefined;
@@ -243,6 +256,20 @@ export const Reports: React.FC = () => {
   const unionsBySector = useMemo(() => {
     return unionsSummary?.data?.by_sector || [];
   }, [unionsSummary]);
+
+  const organizationLeadersTotal = organizationLeadersSummary?.data?.total_leaders ?? 0;
+
+  const organizationLeadersBySector = useMemo(() => {
+    return organizationLeadersSummary?.data?.by_sector || [];
+  }, [organizationLeadersSummary]);
+
+  const organizationLeadersByOrganization = useMemo(() => {
+    return organizationLeadersSummary?.data?.by_organization || [];
+  }, [organizationLeadersSummary]);
+
+  const organizationLeadersPreview = useMemo<OrganizationLeadersReportRow[]>(() => {
+    return (organizationLeadersList?.data?.data ?? []) as OrganizationLeadersReportRow[];
+  }, [organizationLeadersList]);
 
   // const sectorOptions = useMemo(() => {
   //   const sectors = (unionsSummary?.data?.by_sector || []).map((s: any) => s.sector);
@@ -579,6 +606,12 @@ export const Reports: React.FC = () => {
           variant="success"
           icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 16a6 6 0 100-12 6 6 0 000 12zM12 16v6M9 19h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
         />
+        <KPICard
+          title="Organization Leaders"
+          value={organizationLeadersTotal.toLocaleString()}
+          variant="info"
+          icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM19 8v6m0-6a3 3 0 010 6m0-6c-1.657 0-3-1.79-3-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        />
       </div>
 
       {/* Filters removed by request */}
@@ -730,6 +763,56 @@ export const Reports: React.FC = () => {
             </ChartCard> */}
           </div>
 
+          {organizationLeadersBySector.length > 0 && (
+            <div className={styles.chartsGrid}>
+              <ChartCard
+                title="Organization Leaders by Sector"
+                description="Distribution of organization leaders across sectors"
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={organizationLeadersBySector}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="sector" stroke="var(--text-muted)" />
+                    <YAxis stroke="var(--text-muted)" />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="count" name="Leaders" fill={COLORS[3]} radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              {organizationLeadersByOrganization.length > 0 && (
+                <ChartCard
+                  title="Organization Leaders by Organization"
+                  description="Top organizations represented by leaders"
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={organizationLeadersByOrganization}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="organization" stroke="var(--text-muted)" />
+                      <YAxis stroke="var(--text-muted)" />
+                      <Tooltip
+                        contentStyle={{
+                          background: 'var(--bg)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="count" name="Leaders" fill={COLORS[4]} radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              )}
+            </div>
+          )}
+
           {/* Row 4: Members by Sector (Stacked) */}
           <div className={styles.fullWidth}>
             <ChartCard
@@ -756,6 +839,49 @@ export const Reports: React.FC = () => {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+
+          {organizationLeadersPreview.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>Organization Leaders Snapshot</h3>
+              <div className={styles.table}>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Leader</th>
+                        <th>Position</th>
+                        <th>Union</th>
+                        <th>Sector</th>
+                        <th>Organization</th>
+                        <th>Phone</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {organizationLeadersPreview.slice(0, 10).map((leader, idx) => (
+                        <tr key={`${leader.id}-${idx}`}>
+                          <td>
+                            {[leader.title, leader.first_name, leader.father_name, leader.surname]
+                              .filter(Boolean)
+                              .join(' ') || 'N/A'}
+                          </td>
+                          <td>{leader.position || 'N/A'}</td>
+                          <td>{leader.union_name || leader.union?.name_en || `Union ${leader.union_id}`}</td>
+                          <td>{leader.sector || leader.union?.sector || 'N/A'}</td>
+                          <td>{leader.organization || leader.union?.organization || 'N/A'}</td>
+                          <td>{leader.phone || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {organizationLeadersTotal > 10 && (
+                    <p className={styles.tableNote}>
+                      Showing 10 of {organizationLeadersTotal.toLocaleString()} leaders
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Unions by Organization */}
           {unionsSummary?.data?.by_organization && unionsSummary.data.by_organization.length > 0 && (

@@ -244,7 +244,7 @@ export const defaultAboutContent: AboutContent = {
 export const defaultHomeContent: HomeContent = {
   hero: {
     title: {
-      en: "Transport & Communication Workers Federation",
+      en: "Ethiopian Transport and Communication Workers Union Industrial Federation",
       am: "የትራንስፖርት እና ኮሙኒኬሽን ሠራተኞች ፌዴሬሽን"
     },
     subtitle: {

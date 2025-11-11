@@ -1,0 +1,239 @@
+.container {
+  padding: var(--spacing-6);
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+  gap: var(--spacing-4);
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.searchBox {
+  flex: 1;
+  min-width: 220px;
+}
+
+.filterSelect {
+  min-width: 180px;
+  flex-shrink: 0;
+}
+
+.resetButton {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tableContainer {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.rowActions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.leaderName {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.leaderDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.errorMessage {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  padding: var(--spacing-4);
+  border-radius: var(--radius);
+  border: 1px solid var(--danger-border);
+  margin-bottom: var(--spacing-4);
+  font-weight: 500;
+}
+
+.formContainer {
+  padding: var(--spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--border);
+  gap: var(--spacing-4);
+}
+
+.form {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.formGrid {
+  display: grid;
+  gap: var(--spacing-6);
+  padding: var(--spacing-6);
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-4);
+}
+
+.formField {
+  width: 100%;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding: var(--spacing-6);
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 1023px) {
+  .container,
+  .formContainer {
+    padding: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox,
+  .filterSelect,
+  .resetButton {
+    width: 100%;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rowActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 767px) {
+  .container,
+  .formContainer {
+    padding: var(--spacing-3);
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+  }
+
+  .formGrid {
+    padding: var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  .formSection {
+    padding: var(--spacing-3);
+  }
+
+  .formActions {
+    padding: var(--spacing-4);
+  }
+}
+

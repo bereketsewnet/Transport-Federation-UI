@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Transport & Communication Workers Federation - Full Stack UI",
+  "description": "Ethiopian Transport and Communication Workers Union Industrial Federation - Full Stack UI",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

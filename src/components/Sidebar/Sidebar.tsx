@@ -137,6 +137,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ),
         },
         {
+          path: '/admin/org-leaders',
+          label: t('nav.orgLeaders'),
+          icon: (
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path
+                d="M3 3a1 1 0 011-1h4a1 1 0 011 1v3h2V3a1 1 0 011-1h4a1 1 0 011 1v14h-4v-3a1 1 0 10-2 0v3H8v-3a1 1 0 10-2 0v3H3V3z"
+                fill="currentColor"
+              />
+            </svg>
+          ),
+        },
+        {
           path: '/admin/cbas',
           label: t('nav.cbas'),
           icon: (

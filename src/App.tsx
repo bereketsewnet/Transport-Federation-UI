@@ -66,6 +66,10 @@ import { OSH } from '@pages/Admin/OSH';
 // Admin General Assembly
 import { GeneralAssembly } from '@pages/Admin/GeneralAssembly';
 
+// Admin Organization Leaders
+import OrgLeadersList from '@pages/Admin/OrgLeaders/OrgLeadersList';
+import OrgLeaderForm from '@pages/Admin/OrgLeaders/OrgLeaderForm';
+
 // Member Pages
 import { MemberDashboard, MemberChangePassword } from '@pages/Member';
 
@@ -177,6 +181,11 @@ function App() {
           <Route path="executives" element={<ExecutivesListComplete />} />
           <Route path="executives/new" element={<ExecutivesFormComplete />} />
           <Route path="executives/:id/edit" element={<ExecutivesFormComplete />} />
+
+          {/* Organization Leaders Management */}
+          <Route path="org-leaders" element={<OrgLeadersList />} />
+          <Route path="org-leaders/new" element={<OrgLeaderForm />} />
+          <Route path="org-leaders/:id/edit" element={<OrgLeaderForm />} />
           
           {/* CBAs Management */}
           <Route path="cbas" element={<CBAsListComplete />} />

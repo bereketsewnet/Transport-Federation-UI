@@ -1,6 +1,6 @@
-# Transport & Communication Workers Federation - Frontend UI
+# Ethiopian Transport and Communication Workers Union Industrial Federation - Frontend UI
 
-A modern, production-ready frontend application for managing the Transport & Communication Workers Federation system.
+A modern, production-ready frontend application for managing the Ethiopian Transport and Communication Workers Union Industrial Federation system.
 
 ## 🚀 Tech Stack
 
@@ -297,7 +297,7 @@ Update `.env.production`:
 
 ```
 VITE_API_BASE_URL=https://api.yourproduction.com
-VITE_APP_NAME=Transport & Communication Workers Federation
+VITE_APP_NAME=Ethiopian Transport and Communication Workers Union Industrial Federation
 VITE_DEFAULT_LANGUAGE=en
 ```
 
@@ -327,7 +327,7 @@ npm run lint:fix
 
 ## 📄 License
 
-Proprietary - Transport & Communication Workers Federation
+Proprietary - Ethiopian Transport and Communication Workers Union Industrial Federation
 
 ## 👥 Support
 
@@ -335,5 +335,5 @@ For technical support, contact the development team.
 
 ---
 
-**Built with ❤️ for the Transport & Communication Workers Federation**
+**Built with ❤️ for the Ethiopian Transport and Communication Workers Union Industrial Federation**
 

@@ -21,6 +21,9 @@ import {
   getOSHIncidents,
   getCBAs,
   getUnionExecutives,
+  getOrganizationLeadersSummary,
+  getOrganizationLeadersReportList,
+  OrganizationLeadersReportRow,
 } from '@api/endpoints';
 import {
   BarChart,
@@ -72,6 +75,11 @@ const PrintedReportPage: React.FC = () => {
     queryFn: getUnionsSummary,
   });
 
+  const { data: organizationLeadersSummary } = useQuery({
+    queryKey: ['reports-organization-leaders-summary'],
+    queryFn: getOrganizationLeadersSummary,
+  });
+
   const { data: execRemaining } = useQuery({
     queryKey: ['reports-executives-remaining'],
     queryFn: getExecutivesRemainingDays,
@@ -80,6 +88,11 @@ const PrintedReportPage: React.FC = () => {
   const { data: unionsList } = useQuery({
     queryKey: ['reports-unions-list'],
     queryFn: () => getUnions({ per_page: 1000 }),
+  });
+
+  const { data: organizationLeadersReportList } = useQuery({
+    queryKey: ['reports-organization-leaders-list'],
+    queryFn: () => getOrganizationLeadersReportList({ per_page: 50 }),
   });
 
   const { data: allExecutivesData } = useQuery({
@@ -486,6 +499,22 @@ const PrintedReportPage: React.FC = () => {
   const unionsBySector = useMemo(() => {
     return unionsSummary?.data?.by_sector || [];
   }, [unionsSummary]);
+
+  const organizationLeadersTotal = useMemo(() => {
+    return organizationLeadersSummary?.data?.total_leaders ?? 0;
+  }, [organizationLeadersSummary]);
+
+  const organizationLeadersBySector = useMemo(() => {
+    return organizationLeadersSummary?.data?.by_sector || [];
+  }, [organizationLeadersSummary]);
+
+  const organizationLeadersByOrganization = useMemo(() => {
+    return organizationLeadersSummary?.data?.by_organization || [];
+  }, [organizationLeadersSummary]);
+
+  const organizationLeadersReportRows = useMemo<OrganizationLeadersReportRow[]>(() => {
+    return (organizationLeadersReportList?.data?.data ?? []) as OrganizationLeadersReportRow[];
+  }, [organizationLeadersReportList]);
 
   const totalMembers = useMemo(() => {
     if (filterStartDate || filterEndDate) {
@@ -2416,6 +2445,111 @@ const PrintedReportPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {organizationLeadersTotal > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>2.6 Organization Leaders Overview</h3>
+                <div className={styles.kpiBox}>
+                  <p className={styles.kpiLabel}>Total Organization Leaders</p>
+                  <p className={styles.kpiValue}>{organizationLeadersTotal.toLocaleString()}</p>
+                </div>
+              </div>
+            )}
+
+            {organizationLeadersBySector.length > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>2.7 Organization Leaders by Sector</h3>
+                <div className={styles.chartContainer}>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={organizationLeadersBySector}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="sector" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="count" name="Leaders" fill={COLORS[3]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className={styles.dataTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Sector</th>
+                        <th>Leaders</th>
+                        <th>Percentage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {organizationLeadersBySector.map((item, idx) => (
+                        <tr key={`leaders-sector-${idx}`}>
+                          <td><strong>{item.sector}</strong></td>
+                          <td>{item.count.toLocaleString()}</td>
+                          <td>{organizationLeadersTotal > 0 ? ((item.count / organizationLeadersTotal) * 100).toFixed(2) : '0.00'}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {organizationLeadersByOrganization.length > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>2.8 Organization Leaders by Organization</h3>
+                <div className={styles.chartContainer}>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={organizationLeadersByOrganization}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="organization" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="count" name="Leaders" fill={COLORS[4]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            {organizationLeadersReportRows.length > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>2.9 Organization Leaders Listing (Sample)</h3>
+                <div className={styles.dataTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Leader</th>
+                        <th>Position</th>
+                        <th>Union</th>
+                        <th>Sector</th>
+                        <th>Organization</th>
+                        <th>Phone</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {organizationLeadersReportRows.slice(0, 25).map((leader, idx) => (
+                        <tr key={`leader-row-${leader.id}-${idx}`}>
+                          <td>
+                            {[leader.title, leader.first_name, leader.father_name, leader.surname]
+                              .filter(Boolean)
+                              .join(' ') || 'N/A'}
+                          </td>
+                          <td>{leader.position || 'N/A'}</td>
+                          <td>{leader.union_name || leader.union?.name_en || `Union ${leader.union_id}`}</td>
+                          <td>{leader.sector || leader.union?.sector || 'N/A'}</td>
+                          <td>{leader.organization || leader.union?.organization || 'N/A'}</td>
+                          <td>{leader.phone || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {organizationLeadersTotal > 25 && (
+                    <p className={styles.tableNote}>*Showing 25 of {organizationLeadersTotal.toLocaleString()} leaders</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -2637,6 +2771,10 @@ const PrintedReportPage: React.FC = () => {
               <div className={styles.summaryCard}>
                 <h4>OSH Incidents</h4>
                 <p className={styles.summaryValue}>{oshIncidentsCount.toLocaleString()}</p>
+              </div>
+              <div className={styles.summaryCard}>
+                <h4>Organization Leaders</h4>
+                <p className={styles.summaryValue}>{organizationLeadersTotal.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
                 <h4>Unions Without CBA</h4>

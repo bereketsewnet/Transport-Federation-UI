@@ -59,7 +59,7 @@ export const Login: React.FC = () => {
             </svg>
           </div>
           <h1 className={styles.title}>{t('auth.login')}</h1>
-          <p className={styles.subtitle}>Transport & Communication Workers Federation</p>
+          <p className={styles.subtitle}>Ethiopian Transport and Communication Workers Union Industrial Federation</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>

@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
         <div className={styles.grid}>
           {/* About Section */}
           <div className={styles.section}>
-            <h3 className={styles.title}>Transport & Communication Workers Federation</h3>
+            <h3 className={styles.title}>Ethiopian Transport and Communication Workers Union Industrial Federation</h3>
             <p className={styles.description}>
               Empowering workers in the transport and communication sectors across Ethiopia.
             </p>
@@ -121,7 +121,7 @@ export const Footer: React.FC = () => {
 
         <div className={styles.bottom}>
           <p className={styles.copyright}>
-            © {currentYear} Transport & Communication Workers Federation. All rights reserved.
+            © {currentYear} Ethiopian Transport and Communication Workers Union Industrial Federation. All rights reserved.
           </p>
         </div>
       </div>

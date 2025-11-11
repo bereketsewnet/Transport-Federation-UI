@@ -2930,3 +2930,719 @@ Errors:
   "message": "Server error"
 }
 ```
+
+
+ 
+ ## OSH (Occupational Safety and Health) Incidents
+
+### [GET] {{base_url}}/api/osh-incidents?union_id=1&accident_category=People&injury_severity=Major&status=open&from_date=2024-01-01&to_date=2024-12-31&page=1&per_page=20 - List OSH incidents (public)
+Group: OSH Incidents
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `accident_category` (optional): Filter by accident category (People, Property/Asset)
+- `injury_severity` (optional): Filter by injury severity
+- `damage_severity` (optional): Filter by damage severity
+- `status` (optional): Filter by status (open, investigating, action_pending, closed)
+- `from_date` (optional): Start date filter (YYYY-MM-DD)
+- `to_date` (optional): End date filter (YYYY-MM-DD)
+- `q` (optional): Search in description
+- `page` (optional): Page number (default: 1)
+- `per_page` (optional): Items per page (default: 20)
+
+Success (200):
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "unionId": 1,
+      "accidentCategory": "People",
+      "dateTimeOccurred": "2024-10-18T10:30:00.000Z",
+      "locationSite": "Main Office Building",
+      "locationBuilding": "Building A",
+      "locationArea": "Ground Floor",
+      "locationGpsLatitude": 9.0320,
+      "locationGpsLongitude": 38.7469,
+      "injurySeverity": "Minor",
+      "damageSeverity": "None",
+      "rootCauseUnsafeAct": true,
+      "rootCauseEquipmentFailure": false,
+      "rootCauseEnvironmental": false,
+      "rootCauseOther": null,
+      "description": "Employee slipped on wet floor in the cafeteria",
+      "regulatoryReportRequired": false,
+      "regulatoryReportDate": null,
+      "status": "open",
+      "reportedBy": "Safety Officer",
+      "reportedDate": "2024-10-18T10:30:00.000Z",
+      "investigationNotes": "Initial investigation completed",
+      "correctiveActions": "Install non-slip mats",
+      "preventiveMeasures": "Regular floor cleaning schedule",
+      "createdAt": "2024-10-18T10:30:00.000Z",
+      "updatedAt": "2024-10-18T10:30:00.000Z",
+      "createdBy": 1,
+      "updatedBy": 1,
+      "rootCauses": ["Unsafe Act"]
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "per_page": 20,
+    "total_pages": 1
+  }
+}
+```
+
+### [GET] {{base_url}}/api/osh-incidents/1 - Get OSH incident by ID (public)
+Group: OSH Incidents
+
+Success (200):
+```json
+{
+  "data": {
+    "id": 1,
+    "unionId": 1,
+    "accidentCategory": "People",
+    "dateTimeOccurred": "2024-10-18T10:30:00.000Z",
+    "locationSite": "Main Office Building",
+    "locationBuilding": "Building A",
+    "locationArea": "Ground Floor",
+    "locationGpsLatitude": 9.0320,
+    "locationGpsLongitude": 38.7469,
+    "injurySeverity": "Minor",
+    "damageSeverity": "None",
+    "rootCauseUnsafeAct": true,
+    "rootCauseEquipmentFailure": false,
+    "rootCauseEnvironmental": false,
+    "rootCauseOther": null,
+    "description": "Employee slipped on wet floor in the cafeteria",
+    "regulatoryReportRequired": false,
+    "regulatoryReportDate": null,
+    "status": "open",
+    "reportedBy": "Safety Officer",
+    "reportedDate": "2024-10-18T10:30:00.000Z",
+    "investigationNotes": "Initial investigation completed",
+    "correctiveActions": "Install non-slip mats",
+    "preventiveMeasures": "Regular floor cleaning schedule",
+    "createdAt": "2024-10-18T10:30:00.000Z",
+    "updatedAt": "2024-10-18T10:30:00.000Z",
+    "createdBy": 1,
+    "updatedBy": 1,
+    "rootCauses": ["Unsafe Act"]
+  }
+}
+```
+
+Errors:
+- 404:
+```json
+{
+  "message": "OSH incident not found"
+}
+```
+
+### [POST] {{base_url}}/api/osh-incidents - Create OSH incident (admin)
+Group: OSH Incidents
+
+Headers:
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Request Body:
+```json
+{
+  "union_id": 1,
+  "accident_category": "People",
+  "date_time_occurred": "2024-10-18T10:30:00Z",
+  "location_site": "Main Office Building",
+  "location_building": "Building A",
+  "location_area": "Ground Floor",
+  "location_gps_latitude": 9.0320,
+  "location_gps_longitude": 38.7469,
+  "injury_severity": "Minor",
+  "damage_severity": "None",
+  "root_causes": ["Unsafe Act", "Equipment Failure"],
+  "description": "Employee slipped on wet floor in the cafeteria",
+  "regulatory_report_required": false,
+  "status": "open",
+  "reported_by": "Safety Officer",
+  "investigation_notes": "Initial investigation completed",
+  "corrective_actions": "Install non-slip mats",
+  "preventive_measures": "Regular floor cleaning schedule"
+}
+```
+
+Success (201):
+```json
+{
+  "data": {
+    "id": 1,
+    "unionId": 1,
+    "accidentCategory": "People",
+    "dateTimeOccurred": "2024-10-18T10:30:00.000Z",
+    "locationSite": "Main Office Building",
+    "locationBuilding": "Building A",
+    "locationArea": "Ground Floor",
+    "locationGpsLatitude": 9.0320,
+    "locationGpsLongitude": 38.7469,
+    "injurySeverity": "Minor",
+    "damageSeverity": "None",
+    "rootCauseUnsafeAct": true,
+    "rootCauseEquipmentFailure": true,
+    "rootCauseEnvironmental": false,
+    "rootCauseOther": null,
+    "description": "Employee slipped on wet floor in the cafeteria",
+    "regulatoryReportRequired": false,
+    "regulatoryReportDate": null,
+    "status": "open",
+    "reportedBy": "Safety Officer",
+    "reportedDate": "2024-10-18T10:30:00.000Z",
+    "investigationNotes": "Initial investigation completed",
+    "correctiveActions": "Install non-slip mats",
+    "preventiveMeasures": "Regular floor cleaning schedule",
+    "createdAt": "2024-10-18T10:30:00.000Z",
+    "updatedAt": "2024-10-18T10:30:00.000Z",
+    "createdBy": 1,
+    "updatedBy": 1,
+    "rootCauses": ["Unsafe Act", "Equipment Failure"]
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 400:
+```json
+{
+  "message": "Validation error"
+}
+```
+
+### [PUT] {{base_url}}/api/osh-incidents/1 - Update OSH incident (admin)
+Group: OSH Incidents
+
+Headers:
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Request Body:
+```json
+{
+  "status": "investigating",
+  "investigation_notes": "Updated investigation notes",
+  "corrective_actions": "Updated corrective actions",
+  "preventive_measures": "Updated preventive measures"
+}
+```
+
+Success (200):
+```json
+{
+  "data": {
+    "id": 1,
+    "unionId": 1,
+    "accidentCategory": "People",
+    "dateTimeOccurred": "2024-10-18T10:30:00.000Z",
+    "locationSite": "Main Office Building",
+    "locationBuilding": "Building A",
+    "locationArea": "Ground Floor",
+    "locationGpsLatitude": 9.0320,
+    "locationGpsLongitude": 38.7469,
+    "injurySeverity": "Minor",
+    "damageSeverity": "None",
+    "rootCauseUnsafeAct": true,
+    "rootCauseEquipmentFailure": true,
+    "rootCauseEnvironmental": false,
+    "rootCauseOther": null,
+    "description": "Employee slipped on wet floor in the cafeteria",
+    "regulatoryReportRequired": false,
+    "regulatoryReportDate": null,
+    "status": "investigating",
+    "reportedBy": "Safety Officer",
+    "reportedDate": "2024-10-18T10:30:00.000Z",
+    "investigationNotes": "Updated investigation notes",
+    "correctiveActions": "Updated corrective actions",
+    "preventiveMeasures": "Updated preventive measures",
+    "createdAt": "2024-10-18T10:30:00.000Z",
+    "updatedAt": "2024-10-18T10:30:00.000Z",
+    "createdBy": 1,
+    "updatedBy": 1,
+    "rootCauses": ["Unsafe Act", "Equipment Failure"]
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "OSH incident not found"
+}
+```
+
+### [DELETE] {{base_url}}/api/osh-incidents/1 - Delete OSH incident (admin)
+Group: OSH Incidents
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "message": "OSH incident deleted successfully"
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "OSH incident not found"
+}
+```
+
+### [GET] {{base_url}}/api/osh-incidents/statistics?union_id=1&from_date=2024-01-01&to_date=2024-12-31 - Get OSH statistics (public)
+Group: OSH Incidents
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `from_date` (optional): Start date filter (YYYY-MM-DD)
+- `to_date` (optional): End date filter (YYYY-MM-DD)
+
+Success (200):
+```json
+{
+  "data": {
+    "byCategory": [
+      {
+        "category": "People",
+        "count": 5
+      },
+      {
+        "category": "Property/Asset",
+        "count": 2
+      }
+    ],
+    "byInjurySeverity": [
+      {
+        "severity": "Minor",
+        "count": 3
+      },
+      {
+        "severity": "None",
+        "count": 4
+      }
+    ],
+    "byDamageSeverity": [
+      {
+        "severity": "Minor",
+        "count": 2
+      },
+      {
+        "severity": "None",
+        "count": 5
+      }
+    ],
+    "byStatus": [
+      {
+        "status": "open",
+        "count": 3
+      },
+      {
+        "status": "investigating",
+        "count": 2
+      },
+      {
+        "status": "closed",
+        "count": 2
+      }
+    ],
+    "monthlyTrends": [
+      {
+        "month": "2024-10",
+        "count": 3
+      },
+      {
+        "month": "2024-11",
+        "count": 4
+      }
+    ],
+    "total": 7
+  }
+}
+```
+
+## OSH Reports
+
+### [GET] {{base_url}}/api/reports/osh-summary?union_id=1&from_date=2024-01-01&to_date=2024-12-31 - OSH Summary Report (admin)
+Group: OSH Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `from_date` (optional): Start date filter (YYYY-MM-DD)
+- `to_date` (optional): End date filter (YYYY-MM-DD)
+
+Success (200):
+```json
+{
+  "total_incidents": 7,
+  "by_category": [
+    {
+      "category": "People",
+      "count": 5
+    },
+    {
+      "category": "Property/Asset",
+      "count": 2
+    }
+  ],
+  "by_injury_severity": [
+    {
+      "severity": "Minor",
+      "count": 3
+    },
+    {
+      "severity": "None",
+      "count": 4
+    }
+  ],
+  "by_damage_severity": [
+    {
+      "severity": "Minor",
+      "count": 2
+    },
+    {
+      "severity": "None",
+      "count": 5
+    }
+  ],
+  "by_status": [
+    {
+      "status": "open",
+      "count": 3
+    },
+    {
+      "status": "investigating",
+      "count": 2
+    },
+    {
+      "status": "closed",
+      "count": 2
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/osh-high-severity?union_id=1&from_date=2024-01-01&to_date=2024-12-31 - OSH High Severity Report (admin)
+Group: OSH Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `from_date` (optional): Start date filter (YYYY-MM-DD)
+- `to_date` (optional): End date filter (YYYY-MM-DD)
+
+Success (200):
+```json
+{
+  "count": 2,
+  "data": [
+    {
+      "id": 1,
+      "unionId": 1,
+      "accidentCategory": "People",
+      "dateTimeOccurred": "2024-10-18T10:30:00.000Z",
+      "locationSite": "Main Office Building",
+      "locationBuilding": "Building A",
+      "locationArea": "Ground Floor",
+      "injurySeverity": "Major",
+      "damageSeverity": "Major",
+      "rootCauseUnsafeAct": true,
+      "rootCauseEquipmentFailure": false,
+      "rootCauseEnvironmental": false,
+      "rootCauseOther": null,
+      "description": "Serious workplace accident",
+      "regulatoryReportRequired": true,
+      "regulatoryReportDate": "2024-10-19",
+      "status": "investigating",
+      "reportedBy": "Safety Officer",
+      "reportedDate": "2024-10-18T10:30:00.000Z",
+      "investigationNotes": "Under investigation",
+      "correctiveActions": "Immediate safety measures",
+      "preventiveMeasures": "Enhanced safety protocols",
+      "createdAt": "2024-10-18T10:30:00.000Z",
+      "updatedAt": "2024-10-18T10:30:00.000Z",
+      "createdBy": 1,
+      "updatedBy": 1,
+      "rootCauses": ["Unsafe Act"]
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/osh-regulatory-reports?union_id=1&from_date=2024-01-01&to_date=2024-12-31 - OSH Regulatory Reports (admin)
+Group: OSH Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `from_date` (optional): Start date filter (YYYY-MM-DD)
+- `to_date` (optional): End date filter (YYYY-MM-DD)
+
+Success (200):
+```json
+{
+  "count": 1,
+  "data": [
+    {
+      "id": 1,
+      "unionId": 1,
+      "accidentCategory": "People",
+      "dateTimeOccurred": "2024-10-18T10:30:00.000Z",
+      "locationSite": "Main Office Building",
+      "locationBuilding": "Building A",
+      "locationArea": "Ground Floor",
+      "injurySeverity": "Major",
+      "damageSeverity": "Major",
+      "rootCauseUnsafeAct": true,
+      "rootCauseEquipmentFailure": false,
+      "rootCauseEnvironmental": false,
+      "rootCauseOther": null,
+      "description": "Serious workplace accident requiring regulatory report",
+      "regulatoryReportRequired": true,
+      "regulatoryReportDate": "2024-10-19",
+      "status": "investigating",
+      "reportedBy": "Safety Officer",
+      "reportedDate": "2024-10-18T10:30:00.000Z",
+      "investigationNotes": "Under investigation",
+      "correctiveActions": "Immediate safety measures",
+      "preventiveMeasures": "Enhanced safety protocols",
+      "createdAt": "2024-10-18T10:30:00.000Z",
+      "updatedAt": "2024-10-18T10:30:00.000Z",
+      "createdBy": 1,
+      "updatedBy": 1,
+      "rootCauses": ["Unsafe Act"]
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/osh-monthly-trends?union_id=1&months=12 - OSH Monthly Trends (admin)
+Group: OSH Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `months` (optional): Number of months to analyze (default: 12)
+
+Success (200):
+```json
+{
+  "period_months": 12,
+  "data": [
+    {
+      "month": "2024-01",
+      "People": 2,
+      "Property/Asset": 1,
+      "total": 3
+    },
+    {
+      "month": "2024-02",
+      "People": 1,
+      "Property/Asset": 0,
+      "total": 1
+    },
+    {
+      "month": "2024-03",
+      "People": 3,
+      "Property/Asset": 2,
+      "total": 5
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/osh-root-causes?union_id=1&from_date=2024-01-01&to_date=2024-12-31 - OSH Root Causes Analysis (admin)
+Group: OSH Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Query Parameters:
+- `union_id` (optional): Filter by union ID
+- `from_date` (optional): Start date filter (YYYY-MM-DD)
+- `to_date` (optional): End date filter (YYYY-MM-DD)
+
+Success (200):
+```json
+{
+  "total_incidents": 7,
+  "root_causes": {
+    "unsafe_act": 4,
+    "equipment_failure": 2,
+    "environmental": 1,
+    "other": 0
+  },
+  "percentages": {
+    "unsafe_act": "57.14",
+    "equipment_failure": "28.57",
+    "environmental": "14.29",
+    "other": "0.00"
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/reports/organization-leaders-summary - Organization Leaders Summary
+Group: Reports
+
+Success (200):
+```json
+{
+  "total_leaders": 0,
+  "by_sector": [
+    {
+      "sector": "Communication",
+      "count": 0
+    }
+  ],
+  "by_organization": [
+    {
+      "organization": "Ethio Telecom",
+      "count": 0
+    }
+  ]
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
+### [GET] {{base_url}}/api/reports/organization-leaders-list?sector=Communication&page=1&per_page=20 - Organization Leaders Filtered List
+Group: Reports
+
+Success (200):
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "union_id": 1,
+      "title": "Mr",
+      "first_name": "Yared",
+      "father_name": "Kebede",
+      "surname": "Tadesse",
+      "position": "CEO",
+      "phone": "+251911222333",
+      "email": "yared@org.com",
+      "sector": "Communication",
+      "organization": "Ethio Telecom",
+      "created_at": "2025-10-18T08:00:00.000Z",
+      "union_name": "Ethio Telecom Workers Union"
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "per_page": 20
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```

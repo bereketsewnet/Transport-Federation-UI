@@ -787,26 +787,85 @@ export const getTerminatedUnionsList = (): Promise<AxiosResponse<{ count: number
   return apiClient.get('/api/reports/terminated-unions-list');
 };
 
+export interface OrganizationLeadersSummaryReport {
+  total_leaders: number;
+  by_sector: Array<{ sector: string; count: number }>;
+  by_organization: Array<{ organization: string; count: number }>;
+}
+
+export const getOrganizationLeadersSummary = (): Promise<AxiosResponse<OrganizationLeadersSummaryReport>> => {
+  return apiClient.get('/api/reports/organization-leaders-summary');
+};
+
+export interface OrganizationLeadersReportFilters extends PaginationParams {
+  sector?: string;
+  union_id?: number | string;
+  organization?: string;
+}
+
+export interface OrganizationLeadersReportRow extends OrgLeader {
+  union_name?: string;
+}
+
+export const getOrganizationLeadersReportList = (
+  params?: OrganizationLeadersReportFilters
+): Promise<AxiosResponse<ApiResponse<OrganizationLeadersReportRow[]>>> => {
+  return apiClient.get('/api/reports/organization-leaders-list', { params });
+};
+
 // ==================== ORGANIZATION LEADERS ====================
 
 export interface OrgLeader {
   id: number;
   union_id: number;
+  union?: Partial<Union>;
   title: string;
   first_name: string;
+  father_name?: string;
+  surname?: string;
   position: string;
   phone: string;
-  email: string;
+  email?: string | null;
+  sector?: string | null;
+  organization?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface OrgLeaderFilters extends PaginationParams {
+  q?: string;
+  union_id?: number | string;
+  position?: string;
+  sector?: string;
+  organization?: string;
 }
 
 export const getOrgLeaders = (
-  params?: PaginationParams
+  params?: OrgLeaderFilters
 ): Promise<AxiosResponse<ApiResponse<OrgLeader[]>>> => {
   return apiClient.get('/api/org-leaders', { params });
 };
 
+export const getOrgLeader = (id: number | string): Promise<AxiosResponse<OrgLeader>> => {
+  return apiClient.get(`/api/org-leaders/${id}`);
+};
+
 export const createOrgLeader = (data: Partial<OrgLeader>): Promise<AxiosResponse<OrgLeader>> => {
   return apiClient.post('/api/org-leaders', data);
+};
+
+export const updateOrgLeader = (
+  id: number | string,
+  data: Partial<OrgLeader>
+): Promise<AxiosResponse<OrgLeader>> => {
+  return apiClient.put(`/api/org-leaders/${id}`, data);
+};
+
+export const deleteOrgLeader = (
+  id: number | string,
+  confirm = true
+): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/org-leaders/${id}`, { params: { confirm } });
 };
 
 // ==================== LOGIN ACCOUNTS (Admin) ====================
