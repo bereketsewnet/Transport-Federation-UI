@@ -56,6 +56,15 @@
   background: var(--accent-dark);
 }
 
+.success {
+  background: var(--success);
+  color: white;
+}
+
+.success:hover:not(:disabled) {
+  background: var(--success-dark);
+}
+
 .ghost {
   background: transparent;
   color: var(--text-secondary);

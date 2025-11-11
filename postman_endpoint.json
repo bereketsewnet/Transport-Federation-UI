@@ -111,7 +111,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"union_code\": \"ET01\",\n  \"name_en\": \"Ethio Telecom Workers Union\",\n  \"name_am\": \"የኢትዮ ቴሌኮም ሠራተኞች ህብረት\",\n  \"sector\": \"Communication\",\n  \"organization\": \"Ethio Telecom\",\n  \"established_date\": \"2010-01-01\",\n  \"terms_of_election\": 3,\n  \"strategic_plan_in_place\": true\n}"
+              "raw": "{\n  \"union_code\": \"ET01\",\n  \"name_en\": \"Ethio Telecom Workers Union\",\n  \"name_am\": \"የኢትዮ ቴሌኮም ሠራተኞች ህብረት\",\n  \"sector\": \"Communication\",\n  \"organization\": \"Ethio Telecom\",\n  \"established_date\": \"2010-01-01\",\n  \"terms_of_election\": 3,\n  \"general_assembly_date\": \"2024-06-15\",\n  \"strategic_plan_in_place\": true\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/unions",
@@ -176,7 +176,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name_en\": \"Updated Ethio Telecom Union\",\n  \"terms_of_election\": 4\n}"
+              "raw": "{\n  \"name_en\": \"Updated Ethio Telecom Union\",\n  \"terms_of_election\": 4,\n  \"general_assembly_date\": \"2025-06-20\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/unions/1",
@@ -784,11 +784,79 @@
           "response": []
         },
         {
+          "name": "Restore archive (admin)",
+          "request": {
+            "method":"POST",
+            "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{
+              "raw":"{{base_url}}/api/archives/1/restore",
+              "host":["{{base_url}}"],
+              "path":["api","archives","1","restore"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Delete archive (admin confirm)",
           "request": {
             "method":"DELETE",
             "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
             "url":{"raw":"{{base_url}}/api/archives/1?confirm=true","host":["{{base_url}}"],"path":["api","archives","1"],"query":[{"key":"confirm","value":"true"}]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "description": "Document management (files, reports, PDFs)",
+      "item": [
+        {
+          "name": "List documents",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url": {"raw": "{{base_url}}/api/documents?q=report&category=Reports&page=1&per_page=20", "host":["{{base_url}}"], "path":["api","documents"], "query":[{"key":"q","value":"report"},{"key":"category","value":"Reports"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get document by id",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url": {"raw": "{{base_url}}/api/documents/1", "host":["{{base_url}}"], "path":["api","documents","1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Create document (admin)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": {"mode":"raw","raw":"{\n  \"title\": \"Annual Report 2024\",\n  \"category\": \"Reports\",\n  \"document_type\": \"PDF\",\n  \"file_url\": \"/uploads/documents/annual-report-2024.pdf\",\n  \"file_name\": \"annual-report-2024.pdf\",\n  \"file_size\": 1024000,\n  \"tags\": [\"annual\", \"report\", \"2024\"],\n  \"description\": \"Complete annual report for 2024\",\n  \"is_public\": true\n}"},
+            "url": {"raw": "{{base_url}}/api/documents", "host":["{{base_url}}"], "path":["api","documents"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update document (admin)",
+          "request": {
+            "method": "PUT",
+            "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": {"mode":"raw","raw":"{\n  \"title\": \"Annual Report 2024 (Updated)\",\n  \"is_public\": false\n}"},
+            "url": {"raw": "{{base_url}}/api/documents/1", "host":["{{base_url}}"], "path":["api","documents","1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Delete document (admin)",
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url": {"raw": "{{base_url}}/api/documents/1?confirm=true", "host":["{{base_url}}"], "path":["api","documents","1"], "query":[{"key":"confirm","value":"true"}]}
           },
           "response": []
         }
@@ -1131,6 +1199,42 @@
             "url":{"raw":"{{base_url}}/api/reports/cache","host":["{{base_url}}"],"path":["api","reports","cache"]}
           },
           "response": []
+        },
+        {
+          "name": "General Assembly Status Report (conducted/not conducted)",
+          "request": {
+            "method":"GET",
+            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{"raw":"{{base_url}}/api/reports/unions-general-assembly-status","host":["{{base_url}}"],"path":["api","reports","unions-general-assembly-status"]}
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions Without General Assembly",
+          "request": {
+            "method":"GET",
+            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{"raw":"{{base_url}}/api/reports/unions-no-general-assembly","host":["{{base_url}}"],"path":["api","reports","unions-no-general-assembly"]}
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with GAM on Specific Date",
+          "request": {
+            "method":"GET",
+            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{"raw":"{{base_url}}/api/reports/unions-assembly-on-date?date=2024-06-15","host":["{{base_url}}"],"path":["api","reports","unions-assembly-on-date"],"query":[{"key":"date","value":"2024-06-15"}]}
+          },
+          "response": []
+        },
+        {
+          "name": "List Unions with Recent Assembly (< 3 months)",
+          "request": {
+            "method":"GET",
+            "auth":{ "type":"bearer","bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{"raw":"{{base_url}}/api/reports/unions-assembly-recent?months=3","host":["{{base_url}}"],"path":["api","reports","unions-assembly-recent"],"query":[{"key":"months","value":"3"}]}
+          },
+          "response": []
         }
       ]
     },
@@ -1153,7 +1257,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"heroTitleEn\": \"Ethiopian Transport and Communication Workers Union Industrial Federation\",\n  \"heroTitleAm\": \"የትራንስፖርትና መገናኛ ሠራተኞች ማኅበራት ፌዴሬሽን\",\n  \"heroSubtitleEn\": \"Empowering workers across Ethiopia's transport and communication sectors\",\n  \"heroSubtitleAm\": \"በኢትዮጵያ የትራንስፖርትና መገናኛ ዘርፎች ውስጥ የሰራተኞችን አቅም ማሳደግ\",\n  \"overviewEn\": \"The Industrial Federation of Transport and Communication Workers of Ethiopia (TCWF) is a national trade union federation representing workers in the transport and communication sectors.\",\n  \"overviewAm\": \"የኢትዮጵያ የትራንስፖርትና መገናኛ ሠራተኞች የኢንዱስትሪ ፌዴሬሽን (TCWF) በትራንስፖርትና መገናኛ ዘርፎች ውስጥ የሚሰሩ ሠራተኞችን የሚወክል የብሔራዊ የሠራተኛ ማኅበር ፌዴሬሽን ነው።\",\n  \"stat1Value\": 1250,\n  \"stat2Value\": 19,\n  \"stat3Value\": 50,\n  \"stat4Value\": 100\n}"
+              "raw": "{\n  \"heroTitleEn\": \"Transport & Communication Workers Federation\",\n  \"heroTitleAm\": \"የትራንስፖርትና መገናኛ ሠራተኞች ማኅበራት ፌዴሬሽን\",\n  \"heroSubtitleEn\": \"Empowering workers across Ethiopia's transport and communication sectors\",\n  \"heroSubtitleAm\": \"በኢትዮጵያ የትራንስፖርትና መገናኛ ዘርፎች ውስጥ የሰራተኞችን አቅም ማሳደግ\",\n  \"overviewEn\": \"The Industrial Federation of Transport and Communication Workers of Ethiopia (TCWF) is a national trade union federation representing workers in the transport and communication sectors.\",\n  \"overviewAm\": \"የኢትዮጵያ የትራንስፖርትና መገናኛ ሠራተኞች የኢንዱስትሪ ፌዴሬሽን (TCWF) በትራንስፖርትና መገናኛ ዘርፎች ውስጥ የሚሰሩ ሠራተኞችን የሚወክል የብሔራዊ የሠራተኛ ማኅበር ፌዴሬሽን ነው።\",\n  \"stat1Value\": 1250,\n  \"stat2Value\": 19,\n  \"stat3Value\": 50,\n  \"stat4Value\": 100\n}"
             },
             "url": {"raw": "{{base_url}}/api/cms/home-content", "host": ["{{base_url}}"], "path": ["api", "cms", "home-content"]}
           },

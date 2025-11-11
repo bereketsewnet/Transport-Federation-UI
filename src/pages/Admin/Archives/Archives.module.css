@@ -166,6 +166,14 @@
   flex-wrap: wrap;
 }
 
+.hiddenActionButton {
+  display: none !important;
+}
+
+.restoreButton {
+  min-width: 90px;
+}
+
 /* Form styles */
 .form {
   background-color: var(--bg-card);

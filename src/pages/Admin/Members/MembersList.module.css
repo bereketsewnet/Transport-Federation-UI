@@ -46,6 +46,18 @@
 .rowActions {
   display: flex;
   gap: var(--spacing-2);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.actionButton {
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.actionButton:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .badge {

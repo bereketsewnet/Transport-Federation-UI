@@ -23,6 +23,7 @@ export const MembersList: React.FC = () => {
   
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [archiveId, setArchiveId] = useState<number | null>(null);
+  const showDeleteButton = false;
 
   // Fetch members
   const { data, isLoading, refetch } = useQuery({
@@ -127,7 +128,8 @@ export const MembersList: React.FC = () => {
       <div className={styles.rowActions}>
         <Button 
           size="sm" 
-          variant="ghost" 
+          variant="secondary"
+          className={styles.actionButton}
           onClick={(e) => {
             e.stopPropagation();
             console.log('👁️ View clicked for member ID:', row.mem_id);
@@ -138,7 +140,8 @@ export const MembersList: React.FC = () => {
         </Button>
         <Button 
           size="sm" 
-          variant="ghost" 
+          variant="secondary"
+          className={styles.actionButton}
           onClick={(e) => {
             e.stopPropagation();
             console.log('📦 Archive clicked for member ID:', row.mem_id);
@@ -147,17 +150,19 @@ export const MembersList: React.FC = () => {
         >
           Archive
         </Button>
-        <Button 
-          size="sm" 
-          variant="danger" 
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('🗑️ Delete clicked for member ID:', row.mem_id);
-            setDeleteId(row.mem_id);
-          }}
-        >
-          {t('common.delete')}
-        </Button>
+        {showDeleteButton && (
+          <Button 
+            size="sm" 
+            variant="danger" 
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('🗑️ Delete clicked for member ID:', row.mem_id);
+              setDeleteId(row.mem_id);
+            }}
+          >
+            {t('common.delete')}
+          </Button>
+        )}
       </div>
     );
   };
@@ -203,15 +208,17 @@ export const MembersList: React.FC = () => {
       />
 
       {/* Delete Confirmation */}
-      <ConfirmDialog
-        isOpen={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={handleDelete}
-        title={t('members.deleteMember')}
-        message={t('members.deleteConfirm')}
-        variant="danger"
-        confirmText={t('common.delete')}
-      />
+      {showDeleteButton && (
+        <ConfirmDialog
+          isOpen={!!deleteId}
+          onClose={() => setDeleteId(null)}
+          onConfirm={handleDelete}
+          title={t('members.deleteMember')}
+          message={t('members.deleteConfirm')}
+          variant="danger"
+          confirmText={t('common.delete')}
+        />
+      )}
 
       {/* Archive Confirmation */}
       <ConfirmDialog

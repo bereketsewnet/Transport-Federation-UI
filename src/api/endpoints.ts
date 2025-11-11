@@ -566,6 +566,20 @@ export const uploadArchiveFile = (file: File, onProgress?: (progress: number) =>
   });
 };
 
+export interface RestoreArchiveResponse {
+  message?: string;
+  member: Partial<Member> & { mem_id?: number };
+  loginCredentials?: {
+    username: string;
+    defaultPassword: string;
+    message?: string;
+  };
+}
+
+export const restoreArchive = (id: number | string): Promise<AxiosResponse<RestoreArchiveResponse>> => {
+  return apiClient.post(`/api/archives/${id}/restore`);
+};
+
 // ==================== TERMINATED UNIONS ====================
 
 export interface TerminatedUnion {

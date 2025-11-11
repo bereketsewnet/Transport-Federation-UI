@@ -411,6 +411,9 @@
     "noArchivesFound": "ከመስፈርትዎ ጋር የሚዛመዱ ሰነዶች አልተገኙም",
     "uploadFile": "ፋይል ይጫኑ",
     "fileUploaded": "ፋይል በተሳካ ሁኔታ ተጫነ",
+    "restore": "እንደገና መመለስ",
+    "restoreSuccess": "አርኪቩ በተሳካ ሁኔታ ተመለሰ።",
+    "restoreError": "አርኪቩን መመለስ አልተሳካም። እባኮትን ደግመው ይሞክሩ።",
     "categories": {
       "legal": "የሕግ ሰነዶች",
       "financial": "የገንዘብ ሪፖርቶች",

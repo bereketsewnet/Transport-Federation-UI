@@ -30,3 +30,20 @@
   line-height: 1.5;
 }
 
+.rowActions {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.hiddenActionButton {
+  display: none !important;
+}
+
+.restoreButton {
+  min-width: 90px;
+}
+

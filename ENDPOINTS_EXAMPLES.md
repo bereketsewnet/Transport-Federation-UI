@@ -3566,6 +3566,62 @@ Errors:
 }
 ```
 
+### [POST] {{base_url}}/api/archives/1/restore - Restore archive (admin)
+Group: Archives
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "message": "Member restored from archive",
+  "member": {
+    "mem_id": 42,
+    "union_id": 1,
+    "member_code": "M-1001",
+    "first_name": "Abebe",
+    "surname": "Tadesse",
+    "is_active": true
+  },
+  "loginCredentials": {
+    "username": "M-1001",
+    "defaultPassword": "M-1001",
+    "message": "Login account recreated. User must change password and set security questions on first login."
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Archive not found"
+}
+```
+- 409:
+```json
+{
+  "message": "Member with this member_code already exists. Please update member_code before restoring."
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
 ### [GET] {{base_url}}/api/reports/organization-leaders-summary - Organization Leaders Summary
 Group: Reports
 

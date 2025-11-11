@@ -411,6 +411,9 @@
     "noArchivesFound": "No archives found matching your criteria",
     "uploadFile": "Upload File",
     "fileUploaded": "File uploaded successfully",
+    "restore": "Restore",
+    "restoreSuccess": "Archive restored successfully.",
+    "restoreError": "Unable to restore this archive. Please try again.",
     "categories": {
       "legal": "Legal Documents",
       "financial": "Financial Reports",

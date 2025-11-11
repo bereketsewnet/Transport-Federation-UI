@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import {
   getArchives,
   deleteArchive,
+  restoreArchive,
   Archive,
   ArchiveFilters
 } from '@api/endpoints';
@@ -16,6 +17,7 @@ import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import { Loading } from '@components/Loading/Loading';
 import { useTable } from '@hooks/useTable';
 import { formatDate, formatFileSize } from '@utils/formatters';
+import { toast } from 'react-hot-toast';
 import styles from './Archives.module.css';
 
 export const ArchivesList: React.FC = () => {
@@ -28,6 +30,7 @@ export const ArchivesList: React.FC = () => {
     isOpen: boolean;
     archive: Archive | null;
   }>({ isOpen: false, archive: null });
+  const [restoringId, setRestoringId] = useState<number | null>(null);
 
   const {
     page: currentPage,
@@ -115,6 +118,27 @@ export const ArchivesList: React.FC = () => {
     }
   };
 
+  const handleRestore = async (archive: Archive) => {
+    if (!archive.id) {
+      return;
+    }
+
+    try {
+      setRestoringId(archive.id);
+      const response = await restoreArchive(archive.id);
+      const message =
+        response.data?.message ||
+        t('archives.restoreSuccess');
+
+      toast.success(message);
+      await loadArchives();
+    } catch (err: any) {
+      console.error('Error restoring archive:', err);
+      toast.error(err?.response?.data?.message || t('archives.restoreError'));
+    } finally {
+      setRestoringId(null);
+    }
+  };
   const handleDownload = (archive: Archive) => {
     if (archive.file_url) {
       window.open(archive.file_url, '_blank');
@@ -196,9 +220,20 @@ export const ArchivesList: React.FC = () => {
       <Button
         variant="secondary"
         size="sm"
+        className={styles.hiddenActionButton}
+        style={{ display: 'none' }}
         onClick={() => navigate(`/admin/archives/${archive.id}/edit`)}
       >
         {t('common.edit')}
+      </Button>
+      <Button
+        variant="success"
+        size="sm"
+        className={styles.restoreButton}
+        disabled={restoringId === archive.id}
+        onClick={() => handleRestore(archive)}
+      >
+        {restoringId === archive.id ? t('common.loading') : t('archives.restore')}
       </Button>
       <Button
         variant="danger"

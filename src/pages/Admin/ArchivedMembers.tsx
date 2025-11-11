@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { getArchives, deleteArchive } from '@api/endpoints';
+import { getArchives, deleteArchive, restoreArchive } from '@api/endpoints';
 import { DataTable, Column } from '@components/DataTable/DataTable';
 import { Loading } from '@components/Loading/Loading';
 import { Button } from '@components/Button/Button';
@@ -32,6 +32,8 @@ export const ArchivedMembers: React.FC = () => {
     isOpen: false,
     member: null,
   });
+  const [restoringId, setRestoringId] = useState<number | null>(null);
+  const showDeleteButton = false;
 
   useEffect(() => {
     fetchArchivedMembers();
@@ -80,6 +82,27 @@ export const ArchivedMembers: React.FC = () => {
     }
   };
 
+  const handleRestore = async (member: ArchivedMember) => {
+    if (!member.id) {
+      return;
+    }
+
+    try {
+      setRestoringId(member.id);
+      const response = await restoreArchive(member.id);
+      const message = response.data?.message || 'Member restored successfully';
+      toast.success(message);
+      await fetchArchivedMembers();
+    } catch (error: any) {
+      console.error('Failed to restore archived member:', error);
+      const message =
+        error?.response?.data?.message || 'Failed to restore archived member';
+      toast.error(message);
+    } finally {
+      setRestoringId(null);
+    }
+  };
+
   const columns: Column<ArchivedMember>[] = [
     {
       key: 'member_code',
@@ -113,22 +136,35 @@ export const ArchivedMembers: React.FC = () => {
   ];
 
   const rowActions = (member: ArchivedMember) => (
-    <>
-      <Button 
-        size="sm" 
-        variant="secondary" 
+    <div className={styles.rowActions}>
+      <Button
+        size="sm"
+        variant="secondary"
+        className={styles.hiddenActionButton}
+        style={{ display: 'none' }}
         onClick={() => toast.success('Edit functionality coming soon')}
       >
         Edit
       </Button>
-      <Button 
-        size="sm" 
-        variant="danger" 
-        onClick={() => setDeleteDialog({ isOpen: true, member })}
+      <Button
+        size="sm"
+        variant="success"
+        className={styles.restoreButton}
+        disabled={restoringId === member.id}
+        onClick={() => handleRestore(member)}
       >
-        Delete
+        {restoringId === member.id ? 'Restoring...' : 'Restore'}
       </Button>
-    </>
+      {showDeleteButton && (
+        <Button 
+          size="sm" 
+          variant="danger" 
+          onClick={() => setDeleteDialog({ isOpen: true, member })}
+        >
+          Delete
+        </Button>
+      )}
+    </div>
   );
 
   if (loading) return <Loading />;

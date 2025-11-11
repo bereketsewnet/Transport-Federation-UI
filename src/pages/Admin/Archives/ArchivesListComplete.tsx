@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import {
   getDocuments,
   deleteDocument,
+  restoreArchive,
   Document as Archive
 } from '@api/endpoints';
 import { DataTable, Column } from '@components/DataTable/DataTable';
@@ -28,6 +29,7 @@ export const ArchivesListComplete: React.FC = () => {
     isOpen: boolean;
     archive: Archive | null;
   }>({ isOpen: false, archive: null });
+  const [restoringId, setRestoringId] = useState<number | null>(null);
 
   // Filter and pagination state
   const [searchTerm, setSearchTerm] = useState('');
@@ -110,6 +112,29 @@ export const ArchivesListComplete: React.FC = () => {
       console.error('💥 Error deleting document:', err);
       setError(t('messages.errorDeletingData'));
       toast.error(t('messages.errorDeletingData'));
+    }
+  };
+
+  const handleRestore = async (archive: Archive) => {
+    if (!archive?.id) {
+      return;
+    }
+
+    try {
+      setRestoringId(archive.id);
+      console.log('♻️ Restoring archive:', archive.id);
+      const response = await restoreArchive(archive.id);
+      const message =
+        response.data?.message ||
+        t('archives.restoreSuccess');
+
+      toast.success(message);
+      await loadArchives();
+    } catch (err: any) {
+      console.error('💥 Error restoring archive:', err);
+      toast.error(err?.response?.data?.message || t('archives.restoreError'));
+    } finally {
+      setRestoringId(null);
     }
   };
 
@@ -200,6 +225,8 @@ export const ArchivesListComplete: React.FC = () => {
         <Button
           size="sm"
           variant="secondary"
+          className={styles.hiddenActionButton}
+          style={{ display: 'none' }}
           onClick={(e) => {
             e.stopPropagation();
             console.log('✏️ Edit clicked for archive ID:', archive.id);
@@ -207,6 +234,18 @@ export const ArchivesListComplete: React.FC = () => {
           }}
         >
           {t('common.edit')}
+        </Button>
+        <Button
+          size="sm"
+          variant="success"
+          className={styles.restoreButton}
+          disabled={restoringId === archive.id}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRestore(archive);
+          }}
+        >
+          {restoringId === archive.id ? t('common.loading') : t('archives.restore')}
         </Button>
         <Button
           size="sm"
