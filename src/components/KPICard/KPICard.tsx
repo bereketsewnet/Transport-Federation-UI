@@ -9,7 +9,7 @@ export interface KPICardProps {
   change?: number;
   changeLabel?: string;
   icon?: React.ReactNode;
-  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
   isLoading?: boolean;
 }
 

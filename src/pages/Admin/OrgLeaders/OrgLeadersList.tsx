@@ -180,12 +180,28 @@ export const OrgLeadersList: React.FC = () => {
     {
       key: 'sector',
       label: t('orgLeaders.table.sector'),
-      render: (value, row) => value || row.sector || row.union?.sector || '—',
+      render: (value, row) => {
+        const sectorValue =
+          (value as string | null | undefined) ??
+          row.sector ??
+          row.union?.sector ??
+          null;
+
+        return sectorValue ? String(sectorValue) : '—';
+      },
     },
     {
       key: 'organization',
       label: t('orgLeaders.table.organization'),
-      render: (value, row) => value || row.organization || row.union?.organization || '—',
+      render: (value, row) => {
+        const orgValue =
+          (value as string | null | undefined) ??
+          row.organization ??
+          row.union?.organization ??
+          null;
+
+        return orgValue ? String(orgValue) : '—';
+      },
     },
   ];
 

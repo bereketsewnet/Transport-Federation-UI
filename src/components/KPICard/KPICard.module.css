@@ -28,6 +28,10 @@
   border-left: 4px solid var(--success);
 }
 
+.info {
+  border-left: 4px solid var(--info);
+}
+
 .warning {
   border-left: 4px solid var(--warning);
 }
