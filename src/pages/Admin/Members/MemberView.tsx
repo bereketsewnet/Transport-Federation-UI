@@ -6,10 +6,12 @@ import {
   getMember, 
   Member,
   getUnion,
-  Union
+  Union,
+  resetPasswordByMemberId
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { Loading } from '@components/Loading/Loading';
+import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import { formatDate } from '@utils/formatters';
 import { toast } from 'react-hot-toast';
 import styles from './Members.module.css';
@@ -23,6 +25,8 @@ export const MemberView: React.FC = () => {
   const [union, setUnion] = useState<Union | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -62,6 +66,31 @@ export const MemberView: React.FC = () => {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!member || !member.mem_id) {
+      toast.error(t('members.resetPasswordError'));
+      return;
+    }
+
+    try {
+      setResettingPassword(true);
+      const response = await resetPasswordByMemberId(member.mem_id);
+      const { member_code, message } = response.data;
+      
+      toast.success(
+        t('members.resetPasswordSuccessMessage', { code: member_code }),
+        { duration: 5000 }
+      );
+      setShowResetPasswordDialog(false);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || t('members.resetPasswordError');
+      toast.error(errorMessage);
+      console.error('Error resetting password:', err);
+    } finally {
+      setResettingPassword(false);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -97,6 +126,13 @@ export const MemberView: React.FC = () => {
             onClick={() => navigate('/admin/members')}
           >
             {t('common.back')}
+          </Button>
+          <Button
+            variant="warning"
+            onClick={() => setShowResetPasswordDialog(true)}
+            disabled={!member?.member_code}
+          >
+            {t('members.resetPassword')}
           </Button>
           <Button
             onClick={() => navigate(`/admin/members/${id}/edit`)}
@@ -252,11 +288,38 @@ export const MemberView: React.FC = () => {
           {t('common.back')}
         </Button>
         <Button
+          variant="warning"
+          onClick={() => setShowResetPasswordDialog(true)}
+          disabled={!member?.member_code}
+        >
+          {t('members.resetPassword')}
+        </Button>
+        <Button
           onClick={() => navigate(`/admin/members/${id}/edit`)}
         >
           {t('common.edit')}
         </Button>
       </div>
+
+      {/* Reset Password Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showResetPasswordDialog}
+        onClose={() => setShowResetPasswordDialog(false)}
+        onConfirm={handleResetPassword}
+        title={t('members.resetPassword')}
+        message={
+          member?.member_code
+            ? t('members.resetPasswordConfirmation', {
+                name: `${member.first_name} ${member.father_name}`,
+                code: member.member_code,
+              })
+            : t('members.resetPasswordConfirm')
+        }
+        variant="warning"
+        confirmText={t('members.resetPassword')}
+        cancelText={t('common.cancel')}
+        isLoading={resettingPassword}
+      />
     </motion.div>
   );
 };

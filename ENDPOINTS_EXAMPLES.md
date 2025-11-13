@@ -1335,6 +1335,61 @@ Errors:
 }
 ```
 
+### [POST] {{base_url}}/api/login-accounts/reset-by-member/:mem_id - Reset password to default by member ID (admin)
+Group: Login Accounts (admin)
+
+**Description**: Resets a member's login credentials to their default member code (both username and password). Clears all security questions. User will be required to change password and set security questions on next login.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+URL Parameters:
+- `mem_id` (required): Member ID to reset credentials for
+
+Success (200):
+```json
+{
+  "message": "Password and username reset to default (member code). User must change password and set security questions on next login.",
+  "member_id": 1,
+  "member_code": "M-1001",
+  "default_username": "M-1001",
+  "default_password": "M-1001",
+  "login_account_id": 5,
+  "password_reset_required": true,
+  "must_change_password": true
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 404:
+```json
+{
+  "message": "Member not found"
+}
+```
+- 400:
+```json
+{
+  "message": "Member does not have a member_code. Cannot reset to default credentials."
+}
+```
+- 500:
+```json
+{
+  "message": "Server error"
+}
+```
+
 ### [PUT] {{base_url}}/api/login-accounts/1/lock - Lock/Unlock account (admin)
 Group: Login Accounts (admin)
 

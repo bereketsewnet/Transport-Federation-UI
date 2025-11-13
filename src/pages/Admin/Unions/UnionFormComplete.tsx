@@ -317,7 +317,7 @@ export const UnionFormComplete: React.FC = () => {
                     {...register('strategic_plan_in_place')}
                   />
                   <span className={styles.checkboxText}>
-                    Strategic Plan in Place
+                  Annual Plan in Place
                     <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'block', marginTop: '0.25rem' }}>
                       (Optional: Check if the union has a strategic development plan)
                     </span>

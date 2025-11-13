@@ -909,6 +909,23 @@ export const resetPassword = (username: string, password: string): Promise<Axios
   return apiClient.post(`/api/login-accounts/reset/${username}`, { password });
 };
 
+export interface ResetPasswordByMemberResponse {
+  message: string;
+  member_id: number;
+  member_code: string;
+  default_username: string;
+  default_password: string;
+  login_account_id: number;
+  password_reset_required: boolean;
+  must_change_password: boolean;
+}
+
+export const resetPasswordByMemberId = (
+  mem_id: number | string
+): Promise<AxiosResponse<ResetPasswordByMemberResponse>> => {
+  return apiClient.post(`/api/login-accounts/reset-by-member/${mem_id}`);
+};
+
 // ==================== FORGOT PASSWORD ====================
 
 export interface ForgotPasswordStep1Payload {

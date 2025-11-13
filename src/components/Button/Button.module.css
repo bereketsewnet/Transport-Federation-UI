@@ -65,6 +65,15 @@
   background: var(--success-dark);
 }
 
+.warning {
+  background: var(--warning);
+  color: white;
+}
+
+.warning:hover:not(:disabled) {
+  background: #d97706;
+}
+
 .ghost {
   background: transparent;
   color: var(--text-secondary);

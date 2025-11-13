@@ -181,7 +181,13 @@
     "additionalInformation": "ተጨማሪ መረጃ",
     "noMembersFound": "ምንም አባላት አልተገኙም",
     "memberNotFound": "አባል አልተገኘም",
-    "name": "ስም"
+    "name": "ስም",
+    "resetPassword": "የይለፍ ቃል ዳግም ያቋቁሙ",
+    "resetPasswordConfirm": "እርግጠኛ ነዎት የዚህን አባል የይለፍ ቃል ዳግም ማቋቁም ይፈልጋሉ?",
+    "resetPasswordConfirmation": "ይህ {{name}}ን የተጠቃሚ ስም እና የይለፍ ቃል ወደ የአባል ኮዳቸው ({{code}}) ዳግም ያቋቁማል። በሚቀጥለው መግቢያ ላይ የይለፍ ቃላቸውን መለወጥ እና የደህንነት ጥያቄዎችን ማቀናበር ይጠይቃሉ።",
+    "resetPasswordSuccess": "የይለፍ ቃል ዳግም ተቋቁሟል",
+    "resetPasswordSuccessMessage": "የአባሉ የይለፍ ቃል ዳግም ተቋቁሟል። የተጠቃሚ ስም እና የይለፍ ቃል አሁን ወደ ይህ ተቋቁመዋል: {{code}}",
+    "resetPasswordError": "የይለፍ ቃልን ዳግም ማቋቁም አልተሳካም"
   },
   "unions": {
     "title": "የማህበራት አስተዳደር",

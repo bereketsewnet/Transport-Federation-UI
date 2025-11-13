@@ -181,7 +181,13 @@
     "additionalInformation": "Additional Information",
     "noMembersFound": "No members found",
     "memberNotFound": "Member not found",
-    "name": "Name"
+    "name": "Name",
+    "resetPassword": "Reset Password",
+    "resetPasswordConfirm": "Are you sure you want to reset this member's password?",
+    "resetPasswordConfirmation": "This will reset {{name}}'s username and password to their member code ({{code}}). They will need to change their password and set security questions on their next login.",
+    "resetPasswordSuccess": "Password reset successful",
+    "resetPasswordSuccessMessage": "The member's password has been reset. Username and password are now set to: {{code}}",
+    "resetPasswordError": "Failed to reset password"
   },
   "unions": {
     "title": "Unions Management",
@@ -224,7 +230,7 @@
     "descriptionPlaceholder": "Brief description of the union's purpose and activities...",
     "noUnionsFound": "No unions found matching your criteria",
     "termsOfElection": "Terms of Election (years)",
-    "strategicPlan": "Strategic Plan in Place",
+    "strategicPlan": "Annual Plan in Place",
     "communication": "Communication",
     "transport": "Transport",
     "deleteConfirm": "Are you sure you want to delete this union?",

@@ -784,7 +784,7 @@ const PrintedReportPage: React.FC = () => {
       .filter(item => item.value > 0);
   }, [execByUnionForReport31, allMembersData, selectedUnionIdForReport31, overallExecutivesByGender, filteredMembers, filterStartDate, filterEndDate]);
 
-  // Strategic plan counts
+  // Annual Plan counts
   const strategicPlanStats = useMemo(() => {
     const unions: any[] = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
     let withPlan = 0;
@@ -1591,16 +1591,16 @@ const PrintedReportPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 2.5 Report 22: Strategic Plan in Place */}
+            {/* 2.5 Report 22: Annual Plan in Place */}
             <div className={styles.reportItem}>
-              <h3 className={styles.reportQuestion}>2.5 (Report 22) Unions with Strategic Plan In-Place vs Not In-Place</h3>
+              <h3 className={styles.reportQuestion}>2.5 (Report 22) Unions with Annual Plan In-Place vs Not In-Place</h3>
               <div className={styles.chartContainer}>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
                       data={[
-                        { name: 'With Strategic Plan', value: strategicPlanStats.withPlan },
-                        { name: 'Without Strategic Plan', value: strategicPlanStats.withoutPlan },
+                        { name: 'With Annual Plan', value: strategicPlanStats.withPlan },
+                        { name: 'Without Annual Plan', value: strategicPlanStats.withoutPlan },
                       ]}
                       cx="50%"
                       cy="50%"
@@ -1630,12 +1630,12 @@ const PrintedReportPage: React.FC = () => {
                   </thead>
                   <tbody>
                     <tr>
-                      <td><strong>With Strategic Plan</strong></td>
+                      <td><strong>With Annual Plan</strong></td>
                       <td>{strategicPlanStats.withPlan.toLocaleString()}</td>
                       <td>{strategicPlanStats.total > 0 ? ((strategicPlanStats.withPlan / strategicPlanStats.total) * 100).toFixed(2) : 0}%</td>
                     </tr>
                     <tr>
-                      <td><strong>Without Strategic Plan</strong></td>
+                      <td><strong>Without Annual Plan</strong></td>
                       <td>{strategicPlanStats.withoutPlan.toLocaleString()}</td>
                       <td>{strategicPlanStats.total > 0 ? ((strategicPlanStats.withoutPlan / strategicPlanStats.total) * 100).toFixed(2) : 0}%</td>
                     </tr>
@@ -2785,7 +2785,7 @@ const PrintedReportPage: React.FC = () => {
                 <p className={styles.summaryValue}>{unionsWithoutGACount.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Unions with Strategic Plan</h4>
+                <h4>Unions with Annual Plan</h4>
                 <p className={styles.summaryValue}>{strategicPlanStats.withPlan.toLocaleString()}</p>
               </div>
             </div>

@@ -36,7 +36,7 @@ const unionSchema = yup.object({
   organization: yup.string().required('Organization is required'),
   established_date: yup.string().required('Established date is required'),
   terms_of_election: yup.number().required('Terms of election is required').min(1, 'Must be at least 1 year'),
-  strategic_plan_in_place: yup.boolean().required('Strategic plan status is required'),
+  strategic_plan_in_place: yup.boolean().required('Annual Plan status is required'),
 });
 
 export const UnionsForm: React.FC = () => {

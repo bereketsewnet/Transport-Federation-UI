@@ -11,7 +11,7 @@ export interface ConfirmDialogProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'danger' | 'primary';
+  variant?: 'danger' | 'primary' | 'warning';
   isLoading?: boolean;
 }
 
