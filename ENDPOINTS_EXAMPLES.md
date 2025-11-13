@@ -46,6 +46,176 @@ Errors:
 }
 ```
 
+### [GET] {{base_url}}/api/auth/security-questions - Get security questions (public)
+Group: Auth
+
+**Description**: Returns the list of available security questions that can be used for password recovery. Works for both admin and member accounts.
+
+Success (200):
+```json
+{
+  "questions": [
+    {"id": 1, "question": "What was the name of your first pet?"},
+    {"id": 2, "question": "What city were you born in?"},
+    {"id": 3, "question": "What was your mother's maiden name?"}
+  ]
+}
+```
+
+### [POST] {{base_url}}/api/auth/forgot-password/step1 - Forgot password - Step 1: Get security questions (public)
+Group: Auth
+
+**Description**: **Works for both admin and member accounts.** Returns the security questions for a given username. User must have security questions set up first.
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "username": "admin"
+}
+```
+
+Success (200):
+```json
+{
+  "username": "admin",
+  "role": "admin",
+  "securityQuestions": [
+    {"questionId": 1, "question": "What was the name of your first pet?"},
+    {"questionId": 2, "question": "What city were you born in?"},
+    {"questionId": 3, "question": "What was your mother's maiden name?"}
+  ],
+  "message": "Please answer all 3 security questions"
+}
+```
+
+Errors:
+- 400:
+```json
+{
+  "message": "Security questions not set. Please set security questions first or contact another administrator.",
+  "role": "admin",
+  "needsSecurityQuestions": true
+}
+```
+- 404:
+```json
+{
+  "message": "If this account exists, security questions will be shown."
+}
+```
+
+### [POST] {{base_url}}/api/auth/forgot-password/step2 - Forgot password - Step 2: Verify answers and reset (public)
+Group: Auth
+
+**Description**: **Works for both admin and member accounts.** Verifies security question answers and resets the password.
+
+Headers:
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "username": "admin",
+  "answers": ["Fluffy", "Addis Ababa", "Smith"],
+  "newPassword": "NewSecurePass123!"
+}
+```
+
+Success (200):
+```json
+{
+  "message": "Password reset successful. You can now login with your new password.",
+  "role": "admin"
+}
+```
+
+Errors:
+- 400:
+```json
+{
+  "message": "username, 3 answers, and newPassword required"
+}
+```
+- 401:
+```json
+{
+  "message": "Security answers do not match"
+}
+```
+- 404:
+```json
+{
+  "message": "Invalid request"
+}
+```
+
+### [POST] {{base_url}}/api/auth/change-password - Change password + set security questions (requires temp token)
+Group: Auth
+
+**Description**: **Works for both admin and member accounts.** Changes password and optionally sets security questions. Requires a temporary token from login when `must_change_password` or `password_reset_required` is true.
+
+Headers:
+```json
+{
+  "Content-Type": "application/json",
+  "Authorization": "Bearer {{temp_token}}"
+}
+```
+
+Request Body:
+```json
+{
+  "newPassword": "NewSecurePass123!",
+  "securityQuestions": [
+    {"questionId": 1, "answer": "Fluffy"},
+    {"questionId": 2, "answer": "Addis Ababa"},
+    {"questionId": 3, "answer": "Smith"}
+  ]
+}
+```
+
+Success (200):
+```json
+{
+  "token": "FULL_ACCESS_JWT_TOKEN",
+  "user": {
+    "id": 1,
+    "mem_id": null,
+    "username": "admin",
+    "role": "admin"
+  },
+  "message": "Password changed successfully. You can now use the system.",
+  "securityQuestionsSet": true
+}
+```
+
+Errors:
+- 400:
+```json
+{
+  "message": "Security questions are required for password recovery. Please provide 3 security questions with answers.",
+  "requireSecurityQuestions": true,
+  "role": "admin"
+}
+```
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
 ### [GET] {{base_url}}/api/unions?q=telecom&sector=Communication&page=1&per_page=10 - List unions (search & pagination)
 Group: Unions
 

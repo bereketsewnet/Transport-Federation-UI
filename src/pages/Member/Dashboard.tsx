@@ -60,10 +60,43 @@ export const MemberDashboard: React.FC = () => {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatar}>
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+            <div className={styles.avatar} key={`avatar-${member.sex}-${member.mem_id}`}>
+              {(() => {
+                // Get the raw sex value and normalize
+                const rawSex = member.sex;
+                const sexValue = String(rawSex || '').toLowerCase().trim();
+                
+                // Check for male - be very explicit
+                const isMale = sexValue === 'm' || 
+                              sexValue === 'male' || 
+                              sexValue.startsWith('m') ||
+                              rawSex === 'M' ||
+                              rawSex === 'Male';
+                
+                // Return the appropriate icon
+                if (isMale) {
+                  // Male icon - broader shoulders
+                  return (
+                    <svg key="male-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  );
+                } else {
+                  // Female icon - with visible hair
+                  return (
+                    <svg key="female-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      {/* Hair - wavy lines above head */}
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 4C7 3 6 2.5 5 3C4 3.5 3.5 4.5 4 5.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.5C11 2 10 2.5 10 3.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 4C17 3 18 2.5 19 3C20 3.5 20.5 4.5 20 5.5" />
+                      {/* Head - smaller circle */}
+                      <circle cx="12" cy="8" r="2.5" />
+                      {/* Body - narrower shoulders */}
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12a6 6 0 00-5 6h10a6 6 0 00-5-6z" />
+                    </svg>
+                  );
+                }
+              })()}
             </div>
             <div>
               <h1 className={styles.name}>
@@ -99,7 +132,12 @@ export const MemberDashboard: React.FC = () => {
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.label}>Sex:</span>
-                <span className={styles.value}>{member.sex === 'M' ? 'Male' : 'Female'}</span>
+                <span className={styles.value}>
+                  {(() => {
+                    const sexVal = String(member.sex || '').toLowerCase().trim();
+                    return sexVal === 'm' || sexVal === 'male' || sexVal.startsWith('m') ? 'Male' : 'Female';
+                  })()}
+                </span>
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.label}>Birthdate:</span>

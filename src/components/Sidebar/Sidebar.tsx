@@ -315,6 +315,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
       ],
     },
+    {
+      title: 'Profile',
+      items: [
+        {
+          path: '/admin/profile',
+          label: t('nav.profile'),
+          icon: (
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path
+                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                fill="currentColor"
+              />
+            </svg>
+          ),
+        },
+        {
+          path: '/admin/profile/reset-password',
+          label: t('adminProfile.resetPassword'),
+          icon: (
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                fill="currentColor"
+              />
+            </svg>
+          ),
+        },
+      ],
+    },
   ];
 
   const isActive = (path: string) => location.pathname === path;

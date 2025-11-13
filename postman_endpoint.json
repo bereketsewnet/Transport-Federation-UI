@@ -37,6 +37,70 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Get security questions (public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/auth/security-questions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "security-questions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot password - Step 1: Get security questions (public - works for admin & member)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password/step1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "forgot-password", "step1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot password - Step 2: Verify answers and reset (public - works for admin & member)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"answers\": [\"answer1\", \"answer2\", \"answer3\"],\n  \"newPassword\": \"NewSecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password/step2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "forgot-password", "step2"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change password + set security questions (requires temp token)",
+          "request": {
+            "method": "POST",
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{temp_token}}", "type": "string"}]},
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"NewSecurePass123!\",\n  \"securityQuestions\": [\n    {\"questionId\": 1, \"answer\": \"answer1\"},\n    {\"questionId\": 2, \"answer\": \"answer2\"},\n    {\"questionId\": 3, \"answer\": \"answer3\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          },
+          "response": []
         }
       ]
     },

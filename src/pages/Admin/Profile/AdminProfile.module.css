@@ -9,7 +9,6 @@
   margin: 0 auto;
 }
 
-/* Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -19,7 +18,6 @@
   background: var(--bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
 }
 
 .avatarSection {
@@ -33,12 +31,11 @@
   height: 80px;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
 }
 
 .name {
@@ -48,21 +45,19 @@
   margin: 0 0 var(--spacing-1) 0;
 }
 
-.code {
+.role {
   font-size: var(--text-base);
   color: var(--text-secondary);
   margin: 0;
-  font-family: 'Courier New', monospace;
+  text-transform: capitalize;
 }
 
-/* Grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: var(--spacing-6);
 }
 
-/* Card */
 .card {
   background: var(--bg);
   border-radius: var(--radius-lg);
@@ -85,15 +80,12 @@
 
 .cardTitle svg {
   color: var(--primary);
-  flex-shrink: 0;
 }
 
-/* Info List */
 .infoList {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
-  margin-top: var(--spacing-4);
 }
 
 .infoItem {
@@ -120,20 +112,6 @@
   text-align: right;
 }
 
-.link {
-  font-size: var(--text-base);
-  font-weight: 500;
-  color: var(--primary);
-  text-decoration: none;
-  transition: color var(--transition-base);
-}
-
-.link:hover {
-  color: var(--primary-dark);
-  text-decoration: underline;
-}
-
-/* Error State */
 .errorState {
   text-align: center;
   padding: var(--spacing-8);
@@ -151,7 +129,6 @@
   color: var(--text-secondary);
 }
 
-/* Responsive */
 @media (max-width: 1023px) {
   .container {
     padding: var(--spacing-4);
@@ -179,20 +156,6 @@
 
   .card {
     padding: var(--spacing-4);
-  }
-
-  .avatar {
-    width: 64px;
-    height: 64px;
-  }
-
-  .avatar svg {
-    width: 40px;
-    height: 40px;
-  }
-
-  .name {
-    font-size: var(--text-xl);
   }
 
   .infoItem {

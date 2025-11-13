@@ -70,6 +70,9 @@ import { GeneralAssembly } from '@pages/Admin/GeneralAssembly';
 import OrgLeadersList from '@pages/Admin/OrgLeaders/OrgLeadersList';
 import OrgLeaderForm from '@pages/Admin/OrgLeaders/OrgLeaderForm';
 
+// Admin Profile
+import { AdminProfile, AdminResetPassword } from '@pages/Admin/Profile';
+
 // Member Pages
 import { MemberDashboard, MemberChangePassword } from '@pages/Member';
 
@@ -210,6 +213,10 @@ function App() {
 
           {/* General Assembly Management */}
           <Route path="general-assembly" element={<GeneralAssembly />} />
+
+          {/* Admin Profile */}
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="profile/reset-password" element={<AdminResetPassword />} />
         </Route>
 
         {/* Member Routes - Protected */}
