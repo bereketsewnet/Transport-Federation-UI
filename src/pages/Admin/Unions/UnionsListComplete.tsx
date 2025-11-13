@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   getUnions, 
-  deleteUnion, 
+  createTerminatedUnion, 
   Union
 } from '@api/endpoints';
 import { DataTable } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { Select } from '@components/Select/Select';
-import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
+import { TerminateDialog } from '@components/TerminateDialog/TerminateDialog';
 import { Loading } from '@components/Loading/Loading';
 import { formatDate } from '@utils/formatters';
 import { toast } from 'react-hot-toast';
@@ -27,10 +27,11 @@ export const UnionsListComplete: React.FC = () => {
   const [unions, setUnions] = useState<UnionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [deleteDialog, setDeleteDialog] = useState<{
+  const [terminateDialog, setTerminateDialog] = useState<{
     isOpen: boolean;
     union: UnionRow | null;
   }>({ isOpen: false, union: null });
+  const [terminating, setTerminating] = useState(false);
 
   // Filter and pagination state
   const [searchTerm, setSearchTerm] = useState('');
@@ -123,20 +124,39 @@ export const UnionsListComplete: React.FC = () => {
     loadUnions();
   }, [currentPage, pageSize, sortField, sortDirection, searchTerm, filters]);
 
-  // Handle delete union
-  const handleDelete = async () => {
-    if (!deleteDialog.union) return;
+  // Handle terminate union
+  const handleTerminate = async (data: { termination_reason: string; terminated_date: string }) => {
+    if (!terminateDialog.union) return;
     
     try {
-      console.log('🗑️ Deleting union:', deleteDialog.union.id);
-      await deleteUnion(deleteDialog.union.id);
-      toast.success(t('messages.deleteSuccess'));
-      setDeleteDialog({ isOpen: false, union: null });
-      await loadUnions(); // Reload data
-    } catch (err) {
-      console.error('💥 Error deleting union:', err);
-      setError(t('messages.errorDeletingData'));
-      toast.error(t('messages.errorDeletingData'));
+      setTerminating(true);
+      console.log('🛑 Terminating union:', terminateDialog.union.id);
+      console.log('📝 Termination data:', data);
+      
+      // Create terminated union record
+      // The backend will automatically copy all union data to terminated_unions table
+      // Format date as YYYY-MM-DD (date only, not datetime)
+      const formattedDate = data.terminated_date.includes('T') 
+        ? data.terminated_date.split('T')[0] 
+        : data.terminated_date;
+      
+      await createTerminatedUnion({
+        union_id: terminateDialog.union.id || terminateDialog.union.union_id,
+        name_en: terminateDialog.union.name_en,
+        termination_reason: data.termination_reason,
+        terminated_date: formattedDate, // API expects terminated_date in YYYY-MM-DD format
+      } as any); // Use 'as any' to allow terminated_date field
+      
+      toast.success('Union terminated successfully');
+      setTerminateDialog({ isOpen: false, union: null });
+      await loadUnions(); // Reload data to remove terminated union from list
+    } catch (err: any) {
+      console.error('💥 Error terminating union:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to terminate union';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setTerminating(false);
     }
   };
 
@@ -204,11 +224,11 @@ export const UnionsListComplete: React.FC = () => {
           variant="danger"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🗑️ Delete clicked for union ID:', union.id);
-            setDeleteDialog({ isOpen: true, union });
+            console.log('🛑 Terminate clicked for union ID:', union.id);
+            setTerminateDialog({ isOpen: true, union });
           }}
         >
-          {t('common.delete')}
+          Terminate
         </Button>
       </div>
     );
@@ -308,16 +328,13 @@ export const UnionsListComplete: React.FC = () => {
         />
       </div>
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteDialog.isOpen}
-        title={t('unions.deleteUnion')}
-        message={t('unions.deleteConfirmation', { name: deleteDialog.union?.name_en || '' })}
-        onConfirm={handleDelete}
-        onClose={() => setDeleteDialog({ isOpen: false, union: null })}
-        confirmText={t('common.delete')}
-        cancelText={t('common.cancel')}
-        variant="danger"
+      {/* Terminate Union Dialog */}
+      <TerminateDialog
+        isOpen={terminateDialog.isOpen}
+        unionName={terminateDialog.union?.name_en || ''}
+        onConfirm={handleTerminate}
+        onClose={() => setTerminateDialog({ isOpen: false, union: null })}
+        isLoading={terminating}
       />
     </motion.div>
   );

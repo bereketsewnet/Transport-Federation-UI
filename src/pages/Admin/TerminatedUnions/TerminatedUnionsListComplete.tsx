@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   getTerminatedUnions,
-  deleteTerminatedUnion,
+  restoreTerminatedUnion,
   TerminatedUnion,
   getUnions,
   Union
@@ -27,10 +27,11 @@ export const TerminatedUnionsListComplete: React.FC = () => {
   const [unions, setUnions] = useState<Union[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [deleteDialog, setDeleteDialog] = useState<{
+  const [restoreDialog, setRestoreDialog] = useState<{
     isOpen: boolean;
     terminatedUnion: TerminatedUnion | null;
   }>({ isOpen: false, terminatedUnion: null });
+  const [restoring, setRestoring] = useState(false);
 
   // Filter and pagination state
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,12 +69,24 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       const params: any = {
         page: currentPage,
         per_page: pageSize,
-        q: searchTerm
       };
 
+      // Only add search query if it's not empty
+      if (searchTerm && searchTerm.trim()) {
+        params.q = searchTerm.trim();
+      }
+
+      console.log('📊 Loading terminated unions with params:', params);
       const response = await getTerminatedUnions(params);
+      console.log('✅ Terminated unions response:', response);
       
       const data = response.data.data || [];
+      console.log('📋 Terminated unions data:', data);
+      console.log('📋 First terminated union:', data[0]);
+      if (data[0]) {
+        console.log('📋 First union termination_date:', data[0].termination_date);
+        console.log('📋 First union terminated_date:', (data[0] as any).terminated_date);
+      }
       
       setTerminatedUnions(data);
       
@@ -84,8 +97,12 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       }
     } catch (err: any) {
       console.error('💥 Error loading terminated unions:', err);
-      setError(t('messages.errorLoadingData'));
-      toast.error(t('messages.errorLoadingData'));
+      console.error('💥 Error response:', err.response);
+      console.error('💥 Error data:', err.response?.data);
+      
+      const errorMessage = err.response?.data?.message || err.message || t('messages.errorLoadingData');
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -112,40 +129,60 @@ export const TerminatedUnionsListComplete: React.FC = () => {
     loadUnions();
   }, []);
 
-  // Handle delete terminated union
-  const handleDelete = async () => {
-    if (!deleteDialog.terminatedUnion) return;
+  // Handle restore terminated union
+  const handleRestore = async () => {
+    if (!restoreDialog.terminatedUnion) return;
     
     try {
-      console.log('🗑️ Deleting terminated union:', deleteDialog.terminatedUnion.id);
-      await deleteTerminatedUnion(deleteDialog.terminatedUnion.id);
-      toast.success(t('messages.deleteSuccess'));
-      setDeleteDialog({ isOpen: false, terminatedUnion: null });
-      await loadTerminatedUnions(); // Reload data
-    } catch (err) {
-      console.error('💥 Error deleting terminated union:', err);
-      setError(t('messages.errorDeletingData'));
-      toast.error(t('messages.errorDeletingData'));
+      setRestoring(true);
+      console.log('♻️ Restoring terminated union:', restoreDialog.terminatedUnion.id);
+      const response = await restoreTerminatedUnion(restoreDialog.terminatedUnion.id);
+      console.log('✅ Restore response:', response.data);
+      toast.success('Union restored successfully');
+      setRestoreDialog({ isOpen: false, terminatedUnion: null });
+      await loadTerminatedUnions(); // Reload data to remove restored union from list
+    } catch (err: any) {
+      console.error('💥 Error restoring terminated union:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to restore union';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setRestoring(false);
     }
   };
 
   // Table columns configuration
   const columns: Column<TerminatedUnion>[] = [
     {
-      key: 'union_id',
+      key: 'name_en',
       label: 'Union',
       sortable: true,
-      render: (value: unknown, _row: TerminatedUnion) => {
-        const unionId = Number(value);
+      render: (value: unknown, row: TerminatedUnion) => {
+        // Try to get name from terminated union data first (backend copies all union data)
+        if (row.name_en) {
+          return row.name_en;
+        }
+        // Fallback: try to find from unions array
+        const unionId = row.union_id;
         const union = unions.find(u => (u.id || (u as any).union_id) === unionId);
-        return union ? union.name_en : `Union #${unionId}`;
+        if (union) {
+          return union.name_en;
+        }
+        // Last resort: show union ID
+        return `Union #${unionId}`;
       }
     },
     {
       key: 'terminated_date',
       label: 'Termination Date',
       sortable: true,
-      render: (value: unknown) => value ? formatDate(String(value)) : '-'
+      render: (value: unknown, row: TerminatedUnion) => {
+        // Check both field names (terminated_date and termination_date)
+        // Backend might use either field name
+        const dateValue = value || (row as any).terminated_date || row.termination_date;
+        console.log('📅 Date value for row:', row.id, 'terminated_date:', (row as any).terminated_date, 'termination_date:', row.termination_date, 'value:', value);
+        return dateValue ? formatDate(String(dateValue)) : '-';
+      }
     },
     {
       key: 'termination_reason',
@@ -172,25 +209,14 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       <div className={styles.rowActions}>
         <Button
           size="sm"
-          variant="secondary"
+          variant="success"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('✏️ Edit clicked for terminated union ID:', terminatedUnion.id);
-            navigate(`/admin/terminated-unions/${terminatedUnion.id}/edit`);
+            console.log('♻️ Restore clicked for terminated union ID:', terminatedUnion.id);
+            setRestoreDialog({ isOpen: true, terminatedUnion });
           }}
         >
-          {t('common.edit')}
-        </Button>
-        <Button
-          size="sm"
-          variant="danger"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('🗑️ Delete clicked for terminated union ID:', terminatedUnion.id);
-            setDeleteDialog({ isOpen: true, terminatedUnion });
-          }}
-        >
-          {t('common.delete')}
+          Restore
         </Button>
       </div>
     );
@@ -213,11 +239,12 @@ export const TerminatedUnionsListComplete: React.FC = () => {
           <h1 className={styles.title}>Terminated Unions</h1>
           <p className={styles.subtitle}>Manage terminated union records</p>
         </div>
-        <div className={styles.headerActions}>
+        {/* Hidden for now - can be re-enabled later if needed */}
+        {/* <div className={styles.headerActions}>
           <Button onClick={() => navigate('/admin/terminated-unions/new')}>
             Add Terminated Union
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Search - Single Row */}
@@ -267,16 +294,17 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         />
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Restore Confirmation Dialog */}
       <ConfirmDialog
-        isOpen={deleteDialog.isOpen}
-        title="Delete Terminated Union"
-        message="Are you sure you want to delete this terminated union record?"
-        onConfirm={handleDelete}
-        onClose={() => setDeleteDialog({ isOpen: false, terminatedUnion: null })}
-        confirmText={t('common.delete')}
+        isOpen={restoreDialog.isOpen}
+        title="Restore Union"
+        message={`Are you sure you want to restore this union? It will be moved back to the active unions list.`}
+        onConfirm={handleRestore}
+        onClose={() => setRestoreDialog({ isOpen: false, terminatedUnion: null })}
+        confirmText="Restore"
         cancelText={t('common.cancel')}
-        variant="danger"
+        variant="primary"
+        isLoading={restoring}
       />
     </motion.div>
   );

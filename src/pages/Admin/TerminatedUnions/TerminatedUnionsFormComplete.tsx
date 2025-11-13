@@ -106,7 +106,7 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
       
       reset({
         union_id: tuData.union_id || 0,
-        termination_date: tuData.termination_date?.split('T')[0] || '',
+        termination_date: (tuData as any).terminated_date?.split('T')[0] || tuData.termination_date?.split('T')[0] || '',
         termination_reason: tuData.termination_reason || '',
       });
     } catch (err) {
@@ -126,9 +126,9 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
 
       const tuData = {
         union_id: Number(data.union_id),
-        termination_date: new Date(data.termination_date).toISOString(),
+        terminated_date: new Date(data.termination_date).toISOString().split('T')[0], // Backend expects terminated_date in YYYY-MM-DD format
         termination_reason: String(data.termination_reason)
-      };
+      } as any; // Use 'as any' to allow terminated_date field
 
       console.log('📤 Sending data to API:', tuData);
 

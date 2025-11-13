@@ -592,12 +592,29 @@ export const restoreArchive = (id: number | string): Promise<AxiosResponse<Resto
 export interface TerminatedUnion {
   id: number;
   union_id: number;
-  termination_date: string;
+  name_en?: string; // Union name (copied from unions table)
+  name_am?: string; // Union name in Amharic
+  sector?: string; // Union sector
+  organization?: string; // Union organization
+  established_date?: string; // Union established date
+  terms_of_election?: number; // Union terms of election
+  general_assembly_date?: string; // Union general assembly date
+  strategic_plan_in_place?: boolean; // Union strategic plan status
+  external_audit_date?: string; // Union external audit date
+  region?: string; // Union region
+  zone?: string; // Union zone
+  city?: string; // Union city
+  sub_city?: string; // Union sub-city
+  woreda?: string; // Union woreda
+  location_area?: string; // Union location area
+  termination_date?: string; // API field name
+  terminated_date?: string; // Database field name (may differ)
   termination_reason: string;
   notes?: string;
+  archived_at?: string; // Auto-set timestamp
   created_at?: string;
   updated_at?: string;
-  union?: Union; // For display purposes
+  union?: Union; // For display purposes (if populated by backend)
 }
 
 export interface TerminatedUnionFilters extends SearchParams {
@@ -627,6 +644,15 @@ export const updateTerminatedUnion = (id: number, data: Partial<TerminatedUnion>
 
 export const deleteTerminatedUnion = (id: number): Promise<AxiosResponse> => {
   return apiClient.delete(`/api/terminated-unions/${id}`, { params: { confirm: true } });
+};
+
+export interface RestoreTerminatedUnionResponse {
+  message: string;
+  restored_union: Union;
+}
+
+export const restoreTerminatedUnion = (id: number): Promise<AxiosResponse<RestoreTerminatedUnionResponse>> => {
+  return apiClient.post(`/api/terminated-unions/${id}/restore`);
 };
 
 // ==================== CONTACTS ====================

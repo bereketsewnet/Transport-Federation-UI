@@ -682,6 +682,15 @@
             "url":{"raw":"{{base_url}}/api/terminated-unions/1?confirm=true","host":["{{base_url}}"],"path":["api","terminated-unions","1"],"query":[{"key":"confirm","value":"true"}]}
           },
           "response": []
+        },
+        {
+          "name": "Restore terminated union",
+          "request": {
+            "method":"POST",
+            "auth": { "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{"raw":"{{base_url}}/api/terminated-unions/1/restore","host":["{{base_url}}"],"path":["api","terminated-unions","1","restore"]}
+          },
+          "response": []
         }
       ]
     },

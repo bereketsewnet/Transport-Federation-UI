@@ -1321,6 +1321,64 @@ Errors:
 }
 ```
 
+### [POST] {{base_url}}/api/terminated-unions/1/restore - Restore terminated union
+Group: Terminated Unions
+
+**Description**: Restores a terminated union back to the active unions table. If the union still exists in the unions table, it just removes it from the terminated list. Otherwise, it creates a new union record from the terminated union data.
+
+Success (200):
+```json
+{
+  "message": "Union restored successfully",
+  "restored_union": {
+    "union_id": 1,
+    "union_code": "ET01",
+    "name_en": "Ethio Telecom Workers Union",
+    "name_am": "የኢትዮ ቴሌኮም ሠራተኞች ህብረት",
+    "sector": "Communication",
+    "organization": "Ethio Telecom",
+    "established_date": "2010-01-01",
+    "terms_of_election": 3,
+    "general_assembly_date": "2024-06-15",
+    "strategic_plan_in_place": true,
+    "external_audit_date": "2024-12-31",
+    "region": "Addis Ababa",
+    "zone": "Central Zone",
+    "city": "Addis Ababa",
+    "sub_city": "Bole",
+    "woreda": "Woreda 13",
+    "location_area": "Bole International Airport Area"
+  }
+}
+```
+
+Errors:
+- 401:
+```json
+{
+  "message": "Unauthorized"
+}
+```
+- 403:
+```json
+{
+  "message": "Forbidden - Admin access required"
+}
+```
+- 404:
+```json
+{
+  "message": "Terminated union not found"
+}
+```
+- 500:
+```json
+{
+  "message": "Server error",
+  "error": "Error details"
+}
+```
+
 ### [GET] {{base_url}}/api/login-accounts - List accounts (admin)
 Group: Login Accounts (admin)
 
