@@ -226,7 +226,7 @@ export const About: React.FC = () => {
               transition={{ type: "spring", stiffness: 300 }}
               style={{ backgroundColor: '#3B82F6' }}
             >
-              <FaBullseye color="white" size={26} />
+              <FaBullseye color="white" size={20} />
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.mission')}</h2>
@@ -251,7 +251,7 @@ export const About: React.FC = () => {
               transition={{ type: "spring", stiffness: 300 }}
               style={{ backgroundColor: '#10B981' }}
             >
-              <FaEye color="white" size={24} />
+              <FaEye color="white" size={20} />
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.vision')}</h2>
@@ -307,7 +307,7 @@ export const About: React.FC = () => {
               transition={{ type: "spring", stiffness: 300 }}
               style={{ backgroundColor: '#F59E0B' }}
             >
-              <FaBook color="white" size={26} />
+              <FaBook color="white" size={20} />
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.history')}</h2>

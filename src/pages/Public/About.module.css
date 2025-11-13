@@ -118,14 +118,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   background: linear-gradient(135deg, var(--primary-subtle) 0%, var(--primary, #2563eb) 10%);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   color: var(--primary);
-  font-size: 32px;
+  font-size: 24px;
   box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .sectionHeader {
@@ -165,6 +166,8 @@
   padding: var(--spacing-12);
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .valuesList {
@@ -215,6 +218,8 @@
   padding: var(--spacing-12);
   border-radius: var(--radius-2xl);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .objectivesList {
@@ -264,6 +269,8 @@
   padding: var(--spacing-12);
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .departmentsList {
@@ -319,6 +326,8 @@
   padding: var(--spacing-12);
   border-radius: var(--radius-2xl);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .executivesGrid {
@@ -368,7 +377,7 @@
 }
 
 .executiveInfo {
-  padding: var(--spacing-6);
+  padding: var(--spacing-8);
 }
 
 .executiveName {
@@ -398,6 +407,8 @@
   padding: var(--spacing-12);
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .carousel {
@@ -534,6 +545,8 @@
   padding: var(--spacing-12);
   border-radius: var(--radius-2xl);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .stakeholdersList {
@@ -598,9 +611,9 @@
   }
 
   .iconBadge {
-    width: 64px;
-    height: 64px;
-    font-size: 28px;
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
   }
 
   .carouselCard {
