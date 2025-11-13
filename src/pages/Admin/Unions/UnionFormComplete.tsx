@@ -26,17 +26,62 @@ interface UnionFormData {
   established_date: string;
   terms_of_election: number;
   strategic_plan_in_place: boolean;
+  general_assembly_date?: string;
+  external_audit_date?: string;
+  region?: string;
+  zone?: string;
+  city?: string;
+  sub_city?: string;
+  woreda?: string;
+  location_area?: string;
 }
 
 const SECTOR_OPTIONS = [
   'Aviation',
+  'Road transport',
+  'Urban transport',
   'Railway',
-  'Urban Transport',
-  'Road',
-  'Maritime maritime',
+  'Inland transport',
+  'Maritime',
   'Communication',
 ] as const;
 const DEFAULT_SECTOR = SECTOR_OPTIONS[0];
+
+const ORGANIZATION_OPTIONS = [
+  'Ethiopian Airlines Group',
+  'Ethiopian Maritime Transport and Logistics',
+  'Addis Ababa City Bus Service Enterprise',
+  'Ethio Telecom',
+  'Ethiopia Posta',
+  'Public Service Transport',
+  'DHL World Wide Express Ethiopia',
+  'Ethiopian Tool Road Enterprise',
+  'International Cargo and Aviation Service',
+  'ISON Experience Ethio call PLC',
+  'Moti Engineering P.L.C',
+  'Addis Ababa Light Railway Transport Service Enterprise',
+  'East West Ethio Transport PLC',
+  'Abyssinia Transport S/C',
+  'Bekelcha Transport S/C',
+  'Geda Transport S/C',
+  'Selam Bus Public Transport PLC',
+  'Ethiopian Railway Corporation',
+  'Dire Dawa Dewele Railway',
+  'Trans Ethiopia PLC',
+  'Demtsu Woyan',
+  'Bahir Dar Public Service Transport',
+  'Hararge Anestgn Melestegn Public Transport',
+  'Hararge Keftegn Public Transport',
+  'Kinfe Rufael Geda',
+  'Tekur Abay Transport S/C',
+  'National Transport',
+  'Elet Derash Erdata Transport',
+  'Derba Transport S/C',
+  'Hohot Transport',
+  'Ethiopian Maritime Training Institute',
+  'Adama Drivers Training Institute',
+] as const;
+const DEFAULT_ORGANIZATION = ORGANIZATION_OPTIONS[0];
 
 // Make strategic_plan_in_place optional (not required for registration)
 const unionSchema = yup.object({
@@ -48,6 +93,14 @@ const unionSchema = yup.object({
   established_date: yup.string().required('Established date is required'),
   terms_of_election: yup.number().required('Terms of election is required').min(1, 'Must be at least 1 year'),
   strategic_plan_in_place: yup.boolean().default(false), // Optional field with default
+  general_assembly_date: yup.string().optional(),
+  external_audit_date: yup.string().optional(),
+  region: yup.string().optional(),
+  zone: yup.string().optional(),
+  city: yup.string().optional(),
+  sub_city: yup.string().optional(),
+  woreda: yup.string().optional(),
+  location_area: yup.string().optional(),
 }).required();
 
 export const UnionFormComplete: React.FC = () => {
@@ -73,10 +126,18 @@ export const UnionFormComplete: React.FC = () => {
       name_am: '',
       union_code: '',
       sector: DEFAULT_SECTOR,
-      organization: DEFAULT_SECTOR,
+      organization: DEFAULT_ORGANIZATION,
       established_date: new Date().toISOString().split('T')[0],
       terms_of_election: 4,
-      strategic_plan_in_place: false
+      strategic_plan_in_place: false,
+      general_assembly_date: '',
+      external_audit_date: '',
+      region: '',
+      zone: '',
+      city: '',
+      sub_city: '',
+      woreda: '',
+      location_area: '',
     }
   });
 
@@ -114,10 +175,18 @@ export const UnionFormComplete: React.FC = () => {
         sector:
           SECTOR_OPTIONS.find((option) => option === unionData.sector) || DEFAULT_SECTOR,
         organization:
-          SECTOR_OPTIONS.find((option) => option === unionData.organization) || DEFAULT_SECTOR,
+          ORGANIZATION_OPTIONS.find((option) => option === unionData.organization) || DEFAULT_ORGANIZATION,
         established_date: unionData.established_date?.split('T')[0] || '',
         terms_of_election: unionData.terms_of_election || 4,
         strategic_plan_in_place: unionData.strategic_plan_in_place || false,
+        general_assembly_date: (unionData as any).general_assembly_date?.split('T')[0] || '',
+        external_audit_date: (unionData as any).external_audit_date?.split('T')[0] || '',
+        region: (unionData as any).region || '',
+        zone: (unionData as any).zone || '',
+        city: (unionData as any).city || '',
+        sub_city: (unionData as any).sub_city || '',
+        woreda: (unionData as any).woreda || '',
+        location_area: (unionData as any).location_area || '',
       });
     } catch (err) {
       console.error('💥 Error loading union:', err);
@@ -140,6 +209,12 @@ export const UnionFormComplete: React.FC = () => {
       const unionData = {
         ...data,
         established_date: new Date(data.established_date).toISOString(),
+        general_assembly_date: data.general_assembly_date 
+          ? new Date(data.general_assembly_date).toISOString() 
+          : undefined,
+        external_audit_date: data.external_audit_date 
+          ? new Date(data.external_audit_date).toISOString() 
+          : undefined,
       };
 
       console.log('📤 Sending data to API:', unionData);
@@ -256,7 +331,7 @@ export const UnionFormComplete: React.FC = () => {
               />
               <Select
                 label="Organization *"
-                value={watchedValues.organization || DEFAULT_SECTOR}
+                value={watchedValues.organization || DEFAULT_ORGANIZATION}
                 onChange={(e) => {
                   console.log('🔄 Organization selected:', e.target.value);
                   setValue('organization', e.target.value, { shouldValidate: true });
@@ -264,7 +339,7 @@ export const UnionFormComplete: React.FC = () => {
                 error={errors.organization?.message}
                 required
                 className={styles.formField}
-                options={SECTOR_OPTIONS.map((option) => ({
+                options={ORGANIZATION_OPTIONS.map((option) => ({
                   value: option,
                   label: option,
                 }))}
@@ -319,11 +394,84 @@ export const UnionFormComplete: React.FC = () => {
                   <span className={styles.checkboxText}>
                   Annual Plan in Place
                     <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'block', marginTop: '0.25rem' }}>
-                      (Optional: Check if the union has a strategic development plan)
+                      (Optional: Check if the union has a Annual development plan)
                     </span>
                   </span>
                 </label>
               </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <FormField
+                label="General Assembly Date"
+                type="date"
+                error={errors.general_assembly_date?.message}
+                className={styles.formField}
+                register={register('general_assembly_date')}
+              />
+              <FormField
+                label="External Audit Date"
+                type="date"
+                error={errors.external_audit_date?.message}
+                className={styles.formField}
+                register={register('external_audit_date')}
+              />
+            </div>
+          </div>
+
+          {/* Location Information */}
+          <div className={styles.formSection}>
+            <h3 className={styles.sectionTitle}>Location Information</h3>
+            
+            <div className={styles.formRow}>
+              <FormField
+                label="Region"
+                error={errors.region?.message}
+                className={styles.formField}
+                placeholder="Addis Ababa"
+                register={register('region')}
+              />
+              <FormField
+                label="Zone"
+                error={errors.zone?.message}
+                className={styles.formField}
+                placeholder="Central Zone"
+                register={register('zone')}
+              />
+            </div>
+
+            <div className={styles.formRow}>
+              <FormField
+                label="City"
+                error={errors.city?.message}
+                className={styles.formField}
+                placeholder="Addis Ababa"
+                register={register('city')}
+              />
+              <FormField
+                label="Sub-city"
+                error={errors.sub_city?.message}
+                className={styles.formField}
+                placeholder="Bole"
+                register={register('sub_city')}
+              />
+            </div>
+
+            <div className={styles.formRow}>
+              <FormField
+                label="Woreda"
+                error={errors.woreda?.message}
+                className={styles.formField}
+                placeholder="Woreda 13"
+                register={register('woreda')}
+              />
+              <FormField
+                label="Location/Area"
+                error={errors.location_area?.message}
+                className={styles.formField}
+                placeholder="Bole International Airport Area"
+                register={register('location_area')}
+              />
             </div>
           </div>
         </div>

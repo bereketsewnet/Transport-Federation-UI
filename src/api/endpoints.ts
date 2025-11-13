@@ -85,6 +85,13 @@ export interface Union {
   terms_of_election: number;
   strategic_plan_in_place: boolean;
   general_assembly_date?: string | null;  // Date of last general assembly
+  external_audit_date?: string | null;  // Date of external audit
+  region?: string | null;
+  zone?: string | null;
+  city?: string | null;
+  sub_city?: string | null;
+  woreda?: string | null;
+  location_area?: string | null;
   created_at?: string;
   updated_at?: string;
 }

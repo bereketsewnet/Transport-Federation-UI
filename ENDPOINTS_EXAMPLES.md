@@ -265,7 +265,15 @@ Request Body:
   "organization": "Ethio Telecom",
   "established_date": "2010-01-01",
   "terms_of_election": 3,
-  "strategic_plan_in_place": true
+  "general_assembly_date": "2024-06-15",
+  "strategic_plan_in_place": true,
+  "external_audit_date": "2024-12-31",
+  "region": "Addis Ababa",
+  "zone": "Central Zone",
+  "city": "Addis Ababa",
+  "sub_city": "Bole",
+  "woreda": "Woreda 13",
+  "location_area": "Bole International Airport Area"
 }
 ```
 
@@ -279,8 +287,16 @@ Success (201):
   "organization": "Ethio Telecom",
   "established_date": "2010-01-01",
   "terms_of_election": 3,
+  "general_assembly_date": "2024-06-15",
   "strategic_plan_in_place": true,
-  "id": 1
+  "external_audit_date": "2024-12-31",
+  "region": "Addis Ababa",
+  "zone": "Central Zone",
+  "city": "Addis Ababa",
+  "sub_city": "Bole",
+  "woreda": "Woreda 13",
+  "location_area": "Bole International Airport Area",
+  "union_id": 1
 }
 ```
 
@@ -348,16 +364,32 @@ Request Body:
 ```json
 {
   "name_en": "Updated Ethio Telecom Union",
-  "terms_of_election": 4
+  "terms_of_election": 4,
+  "general_assembly_date": "2025-06-20",
+  "external_audit_date": "2025-12-31",
+  "region": "Addis Ababa",
+  "zone": "Central Zone",
+  "city": "Addis Ababa",
+  "sub_city": "Bole",
+  "woreda": "Woreda 13",
+  "location_area": "Bole International Airport Area"
 }
 ```
 
 Success (200):
 ```json
 {
-  "id": 1,
+  "union_id": 1,
   "name_en": "Updated Ethio Telecom Union",
-  "terms_of_election": 4
+  "terms_of_election": 4,
+  "general_assembly_date": "2025-06-20",
+  "external_audit_date": "2025-12-31",
+  "region": "Addis Ababa",
+  "zone": "Central Zone",
+  "city": "Addis Ababa",
+  "sub_city": "Bole",
+  "woreda": "Woreda 13",
+  "location_area": "Bole International Airport Area"
 }
 ```
 

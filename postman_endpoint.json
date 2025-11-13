@@ -175,7 +175,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"union_code\": \"ET01\",\n  \"name_en\": \"Ethio Telecom Workers Union\",\n  \"name_am\": \"የኢትዮ ቴሌኮም ሠራተኞች ህብረት\",\n  \"sector\": \"Communication\",\n  \"organization\": \"Ethio Telecom\",\n  \"established_date\": \"2010-01-01\",\n  \"terms_of_election\": 3,\n  \"general_assembly_date\": \"2024-06-15\",\n  \"strategic_plan_in_place\": true\n}"
+              "raw": "{\n  \"union_code\": \"ET01\",\n  \"name_en\": \"Ethio Telecom Workers Union\",\n  \"name_am\": \"የኢትዮ ቴሌኮም ሠራተኞች ህብረት\",\n  \"sector\": \"Communication\",\n  \"organization\": \"Ethio Telecom\",\n  \"established_date\": \"2010-01-01\",\n  \"terms_of_election\": 3,\n  \"general_assembly_date\": \"2024-06-15\",\n  \"strategic_plan_in_place\": true,\n  \"external_audit_date\": \"2024-12-31\",\n  \"region\": \"Addis Ababa\",\n  \"zone\": \"Central Zone\",\n  \"city\": \"Addis Ababa\",\n  \"sub_city\": \"Bole\",\n  \"woreda\": \"Woreda 13\",\n  \"location_area\": \"Bole International Airport Area\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/unions",
@@ -240,7 +240,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name_en\": \"Updated Ethio Telecom Union\",\n  \"terms_of_election\": 4,\n  \"general_assembly_date\": \"2025-06-20\"\n}"
+              "raw": "{\n  \"name_en\": \"Updated Ethio Telecom Union\",\n  \"terms_of_election\": 4,\n  \"general_assembly_date\": \"2025-06-20\",\n  \"external_audit_date\": \"2025-12-31\",\n  \"region\": \"Addis Ababa\",\n  \"zone\": \"Central Zone\",\n  \"city\": \"Addis Ababa\",\n  \"sub_city\": \"Bole\",\n  \"woreda\": \"Woreda 13\",\n  \"location_area\": \"Bole International Airport Area\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/unions/1",
