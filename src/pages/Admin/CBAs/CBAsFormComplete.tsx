@@ -25,7 +25,7 @@ interface CBAFormData {
   status: string;
   registration_date: string;
   next_end_date: string;
-  round: string;
+  round: number;
 }
 
 const cbaSchema = yup.object({
@@ -34,7 +34,7 @@ const cbaSchema = yup.object({
   status: yup.string().required('Status is required'),
   registration_date: yup.string().required('Registration date is required'),
   next_end_date: yup.string().required('Next end date is required'),
-  round: yup.string().required('Round is required'),
+  round: yup.number().required('Round is required').min(1, 'Round must be at least 1'),
 }).required();
 
 export const CBAsFormComplete: React.FC = () => {
@@ -62,7 +62,7 @@ export const CBAsFormComplete: React.FC = () => {
       status: 'Signed',
       registration_date: new Date().toISOString().split('T')[0],
       next_end_date: '',
-      round: ''
+      round: 1
     }
   });
 
@@ -137,7 +137,7 @@ export const CBAsFormComplete: React.FC = () => {
         status: cbaData.status || '',
         registration_date: cbaData.registration_date?.split('T')[0] || '',
         next_end_date: cbaData.next_end_date?.split('T')[0] || '',
-        round: cbaData.round || '',
+        round: cbaData.round ? (typeof cbaData.round === 'string' ? parseInt(cbaData.round) || 1 : cbaData.round) : 1,
       });
     } catch (err) {
       console.error('💥 Error loading CBA:', err);
@@ -163,7 +163,7 @@ export const CBAsFormComplete: React.FC = () => {
         status: String(data.status),
         registration_date: new Date(data.registration_date).toISOString(),
         next_end_date: new Date(data.next_end_date).toISOString(),
-        round: String(data.round)
+        round: Number(data.round)
       };
 
       console.log('📤 Sending data to API:', cbaData);
@@ -320,28 +320,77 @@ export const CBAsFormComplete: React.FC = () => {
                 ]}
               />
 
-              <Select
-                label="Round *"
-                value={watchedValues.round || ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  console.log('🔄 Round selected:', val);
-                  if (val) {
-                    setValue('round', val);
-                  }
-                }}
-                error={errors.round?.message}
-                required
-                className={styles.formField}
-                options={[
-                  { value: '', label: 'Select Round' },
-                  { value: '1st', label: '1st Round' },
-                  { value: '2nd', label: '2nd Round' },
-                  { value: '3rd', label: '3rd Round' },
-                  { value: '4th', label: '4th Round' },
-                  { value: '5th', label: '5th Round' }
-                ]}
-              />
+              <div className={styles.formField}>
+                <label style={{ 
+                  display: 'block',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 500,
+                  color: 'var(--text)',
+                  marginBottom: 'var(--spacing-2)'
+                }}>
+                  Round *
+                  {errors.round && <span style={{ color: 'var(--error)', marginLeft: '4px' }}> - {errors.round.message}</span>}
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      const currentRound = watchedValues.round || 1;
+                      if (currentRound > 1) {
+                        setValue('round', currentRound - 1, { shouldValidate: true });
+                      }
+                    }}
+                    style={{ minWidth: '40px', padding: '8px' }}
+                  >
+                    −
+                  </Button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={watchedValues.round || 1}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 1;
+                      setValue('round', val, { shouldValidate: true });
+                    }}
+                    style={{ 
+                      flex: 1, 
+                      textAlign: 'center', 
+                      padding: '8px 12px',
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--text)',
+                      background: 'var(--bg)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      transition: 'all var(--transition-base)'
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      const currentRound = watchedValues.round || 1;
+                      setValue('round', currentRound + 1, { shouldValidate: true });
+                    }}
+                    style={{ minWidth: '40px', padding: '8px' }}
+                  >
+                    +
+                  </Button>
+                </div>
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px', textAlign: 'center' }}>
+                  {(() => {
+                    const round = watchedValues.round || 1;
+                    const getOrdinal = (n: number) => {
+                      const s = ['th', 'st', 'nd', 'rd'];
+                      const v = n % 100;
+                      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+                    };
+                    return `${getOrdinal(round)} Round`;
+                  })()}
+                </p>
+              </div>
             </div>
 
             <div className={styles.formRow}>

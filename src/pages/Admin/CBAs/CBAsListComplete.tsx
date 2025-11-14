@@ -237,9 +237,18 @@ export const CBAsListComplete: React.FC = () => {
       key: 'round',
       label: 'Round',
       sortable: true,
-      render: (value: unknown) => (
-        <span className={styles.roundBadge}>{String(value || 'N/A')}</span>
-      )
+      render: (value: unknown) => {
+        const getOrdinal = (n: number | string) => {
+          const num = typeof n === 'string' ? parseInt(n) || 0 : n;
+          if (num === 0) return 'N/A';
+          const s = ['th', 'st', 'nd', 'rd'];
+          const v = num % 100;
+          return num + (s[(v - 20) % 10] || s[v] || s[0]);
+        };
+        return (
+          <span className={styles.roundBadge}>{getOrdinal(value)} Round</span>
+        );
+      }
     }
   ];
 
@@ -346,10 +355,16 @@ export const CBAsListComplete: React.FC = () => {
           className={styles.filterSelect}
           options={[
             { value: '', label: 'All Rounds' },
-            { value: '1st', label: '1st Round' },
-            { value: '2nd', label: '2nd Round' },
-            { value: '3rd', label: '3rd Round' },
-            { value: '4th', label: '4th Round' }
+            { value: '1', label: '1st Round' },
+            { value: '2', label: '2nd Round' },
+            { value: '3', label: '3rd Round' },
+            { value: '4', label: '4th Round' },
+            { value: '5', label: '5th Round' },
+            { value: '6', label: '6th Round' },
+            { value: '7', label: '7th Round' },
+            { value: '8', label: '8th Round' },
+            { value: '9', label: '9th Round' },
+            { value: '10', label: '10th Round' }
           ]}
         />
 

@@ -61,11 +61,26 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
     { value: 'Process', label: 'Process' }
   ];
 
-  const severityLevels = [
+  const injurySeverityOptions = [
     { value: 'None', label: 'None' },
+    { value: 'Near-Miss', label: 'Near-Miss' },
+    { value: 'First Aid Case (FAC)', label: 'First Aid Case (FAC)' },
+    { value: 'Medical Treatment Case (MTC)', label: 'Medical Treatment Case (MTC)' },
+    { value: 'Restricted Work Case (RWC)', label: 'Restricted Work Case (RWC)' },
+    { value: 'Permanent Disability/Major Injury', label: 'Permanent Disability/Major Injury' },
+    { value: 'Fatality', label: 'Fatality' },
     { value: 'Minor', label: 'Minor' },
+    { value: 'Moderate', label: 'Moderate' },
     { value: 'Major', label: 'Major' },
     { value: 'Fatal', label: 'Fatal' }
+  ];
+
+  const damageSeverityOptions = [
+    { value: 'None', label: 'None' },
+    { value: 'Minor', label: 'Minor' },
+    { value: 'Moderate', label: 'Moderate' },
+    { value: 'Major', label: 'Major' },
+    { value: 'Severe/Critical', label: 'Severe/Critical' }
   ];
 
   const statusOptions = [
@@ -509,8 +524,8 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
                     onChange={(e) => {
                       handleInputChange('injurySeverity', e.target.value);
                     }}
-                    options={severityLevels}
-                    placeholder="Select Severity"
+                    options={injurySeverityOptions}
+                    placeholder="Select Injury Severity"
                     error={fieldErrors.injurySeverity}
                   />
                 </div>
@@ -522,8 +537,8 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
                     onChange={(e) => {
                       handleInputChange('damageSeverity', e.target.value);
                     }}
-                    options={severityLevels}
-                    placeholder="Select Damage Level"
+                    options={damageSeverityOptions}
+                    placeholder="Select Damage Severity Level"
                     error={fieldErrors.damageSeverity}
                   />
                 </div>

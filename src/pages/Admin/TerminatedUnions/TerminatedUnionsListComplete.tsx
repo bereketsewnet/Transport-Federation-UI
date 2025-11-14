@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import {
   getTerminatedUnions,
   restoreTerminatedUnion,
+  updateTerminatedUnion,
+  getTerminatedUnion,
   TerminatedUnion,
   getUnions,
   Union
@@ -13,9 +15,15 @@ import { DataTable, Column } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
+import { Modal } from '@components/Modal/Modal';
 import { Loading } from '@components/Loading/Loading';
 import { formatDate } from '@utils/formatters';
 import { toast } from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Select } from '@components/Select/Select';
+import { TextArea } from '@components/TextArea/TextArea';
 import styles from './TerminatedUnions.module.css';
 
 export const TerminatedUnionsListComplete: React.FC = () => {
@@ -32,6 +40,12 @@ export const TerminatedUnionsListComplete: React.FC = () => {
     terminatedUnion: TerminatedUnion | null;
   }>({ isOpen: false, terminatedUnion: null });
   const [restoring, setRestoring] = useState(false);
+  const [editDialog, setEditDialog] = useState<{
+    isOpen: boolean;
+    terminatedUnion: TerminatedUnion | null;
+  }>({ isOpen: false, terminatedUnion: null });
+  const [editing, setEditing] = useState(false);
+  const [loadingEditData, setLoadingEditData] = useState(false);
 
   // Filter and pagination state
   const [searchTerm, setSearchTerm] = useState('');
@@ -200,6 +214,136 @@ export const TerminatedUnionsListComplete: React.FC = () => {
     }
   ];
 
+  // Edit form schema
+  interface EditFormData {
+    union_id: number;
+    termination_date: string;
+    termination_reason: string;
+  }
+
+  const editSchema = yup.object({
+    union_id: yup.number().required('Union is required').min(1, 'Please select a union'),
+    termination_date: yup.string().required('Termination date is required'),
+    termination_reason: yup.string().required('Termination reason is required'),
+  });
+
+  const {
+    register: registerEdit,
+    handleSubmit: handleEditSubmit,
+    reset: resetEdit,
+    watch: watchEdit,
+    setValue: setEditValue,
+    formState: { errors: editErrors, isSubmitting: isEditSubmitting },
+  } = useForm<EditFormData>({
+    resolver: yupResolver(editSchema),
+    defaultValues: {
+      union_id: 0,
+      termination_date: new Date().toISOString().split('T')[0],
+      termination_reason: '',
+    },
+  });
+
+  const watchedEditValues = watchEdit();
+
+  // Load terminated union data for editing
+  const loadEditData = async (terminatedUnion: TerminatedUnion) => {
+    try {
+      setLoadingEditData(true);
+      console.log('🔍 Loading terminated union for edit, ID:', terminatedUnion.id);
+      console.log('📋 Terminated union data (from row):', terminatedUnion);
+      
+      // Fetch fresh data from API to ensure we have all fields
+      const response = await getTerminatedUnion(terminatedUnion.id);
+      const tuData = response.data;
+      
+      console.log('📋 Fetched terminated union data:', tuData);
+      
+      // Get union_id - check if it matches union.id or union.union_id
+      const unionId = tuData.union_id;
+      console.log('🔍 Union ID from terminated union:', unionId);
+      
+      // Get termination date - check both field names
+      const terminationDate = (tuData as any).terminated_date || tuData.termination_date;
+      console.log('📅 Raw termination date:', terminationDate);
+      
+      const formattedDate = terminationDate 
+        ? (typeof terminationDate === 'string' 
+            ? terminationDate.split('T')[0] 
+            : new Date(terminationDate).toISOString().split('T')[0])
+        : new Date().toISOString().split('T')[0];
+      
+      console.log('📅 Formatted termination date:', formattedDate);
+      console.log('📝 Termination reason:', tuData.termination_reason);
+      
+      // Find the union to get the correct ID format
+      const matchingUnion = unions.find(u => {
+        const uId = u.id || (u as any).union_id;
+        return uId === unionId;
+      });
+      
+      console.log('🔍 Matching union found:', matchingUnion);
+      console.log('🔍 Union ID to use:', matchingUnion ? (matchingUnion.id || (matchingUnion as any).union_id) : unionId);
+      
+      const finalUnionId = matchingUnion ? (matchingUnion.id || (matchingUnion as any).union_id) : unionId;
+      
+      console.log('✅ Setting form values:', {
+        union_id: finalUnionId,
+        termination_date: formattedDate,
+        termination_reason: tuData.termination_reason
+      });
+      
+      resetEdit({
+        union_id: finalUnionId || 0,
+        termination_date: formattedDate,
+        termination_reason: tuData.termination_reason || '',
+      });
+      
+      // Force update to ensure form reflects the values
+      setTimeout(() => {
+        setEditValue('union_id', finalUnionId || 0, { shouldValidate: false });
+        setEditValue('termination_date', formattedDate, { shouldValidate: false });
+        setEditValue('termination_reason', tuData.termination_reason || '', { shouldValidate: false });
+      }, 100);
+    } catch (err) {
+      console.error('💥 Error loading terminated union for edit:', err);
+      toast.error('Failed to load terminated union data');
+    } finally {
+      setLoadingEditData(false);
+    }
+  };
+
+  // Handle edit dialog open
+  const handleEditClick = (terminatedUnion: TerminatedUnion) => {
+    setEditDialog({ isOpen: true, terminatedUnion });
+    loadEditData(terminatedUnion);
+  };
+
+  // Handle edit form submission
+  const handleEditSubmitForm = async (data: EditFormData) => {
+    if (!editDialog.terminatedUnion) return;
+    
+    try {
+      setEditing(true);
+      const tuData = {
+        union_id: Number(data.union_id),
+        terminated_date: new Date(data.termination_date).toISOString().split('T')[0],
+        termination_reason: String(data.termination_reason),
+      } as any;
+
+      console.log('📤 Updating terminated union:', editDialog.terminatedUnion.id, tuData);
+      await updateTerminatedUnion(editDialog.terminatedUnion.id, tuData);
+      toast.success('Terminated union updated successfully!');
+      setEditDialog({ isOpen: false, terminatedUnion: null });
+      await loadTerminatedUnions(); // Reload data
+    } catch (err: any) {
+      console.error('💥 Error updating terminated union:', err);
+      const errorMsg = err.response?.data?.message || 'Failed to update terminated union';
+      toast.error(errorMsg);
+    } finally {
+      setEditing(false);
+    }
+  };
+
   // Row actions
   const rowActions = (terminatedUnion: TerminatedUnion) => {
     console.log('🔧 Rendering actions for terminated union:', terminatedUnion);
@@ -207,6 +351,17 @@ export const TerminatedUnionsListComplete: React.FC = () => {
     
     return (
       <div className={styles.rowActions}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('✏️ Edit clicked for terminated union ID:', terminatedUnion.id);
+            handleEditClick(terminatedUnion);
+          }}
+        >
+          Edit
+        </Button>
         <Button
           size="sm"
           variant="success"
@@ -306,6 +461,101 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         variant="primary"
         isLoading={restoring}
       />
+
+      {/* Edit Dialog */}
+      <Modal
+        isOpen={editDialog.isOpen}
+        onClose={() => setEditDialog({ isOpen: false, terminatedUnion: null })}
+        title="Edit Terminated Union"
+        size="md"
+        showCloseButton={!editing}
+      >
+        {loadingEditData ? (
+          <Loading />
+        ) : (
+          <form onSubmit={handleEditSubmit(handleEditSubmitForm)} className={styles.editForm}>
+            <div className={styles.editFormContent}>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label style={{ 
+                    display: 'block',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 500,
+                    color: 'var(--text)',
+                    marginBottom: 'var(--spacing-2)'
+                  }}>
+                    Union *
+                  </label>
+                  <input
+                    type="text"
+                    value={(() => {
+                      const unionId = watchedEditValues.union_id;
+                      const union = unions.find(u => {
+                        const uId = u.id || (u as any).union_id;
+                        return uId === unionId;
+                      });
+                      return union ? union.name_en : `Union #${unionId}`;
+                    })()}
+                    disabled
+                    style={{ 
+                      width: '100%',
+                      padding: '8px 12px',
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--text)',
+                      background: 'var(--bg-subtle)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      cursor: 'not-allowed',
+                      opacity: 0.7
+                    }}
+                  />
+                  <input
+                    type="hidden"
+                    {...registerEdit('union_id')}
+                  />
+                </div>
+
+                <FormField
+                  label="Termination Date *"
+                  type="date"
+                  error={editErrors.termination_date?.message}
+                  required
+                  className={styles.formField}
+                  register={registerEdit('termination_date')}
+                />
+              </div>
+
+              <TextArea
+                label="Termination Reason *"
+                error={editErrors.termination_reason?.message}
+                required
+                className={styles.formField}
+                rows={4}
+                placeholder="Enter the reason for termination"
+                register={registerEdit('termination_reason')}
+              />
+            </div>
+
+            <div className={styles.editFormActions}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setEditDialog({ isOpen: false, terminatedUnion: null })}
+                disabled={editing || isEditSubmitting}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={editing || isEditSubmitting}
+                isLoading={editing || isEditSubmitting}
+              >
+                {t('common.update')}
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </motion.div>
   );
 };

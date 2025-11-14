@@ -407,7 +407,14 @@ export const OSH: React.FC = () => {
               >
                 <option value="">All Severities</option>
                 <option value="None">None</option>
+                <option value="Near-Miss">Near-Miss</option>
+                <option value="First Aid Case (FAC)">First Aid Case (FAC)</option>
+                <option value="Medical Treatment Case (MTC)">Medical Treatment Case (MTC)</option>
+                <option value="Restricted Work Case (RWC)">Restricted Work Case (RWC)</option>
+                <option value="Permanent Disability/Major Injury">Permanent Disability/Major Injury</option>
+                <option value="Fatality">Fatality</option>
                 <option value="Minor">Minor</option>
+                <option value="Moderate">Moderate</option>
                 <option value="Major">Major</option>
                 <option value="Fatal">Fatal</option>
               </select>
