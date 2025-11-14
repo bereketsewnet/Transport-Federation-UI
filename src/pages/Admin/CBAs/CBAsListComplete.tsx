@@ -245,8 +245,9 @@ export const CBAsListComplete: React.FC = () => {
           const v = num % 100;
           return num + (s[(v - 20) % 10] || s[v] || s[0]);
         };
+        const roundValue = typeof value === 'string' || typeof value === 'number' ? value : 0;
         return (
-          <span className={styles.roundBadge}>{getOrdinal(value)} Round</span>
+          <span className={styles.roundBadge}>{getOrdinal(roundValue)} Round</span>
         );
       }
     }

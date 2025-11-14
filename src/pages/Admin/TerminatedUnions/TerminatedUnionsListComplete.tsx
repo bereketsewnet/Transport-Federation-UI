@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
@@ -22,13 +21,11 @@ import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Select } from '@components/Select/Select';
 import { TextArea } from '@components/TextArea/TextArea';
 import styles from './TerminatedUnions.module.css';
 
 export const TerminatedUnionsListComplete: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   
   // State management
   const [terminatedUnions, setTerminatedUnions] = useState<TerminatedUnion[]>([]);
@@ -171,7 +168,7 @@ export const TerminatedUnionsListComplete: React.FC = () => {
       key: 'name_en',
       label: 'Union',
       sortable: true,
-      render: (value: unknown, row: TerminatedUnion) => {
+      render: (_value: unknown, row: TerminatedUnion) => {
         // Try to get name from terminated union data first (backend copies all union data)
         if (row.name_en) {
           return row.name_en;

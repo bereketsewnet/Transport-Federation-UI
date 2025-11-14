@@ -75,7 +75,7 @@ export const MemberView: React.FC = () => {
     try {
       setResettingPassword(true);
       const response = await resetPasswordByMemberId(member.mem_id);
-      const { member_code, message } = response.data;
+      const { member_code } = response.data;
       
       toast.success(
         t('members.resetPasswordSuccessMessage', { code: member_code }),

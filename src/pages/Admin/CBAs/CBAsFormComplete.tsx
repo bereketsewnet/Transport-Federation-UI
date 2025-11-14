@@ -10,7 +10,8 @@ import {
   createCBA, 
   updateCBA, 
   getUnions,
-  Union
+  Union,
+  CBA
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
@@ -157,13 +158,13 @@ export const CBAsFormComplete: React.FC = () => {
       setError('');
       setLoading(true);
 
-      const cbaData = {
+      const cbaData: Partial<CBA> = {
         union_id: Number(data.union_id),
         duration_years: Number(data.duration_years),
         status: String(data.status),
         registration_date: new Date(data.registration_date).toISOString(),
         next_end_date: new Date(data.next_end_date).toISOString(),
-        round: Number(data.round)
+        round: String(data.round)
       };
 
       console.log('📤 Sending data to API:', cbaData);

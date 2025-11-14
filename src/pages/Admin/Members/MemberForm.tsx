@@ -42,15 +42,15 @@ const generateMemberCode = (): string => {
 
 const memberSchema = yup.object({
   union_id: yup.number().required('Union is required'),
-  member_code: yup.string().nullable().transform((value) => value === '' ? null : value).notRequired(),
+  member_code: yup.string().transform((value) => (value === '' || value === null) ? undefined : value).optional(),
   first_name: yup.string().required('First name is required'),
   father_name: yup.string().required('Father name is required'),
-  surname: yup.string(),
+  surname: yup.string().optional(),
   sex: yup.string().required('Sex is required'),
   birthdate: yup.string().required('Birthdate is required'),
   education: yup.string().required('Education is required'),
   phone: yup.string().required('Phone is required'),
-  email: yup.string().nullable().transform((value) => value === '' ? null : value).notRequired().test('email', 'Invalid email', (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)),
+  email: yup.string().transform((value) => (value === '' || value === null) ? undefined : value).optional().test('email', 'Invalid email', (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)),
   salary: yup.number().required('Salary is required').min(0, 'Salary must be positive'),
   registry_date: yup.string().required('Registry date is required'),
 });
@@ -240,7 +240,7 @@ export const MemberForm: React.FC = () => {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <form onSubmit={handleSubmit(onSubmit as any)} className={styles.form}>
         <div className={styles.formGrid}>
           {/* Basic Information */}
           <div className={styles.formSection}>

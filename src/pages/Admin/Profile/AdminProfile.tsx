@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@hooks/useAuth';
 import { Button } from '@components/Button/Button';
-import { formatDate } from '@utils/formatters';
 import styles from './AdminProfile.module.css';
 
 export const AdminProfile: React.FC = () => {
