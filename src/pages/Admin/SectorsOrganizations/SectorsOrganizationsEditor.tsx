@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   getSectors,
@@ -36,7 +35,6 @@ interface OrganizationFormData {
 }
 
 export const SectorsOrganizationsEditor: React.FC = () => {
-  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('sectors');
   const [loading, setLoading] = useState(true);
   
@@ -344,7 +342,6 @@ export const SectorsOrganizationsEditor: React.FC = () => {
             <DataTable
               data={sectors}
               columns={sectorColumns}
-              keyField="id"
             />
           </>
         ) : (
@@ -360,7 +357,6 @@ export const SectorsOrganizationsEditor: React.FC = () => {
             <DataTable
               data={organizations}
               columns={organizationColumns}
-              keyField="id"
             />
           </>
         )}
