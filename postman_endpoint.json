@@ -105,6 +105,290 @@
       ]
     },
     {
+      "name": "Sectors",
+      "item": [
+        {
+          "name": "List sectors",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sectors?page=1&per_page=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sectors"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "per_page", "value": "100"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get sector by id",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sectors/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sectors", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create sector",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aviation\",\n  \"description\": \"Aviation sector\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sectors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sectors"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update sector",
+          "request": {
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aviation Updated\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sectors/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sectors", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete sector (confirm)",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/sectors/1?confirm=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sectors", "1"],
+              "query": [
+                {"key": "confirm", "value": "true"}
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Organizations",
+      "item": [
+        {
+          "name": "List organizations",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/organizations?page=1&per_page=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "organizations"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "per_page", "value": "100"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get organization by id",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/organizations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "organizations", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create organization",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ethiopian Airlines Group\",\n  \"description\": \"Ethiopian Airlines Group organization\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/organizations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "organizations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update organization",
+          "request": {
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ethiopian Airlines Group Updated\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/organizations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "organizations", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete organization (confirm)",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/organizations/1?confirm=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "organizations", "1"],
+              "query": [
+                {"key": "confirm", "value": "true"}
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Unions",
       "item": [
         {

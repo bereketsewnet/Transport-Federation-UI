@@ -38,6 +38,7 @@ import ContactManager from '@pages/Admin/ContactManager';
 import AboutEditor from '@pages/Admin/AboutEditor';
 import HomeEditor from '@pages/Admin/HomeEditor';
 import ContactInfoEditor from '@pages/Admin/ContactInfoEditor';
+import SectorsOrganizationsEditor from '@pages/Admin/SectorsOrganizations/SectorsOrganizationsEditor';
 
 // Admin Unions
 import UnionsListComplete from '@pages/Admin/Unions/UnionsListComplete';
@@ -172,6 +173,7 @@ function App() {
           {/* Contact & About */}
           <Route path="contacts" element={<ContactManager />} />
           <Route path="contact-info-editor" element={<ContactInfoEditor />} />
+          <Route path="sectors-organizations-editor" element={<SectorsOrganizationsEditor />} />
           <Route path="about-editor" element={<AboutEditor />} />
           <Route path="home-editor" element={<HomeEditor />} />
           

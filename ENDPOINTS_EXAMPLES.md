@@ -216,6 +216,332 @@ Errors:
 }
 ```
 
+### [GET] {{base_url}}/api/sectors?page=1&per_page=100 - List sectors
+Group: Sectors
+
+**Description**: Returns a paginated list of all sectors. Requires authentication.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Aviation",
+      "description": null,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "total": 7,
+    "page": 1,
+    "per_page": 100
+  }
+}
+```
+
+Errors:
+- 401: Unauthorized
+- 500: Server error
+
+### [GET] {{base_url}}/api/sectors/:id - Get sector by id
+Group: Sectors
+
+**Description**: Returns a single sector by ID. Requires authentication.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "name": "Aviation",
+  "description": null,
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Errors:
+- 404: Sector not found
+- 401: Unauthorized
+
+### [POST] {{base_url}}/api/sectors - Create sector
+Group: Sectors
+
+**Description**: Creates a new sector. Admin only.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}",
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "name": "Aviation",
+  "description": "Aviation sector"
+}
+```
+
+Success (201):
+```json
+{
+  "id": 1,
+  "name": "Aviation",
+  "description": "Aviation sector",
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Errors:
+- 400: name is required / Duplicate entry
+- 401: Unauthorized
+- 403: Admin access required
+
+### [PUT] {{base_url}}/api/sectors/:id - Update sector
+Group: Sectors
+
+**Description**: Updates an existing sector. Admin only.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}",
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "name": "Aviation Updated",
+  "description": "Updated description"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "name": "Aviation Updated",
+  "description": "Updated description",
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Errors:
+- 404: Sector not found
+- 400: Validation error
+- 401: Unauthorized
+- 403: Admin access required
+
+### [DELETE] {{base_url}}/api/sectors/:id?confirm=true - Delete sector (confirm)
+Group: Sectors
+
+**Description**: Deletes a sector. Admin only. Requires ?confirm=true query parameter.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "message": "Sector deleted"
+}
+```
+
+Errors:
+- 400: To delete set ?confirm=true
+- 404: Sector not found
+- 401: Unauthorized
+- 403: Admin access required
+
+### [GET] {{base_url}}/api/organizations?page=1&per_page=100 - List organizations
+Group: Organizations
+
+**Description**: Returns a paginated list of all organizations. Requires authentication.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Ethiopian Airlines Group",
+      "description": null,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "total": 32,
+    "page": 1,
+    "per_page": 100
+  }
+}
+```
+
+Errors:
+- 401: Unauthorized
+- 500: Server error
+
+### [GET] {{base_url}}/api/organizations/:id - Get organization by id
+Group: Organizations
+
+**Description**: Returns a single organization by ID. Requires authentication.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "name": "Ethiopian Airlines Group",
+  "description": null,
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Errors:
+- 404: Organization not found
+- 401: Unauthorized
+
+### [POST] {{base_url}}/api/organizations - Create organization
+Group: Organizations
+
+**Description**: Creates a new organization. Admin only.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}",
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "name": "Ethiopian Airlines Group",
+  "description": "Ethiopian Airlines Group organization"
+}
+```
+
+Success (201):
+```json
+{
+  "id": 1,
+  "name": "Ethiopian Airlines Group",
+  "description": "Ethiopian Airlines Group organization",
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Errors:
+- 400: name is required / Duplicate entry
+- 401: Unauthorized
+- 403: Admin access required
+
+### [PUT] {{base_url}}/api/organizations/:id - Update organization
+Group: Organizations
+
+**Description**: Updates an existing organization. Admin only.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}",
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "name": "Ethiopian Airlines Group Updated",
+  "description": "Updated description"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "name": "Ethiopian Airlines Group Updated",
+  "description": "Updated description",
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+Errors:
+- 404: Organization not found
+- 400: Validation error
+- 401: Unauthorized
+- 403: Admin access required
+
+### [DELETE] {{base_url}}/api/organizations/:id?confirm=true - Delete organization (confirm)
+Group: Organizations
+
+**Description**: Deletes an organization. Admin only. Requires ?confirm=true query parameter.
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "message": "Organization deleted"
+}
+```
+
+Errors:
+- 400: To delete set ?confirm=true
+- 404: Organization not found
+- 401: Unauthorized
+- 403: Admin access required
+
 ### [GET] {{base_url}}/api/unions?q=telecom&sector=Communication&page=1&per_page=10 - List unions (search & pagination)
 Group: Unions
 

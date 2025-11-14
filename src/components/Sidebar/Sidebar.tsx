@@ -313,6 +313,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </svg>
           ),
         },
+        {
+          path: '/admin/sectors-organizations-editor',
+          label: 'Org & Sector Editor',
+          icon: (
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm2 1v6h10V9H5z"
+                fill="currentColor"
+              />
+            </svg>
+          ),
+        },
       ],
     },
     {

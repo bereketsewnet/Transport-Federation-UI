@@ -120,6 +120,70 @@ export const deleteUnion = (id: number, confirm = true): Promise<AxiosResponse> 
   return apiClient.delete(`/api/unions/${id}`, { params: { confirm } });
 };
 
+// ==================== SECTORS ====================
+
+export interface Sector {
+  id: number;
+  name: string;
+  description?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const getSectors = (
+  params?: PaginationParams
+): Promise<AxiosResponse<ApiResponse<Sector[]>>> => {
+  return apiClient.get('/api/sectors', { params });
+};
+
+export const getSector = (id: number): Promise<AxiosResponse<Sector>> => {
+  return apiClient.get(`/api/sectors/${id}`);
+};
+
+export const createSector = (data: Partial<Sector>): Promise<AxiosResponse<Sector>> => {
+  return apiClient.post('/api/sectors', data);
+};
+
+export const updateSector = (id: number, data: Partial<Sector>): Promise<AxiosResponse<Sector>> => {
+  return apiClient.put(`/api/sectors/${id}`, data);
+};
+
+export const deleteSector = (id: number, confirm = true): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/sectors/${id}`, { params: { confirm } });
+};
+
+// ==================== ORGANIZATIONS ====================
+
+export interface Organization {
+  id: number;
+  name: string;
+  description?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const getOrganizations = (
+  params?: PaginationParams
+): Promise<AxiosResponse<ApiResponse<Organization[]>>> => {
+  return apiClient.get('/api/organizations', { params });
+};
+
+export const getOrganization = (id: number): Promise<AxiosResponse<Organization>> => {
+  return apiClient.get(`/api/organizations/${id}`);
+};
+
+export const createOrganization = (data: Partial<Organization>): Promise<AxiosResponse<Organization>> => {
+  return apiClient.post('/api/organizations', data);
+};
+
+export const updateOrganization = (id: number, data: Partial<Organization>): Promise<AxiosResponse<Organization>> => {
+  return apiClient.put(`/api/organizations/${id}`, data);
+};
+
+export const deleteOrganization = (id: number, confirm = true): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/organizations/${id}`, { params: { confirm } });
+};
+
 // ==================== MEMBERS ====================
 
 export interface Member {

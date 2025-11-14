@@ -8,7 +8,11 @@ import * as yup from 'yup';
 import { 
   getUnion, 
   createUnion, 
-  updateUnion
+  updateUnion,
+  getSectors,
+  getOrganizations,
+  Sector,
+  Organization
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
@@ -36,52 +40,7 @@ interface UnionFormData {
   location_area?: string;
 }
 
-const SECTOR_OPTIONS = [
-  'Aviation',
-  'Road transport',
-  'Urban transport',
-  'Railway',
-  'Inland transport',
-  'Maritime',
-  'Communication',
-] as const;
-const DEFAULT_SECTOR = SECTOR_OPTIONS[0];
-
-const ORGANIZATION_OPTIONS = [
-  'Ethiopian Airlines Group',
-  'Ethiopian Maritime Transport and Logistics',
-  'Addis Ababa City Bus Service Enterprise',
-  'Ethio Telecom',
-  'Ethiopia Posta',
-  'Public Service Transport',
-  'DHL World Wide Express Ethiopia',
-  'Ethiopian Tool Road Enterprise',
-  'International Cargo and Aviation Service',
-  'ISON Experience Ethio call PLC',
-  'Moti Engineering P.L.C',
-  'Addis Ababa Light Railway Transport Service Enterprise',
-  'East West Ethio Transport PLC',
-  'Abyssinia Transport S/C',
-  'Bekelcha Transport S/C',
-  'Geda Transport S/C',
-  'Selam Bus Public Transport PLC',
-  'Ethiopian Railway Corporation',
-  'Dire Dawa Dewele Railway',
-  'Trans Ethiopia PLC',
-  'Demtsu Woyan',
-  'Bahir Dar Public Service Transport',
-  'Hararge Anestgn Melestegn Public Transport',
-  'Hararge Keftegn Public Transport',
-  'Kinfe Rufael Geda',
-  'Tekur Abay Transport S/C',
-  'National Transport',
-  'Elet Derash Erdata Transport',
-  'Derba Transport S/C',
-  'Hohot Transport',
-  'Ethiopian Maritime Training Institute',
-  'Adama Drivers Training Institute',
-] as const;
-const DEFAULT_ORGANIZATION = ORGANIZATION_OPTIONS[0];
+// Sectors and organizations will be fetched from API
 
 // Make strategic_plan_in_place optional (not required for registration)
 const unionSchema = yup.object({
@@ -111,6 +70,9 @@ export const UnionFormComplete: React.FC = () => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
 
   const {
     register,
@@ -125,8 +87,8 @@ export const UnionFormComplete: React.FC = () => {
       name_en: '',
       name_am: '',
       union_code: '',
-      sector: DEFAULT_SECTOR,
-      organization: DEFAULT_ORGANIZATION,
+      sector: '',
+      organization: '',
       established_date: new Date().toISOString().split('T')[0],
       terms_of_election: 4,
       strategic_plan_in_place: false,
@@ -146,12 +108,60 @@ export const UnionFormComplete: React.FC = () => {
   console.log('👀 Form values:', watchedValues);
   console.log('❌ Form errors:', errors);
 
+  // Load sectors and organizations on mount
+  useEffect(() => {
+    loadSectorsAndOrganizations();
+  }, []);
+
   // Load union data for editing
   useEffect(() => {
-    if (isEdit && id) {
+    if (isEdit && id && sectors.length > 0 && organizations.length > 0) {
       loadUnion();
     }
-  }, [isEdit, id]);
+  }, [isEdit, id, sectors, organizations]);
+
+  const loadSectorsAndOrganizations = async () => {
+    try {
+      setLoadingOptions(true);
+      
+      // Fetch sectors and organizations in parallel
+      const [sectorsResponse, organizationsResponse] = await Promise.allSettled([
+        getSectors({ page: 1, per_page: 100 }),
+        getOrganizations({ page: 1, per_page: 100 })
+      ]);
+
+      // Handle sectors
+      if (sectorsResponse.status === 'fulfilled') {
+        const sectorsData = sectorsResponse.value.data.data || [];
+        setSectors(sectorsData);
+        if (!isEdit && sectorsData.length > 0) {
+          setValue('sector', sectorsData[0].name);
+        }
+      } else {
+        console.error('💥 Error loading sectors:', sectorsResponse.reason);
+        toast.error('Failed to load sectors. Please check backend connection.');
+        setSectors([]);
+      }
+
+      // Handle organizations
+      if (organizationsResponse.status === 'fulfilled') {
+        const organizationsData = organizationsResponse.value.data.data || [];
+        setOrganizations(organizationsData);
+        if (!isEdit && organizationsData.length > 0) {
+          setValue('organization', organizationsData[0].name);
+        }
+      } else {
+        console.error('💥 Error loading organizations:', organizationsResponse.reason);
+        toast.error('Failed to load organizations. Please check backend connection.');
+        setOrganizations([]);
+      }
+    } catch (err) {
+      console.error('💥 Error loading sectors/organizations:', err);
+      toast.error('Failed to load sectors and organizations');
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
 
   const loadUnion = async () => {
     try {
@@ -172,10 +182,8 @@ export const UnionFormComplete: React.FC = () => {
         name_en: unionData.name_en || '',
         name_am: unionData.name_am || '',
         union_code: unionData.union_code || '',
-        sector:
-          SECTOR_OPTIONS.find((option) => option === unionData.sector) || DEFAULT_SECTOR,
-        organization:
-          ORGANIZATION_OPTIONS.find((option) => option === unionData.organization) || DEFAULT_ORGANIZATION,
+        sector: unionData.sector || (sectors.length > 0 ? sectors[0].name : ''),
+        organization: unionData.organization || (organizations.length > 0 ? organizations[0].name : ''),
         established_date: unionData.established_date?.split('T')[0] || '',
         terms_of_election: unionData.terms_of_election || 4,
         strategic_plan_in_place: unionData.strategic_plan_in_place || false,
@@ -249,7 +257,7 @@ export const UnionFormComplete: React.FC = () => {
     }
   };
 
-  if (loading && isEdit) {
+  if ((loading && isEdit) || loadingOptions) {
     return <Loading />;
   }
 
@@ -331,7 +339,7 @@ export const UnionFormComplete: React.FC = () => {
               />
               <Select
                 label="Organization *"
-                value={watchedValues.organization || DEFAULT_ORGANIZATION}
+                value={watchedValues.organization || ''}
                 onChange={(e) => {
                   console.log('🔄 Organization selected:', e.target.value);
                   setValue('organization', e.target.value, { shouldValidate: true });
@@ -339,9 +347,10 @@ export const UnionFormComplete: React.FC = () => {
                 error={errors.organization?.message}
                 required
                 className={styles.formField}
-                options={ORGANIZATION_OPTIONS.map((option) => ({
-                  value: option,
-                  label: option,
+                disabled={loadingOptions}
+                options={organizations.map((org) => ({
+                  value: org.name,
+                  label: org.name,
                 }))}
               />
             </div>
@@ -349,7 +358,7 @@ export const UnionFormComplete: React.FC = () => {
             <div className={styles.formRow}>
               <Select
                 label={t('unions.sector') + ' *'}
-                value={watchedValues.sector || DEFAULT_SECTOR}
+                value={watchedValues.sector || ''}
                 onChange={(e) => {
                   console.log('🔄 Sector selected:', e.target.value);
                   setValue('sector', e.target.value, { shouldValidate: true });
@@ -357,9 +366,10 @@ export const UnionFormComplete: React.FC = () => {
                 error={errors.sector?.message}
                 required
                 className={styles.formField}
-                options={SECTOR_OPTIONS.map((option) => ({
-                  value: option,
-                  label: option,
+                disabled={loadingOptions}
+                options={sectors.map((sector) => ({
+                  value: sector.name,
+                  label: sector.name,
                 }))}
               />
               <FormField
