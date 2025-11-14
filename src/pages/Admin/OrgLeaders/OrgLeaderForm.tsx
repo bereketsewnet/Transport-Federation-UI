@@ -45,6 +45,12 @@ const SECTOR_OPTIONS = [
 ] as const;
 const DEFAULT_SECTOR = SECTOR_OPTIONS[0];
 
+const POSITION_OPTIONS = [
+  'CEO',
+  'General Manager',
+  'Director',
+] as const;
+
 const schema = yup
   .object({
     union_id: yup.number().required('Union is required').min(1, 'Union is required'),
@@ -292,13 +298,22 @@ export const OrgLeaderForm: React.FC = () => {
                 placeholder={t('orgLeaders.placeholders.surname')}
                 register={register('surname')}
               />
-              <FormField
+              <Select
                 label={t('orgLeaders.fields.position')}
+                value={watch('position') || ''}
+                onChange={(e) => {
+                  setValue('position', e.target.value, { shouldValidate: true });
+                }}
+                error={errors.position?.message}
                 required
                 className={styles.formField}
-                error={errors.position?.message}
-                placeholder={t('orgLeaders.placeholders.position')}
-                register={register('position')}
+                options={[
+                  { value: '', label: t('orgLeaders.placeholders.position') || 'Select Position' },
+                  ...POSITION_OPTIONS.map((position) => ({
+                    value: position,
+                    label: position,
+                  })),
+                ]}
               />
             </div>
           </div>

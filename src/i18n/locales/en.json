@@ -292,6 +292,7 @@
     "position": "Position",
     "member": "Member",
     "memberId": "Member ID",
+    "memberCode": "Member Code",
     "union": "Union",
     "appointedDate": "Appointed Date",
     "termLength": "Term Length (years)",

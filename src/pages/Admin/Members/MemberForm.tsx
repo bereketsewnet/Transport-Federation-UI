@@ -21,7 +21,7 @@ import styles from './Members.module.css';
 
 interface MemberFormData {
   union_id: number;
-  member_code: string;
+  member_code?: string;
   first_name: string;
   father_name: string;
   surname?: string;
@@ -29,14 +29,20 @@ interface MemberFormData {
   birthdate: string;
   education: string;
   phone: string;
-  email: string;
+  email?: string;
   salary: number;
   registry_date: string;
 }
 
+// Helper function to generate random member code
+const generateMemberCode = (): string => {
+  const randomDigits = Math.floor(10000000 + Math.random() * 90000000).toString();
+  return `M-${randomDigits}`;
+};
+
 const memberSchema = yup.object({
   union_id: yup.number().required('Union is required'),
-  member_code: yup.string().required('Member code is required'),
+  member_code: yup.string().nullable().transform((value) => value === '' ? null : value).notRequired(),
   first_name: yup.string().required('First name is required'),
   father_name: yup.string().required('Father name is required'),
   surname: yup.string(),
@@ -44,7 +50,7 @@ const memberSchema = yup.object({
   birthdate: yup.string().required('Birthdate is required'),
   education: yup.string().required('Education is required'),
   phone: yup.string().required('Phone is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
+  email: yup.string().nullable().transform((value) => value === '' ? null : value).notRequired().test('email', 'Invalid email', (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)),
   salary: yup.number().required('Salary is required').min(0, 'Salary must be positive'),
   registry_date: yup.string().required('Registry date is required'),
 });
@@ -150,8 +156,13 @@ export const MemberForm: React.FC = () => {
       setError('');
       setLoading(true);
 
+      // Auto-generate member_code if not provided
+      const finalMemberCode = data.member_code?.trim() || generateMemberCode();
+      console.log('🔑 Member code:', finalMemberCode);
+
       const memberData = {
         ...data,
+        member_code: finalMemberCode,
         birthdate: new Date(data.birthdate).toISOString(),
         registry_date: new Date(data.registry_date).toISOString(),
       };
@@ -263,14 +274,32 @@ export const MemberForm: React.FC = () => {
                   return options;
                 })()}
               />
-              <FormField
-                label={t('members.memberCode')}
-                error={errors.member_code?.message}
-                required
-                className={styles.formField}
-                placeholder="e.g., M-1001"
-                register={register('member_code')}
-              />
+              <div className={styles.formField}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1 }}>
+                    <FormField
+                      label={t('members.memberCode')}
+                      error={errors.member_code?.message}
+                      helperText="Leave empty to auto-generate member code (e.g., M-12345678)"
+                      className={styles.formField}
+                      placeholder="Leave empty to auto-generate"
+                      register={register('member_code')}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      const generatedCode = generateMemberCode();
+                      setValue('member_code', generatedCode, { shouldValidate: true });
+                      toast.success(`Generated: ${generatedCode}`);
+                    }}
+                    style={{ marginTop: '24px', whiteSpace: 'nowrap' }}
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <div className={styles.formRow}>
@@ -343,10 +372,17 @@ export const MemberForm: React.FC = () => {
                 className={styles.formField}
                 options={[
                   { value: '', label: t('members.selectEducation') },
-                  { value: 'Degree', label: 'Degree' },
+                  { value: '0-6', label: '0-6' },
+                  { value: '7-12', label: '7-12' },
+                  { value: 'Level 1', label: 'Level 1' },
+                  { value: 'Level 2', label: 'Level 2' },
+                  { value: 'Level 3', label: 'Level 3' },
+                  { value: 'Level 4', label: 'Level 4' },
                   { value: 'Diploma', label: 'Diploma' },
-                  { value: 'Certificate', label: 'Certificate' },
-                  { value: 'High School', label: 'High School' }
+                  { value: 'Degree', label: 'Degree' },
+                  { value: 'Masters', label: 'Masters' },
+                  { value: 'Doctor', label: 'Doctor' },
+                  { value: 'PhD', label: 'PhD' }
                 ]}
               />
             </div>
@@ -370,7 +406,6 @@ export const MemberForm: React.FC = () => {
                 label={t('members.email')}
                 type="email"
                 error={errors.email?.message}
-                required
                 className={styles.formField}
                 placeholder="member@example.com"
                 register={register('email')}

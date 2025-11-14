@@ -292,6 +292,7 @@
     "position": "የሥራ መደብ",
     "member": "አባል",
     "memberId": "የአባል መለያ",
+    "memberCode": "የአባል ኮድ",
     "union": "ማህበር",
     "appointedDate": "የተሾመበት ቀን",
     "termLength": "የስራ ዘመን (ዓመታት)",

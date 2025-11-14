@@ -184,7 +184,7 @@ export const deleteMember = (mem_id: number): Promise<AxiosResponse> => {
 export interface UnionExecutive {
   id: number;
   union_id: number;
-  mem_id: number;
+  member_code: string;
   position: string;
   appointed_date: string;
   term_length_years: number;

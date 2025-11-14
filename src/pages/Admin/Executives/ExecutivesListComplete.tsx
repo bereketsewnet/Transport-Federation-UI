@@ -172,7 +172,7 @@ export const ExecutivesListComplete: React.FC = () => {
       render: (value: unknown, row: UnionExecutive) => (
         <div className={styles.executiveInfo}>
           <div className={styles.executivePosition}>{String(value || 'N/A')}</div>
-          <div className={styles.executiveMember}>Member ID: {row.mem_id}</div>
+          <div className={styles.executiveMember}>Member Code: {row.member_code}</div>
         </div>
       )
     },
@@ -304,10 +304,17 @@ export const ExecutivesListComplete: React.FC = () => {
           options={[
             { value: '', label: 'All Positions' },
             { value: 'Chairman', label: 'Chairman' },
-            { value: 'Vice Chairman', label: 'Vice Chairman' },
-            { value: 'Secretary', label: 'Secretary' },
-            { value: 'Treasurer', label: 'Treasurer' },
-            { value: 'Member', label: 'Member' }
+            { value: 'Vice', label: 'Vice' },
+            { value: 'General Secretary', label: 'General Secretary' },
+            { value: 'Assistant General Secretary', label: 'Assistant General Secretary' },
+            { value: 'Executive-Member', label: 'Executive-Member' },
+            { value: 'Finance Head', label: 'Finance Head' },
+            { value: 'Assistant Accountant', label: 'Assistant Accountant' },
+            { value: 'Cashier', label: 'Cashier' },
+            { value: "Women's Representative", label: "Women's Representative" },
+            { value: 'General Audit', label: 'General Audit' },
+            { value: 'Audit Secretary', label: 'Audit Secretary' },
+            { value: 'Audit Member', label: 'Audit Member' }
           ]}
         />
 

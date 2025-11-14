@@ -214,7 +214,6 @@ export const MembersListSimple: React.FC = () => {
             <div className={styles.tableCell}>Member Code</div>
             <div className={styles.tableCell}>Name</div>
             <div className={styles.tableCell}>Sex</div>
-            <div className={styles.tableCell}>Email</div>
             <div className={styles.tableCell}>Phone</div>
             <div className={styles.tableCell}>Registry Date</div>
             <div className={styles.tableCell}>Actions</div>
@@ -237,9 +236,6 @@ export const MembersListSimple: React.FC = () => {
                   <span className={`${styles.badge} ${styles[member.sex?.toLowerCase() || 'unknown']}`}>
                     {member.sex || 'Unknown'}
                   </span>
-                </div>
-                <div className={styles.tableCell}>
-                  {member.email || 'N/A'}
                 </div>
                 <div className={styles.tableCell}>
                   {member.phone || 'N/A'}

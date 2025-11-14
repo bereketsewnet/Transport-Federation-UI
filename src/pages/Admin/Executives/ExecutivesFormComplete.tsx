@@ -21,7 +21,7 @@ import styles from './Executives.module.css';
 
 interface ExecutiveFormData {
   union_id: number;
-  mem_id: number;
+  member_code: string;
   position: string;
   appointed_date: string;
   term_length_years: number;
@@ -29,7 +29,7 @@ interface ExecutiveFormData {
 
 const executiveSchema = yup.object({
   union_id: yup.number().required('Union is required').min(1, 'Please select a union'),
-  mem_id: yup.number().required('Member ID is required').min(1, 'Member ID must be positive'),
+  member_code: yup.string().required('Member code is required'),
   position: yup.string().required('Position is required'),
   appointed_date: yup.string().required('Appointed date is required'),
   term_length_years: yup.number().required('Term length is required').min(1, 'Must be at least 1 year').max(10, 'Cannot exceed 10 years'),
@@ -56,7 +56,7 @@ export const ExecutivesFormComplete: React.FC = () => {
     resolver: yupResolver(executiveSchema),
     defaultValues: {
       union_id: 0,
-      mem_id: 0,
+      member_code: '',
       position: '',
       appointed_date: new Date().toISOString().split('T')[0],
       term_length_years: 4
@@ -120,7 +120,7 @@ export const ExecutivesFormComplete: React.FC = () => {
       // Populate form with executive data
       reset({
         union_id: executive.union_id,
-        mem_id: executive.mem_id,
+        member_code: executive.member_code,
         position: executive.position,
         appointed_date: formattedDate,
         term_length_years: executive.term_length_years
@@ -149,7 +149,7 @@ export const ExecutivesFormComplete: React.FC = () => {
 
       const executiveData = {
         union_id: Number(data.union_id),
-        mem_id: Number(data.mem_id),
+        member_code: String(data.member_code),
         position: String(data.position),
         appointed_date: new Date(data.appointed_date).toISOString(),
         term_length_years: Number(data.term_length_years)
@@ -158,7 +158,7 @@ export const ExecutivesFormComplete: React.FC = () => {
       console.log('📤 Sending data to API:', executiveData);
       console.log('📤 Data types:', {
         union_id: typeof executiveData.union_id,
-        mem_id: typeof executiveData.mem_id,
+        member_code: typeof executiveData.member_code,
         position: typeof executiveData.position,
         appointed_date: typeof executiveData.appointed_date,
         term_length_years: typeof executiveData.term_length_years
@@ -270,14 +270,13 @@ export const ExecutivesFormComplete: React.FC = () => {
               />
 
               <FormField
-                label="Member ID *"
-                type="number"
-                error={errors.mem_id?.message}
+                label="Member Code *"
+                type="text"
+                error={errors.member_code?.message}
                 required
                 className={styles.formField}
-                min="1"
-                placeholder="e.g., 12345"
-                register={register('mem_id', { valueAsNumber: true })}
+                placeholder="e.g., M-008"
+                register={register('member_code')}
               />
             </div>
 
@@ -297,10 +296,17 @@ export const ExecutivesFormComplete: React.FC = () => {
               options={[
                 { value: '', label: 'Select Position' },
                 { value: 'Chairman', label: 'Chairman' },
-                { value: 'Vice Chairman', label: 'Vice Chairman' },
-                { value: 'Secretary', label: 'Secretary' },
-                { value: 'Treasurer', label: 'Treasurer' },
-                { value: 'Member', label: 'Member' }
+                { value: 'Vice', label: 'Vice' },
+                { value: 'General Secretary', label: 'General Secretary' },
+                { value: 'Assistant General Secretary', label: 'Assistant General Secretary' },
+                { value: 'Executive-Member', label: 'Executive-Member' },
+                { value: 'Finance Head', label: 'Finance Head' },
+                { value: 'Assistant Accountant', label: 'Assistant Accountant' },
+                { value: 'Cashier', label: 'Cashier' },
+                { value: "Women's Representative", label: "Women's Representative" },
+                { value: 'General Audit', label: 'General Audit' },
+                { value: 'Audit Secretary', label: 'Audit Secretary' },
+                { value: 'Audit Member', label: 'Audit Member' }
               ]}
             />
 

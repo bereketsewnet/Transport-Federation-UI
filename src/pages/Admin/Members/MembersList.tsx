@@ -78,7 +78,6 @@ export const MembersList: React.FC = () => {
       'father_name',
       'surname',
       'sex',
-      'email',
       'phone',
     ]);
   };
@@ -104,10 +103,6 @@ export const MembersList: React.FC = () => {
       render: (value) => (
         <span className={styles.badge}>{value as string}</span>
       ),
-    },
-    {
-      key: 'email',
-      label: t('members.email'),
     },
     {
       key: 'phone',

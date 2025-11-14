@@ -142,11 +142,11 @@ export const ExecutivesList: React.FC = () => {
       )
     },
     {
-      key: 'mem_id',
+      key: 'member_code',
       label: t('executives.member'),
       sortable: true,
       render: (value: unknown) => (
-        <span className={styles.memberId}>#{String(value)}</span>
+        <span className={styles.memberId}>{String(value || 'N/A')}</span>
       )
     },
     {
@@ -256,11 +256,18 @@ export const ExecutivesList: React.FC = () => {
             className={styles.filterSelect}
             options={[
               { value: '', label: t('executives.allPositions') },
-              { value: 'chairman', label: t('executives.positions.chairman') },
-              { value: 'vice_chairman', label: t('executives.positions.viceChairman') },
-              { value: 'secretary', label: t('executives.positions.secretary') },
-              { value: 'treasurer', label: t('executives.positions.treasurer') },
-              { value: 'member', label: t('executives.positions.member') }
+              { value: 'Chairman', label: 'Chairman' },
+              { value: 'Vice', label: 'Vice' },
+              { value: 'General Secretary', label: 'General Secretary' },
+              { value: 'Assistant General Secretary', label: 'Assistant General Secretary' },
+              { value: 'Executive-Member', label: 'Executive-Member' },
+              { value: 'Finance Head', label: 'Finance Head' },
+              { value: 'Assistant Accountant', label: 'Assistant Accountant' },
+              { value: 'Cashier', label: 'Cashier' },
+              { value: "Women's Representative", label: "Women's Representative" },
+              { value: 'General Audit', label: 'General Audit' },
+              { value: 'Audit Secretary', label: 'Audit Secretary' },
+              { value: 'Audit Member', label: 'Audit Member' }
             ]}
           />
 

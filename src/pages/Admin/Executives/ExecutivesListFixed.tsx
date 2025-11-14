@@ -146,7 +146,7 @@ export const ExecutivesListFixed: React.FC = () => {
       render: (value: unknown, row: UnionExecutive) => (
         <div className={styles.executiveInfo}>
           <div className={styles.executivePosition}>{String(value)}</div>
-          <div className={styles.executiveMember}>Member ID: {row.mem_id}</div>
+          <div className={styles.executiveMember}>Member Code: {row.member_code}</div>
         </div>
       )
     },
@@ -263,10 +263,18 @@ export const ExecutivesListFixed: React.FC = () => {
             className={styles.filterSelect}
             options={[
               { value: '', label: t('executives.allPositions') },
-              { value: 'president', label: t('executives.positions.president') },
-              { value: 'vice_president', label: t('executives.positions.vicePresident') },
-              { value: 'secretary', label: t('executives.positions.secretary') },
-              { value: 'treasurer', label: t('executives.positions.treasurer') }
+              { value: 'Chairman', label: 'Chairman' },
+              { value: 'Vice', label: 'Vice' },
+              { value: 'General Secretary', label: 'General Secretary' },
+              { value: 'Assistant General Secretary', label: 'Assistant General Secretary' },
+              { value: 'Executive-Member', label: 'Executive-Member' },
+              { value: 'Finance Head', label: 'Finance Head' },
+              { value: 'Assistant Accountant', label: 'Assistant Accountant' },
+              { value: 'Cashier', label: 'Cashier' },
+              { value: "Women's Representative", label: "Women's Representative" },
+              { value: 'General Audit', label: 'General Audit' },
+              { value: 'Audit Secretary', label: 'Audit Secretary' },
+              { value: 'Audit Member', label: 'Audit Member' }
             ]}
           />
 

@@ -207,11 +207,6 @@ export const MembersListEnhanced: React.FC = () => {
       }
     },
     {
-      key: 'email',
-      label: t('members.email'),
-      render: (value: unknown) => String(value || 'N/A')
-    },
-    {
       key: 'phone',
       label: t('members.phone'),
       render: (value: unknown) => String(value || 'N/A')

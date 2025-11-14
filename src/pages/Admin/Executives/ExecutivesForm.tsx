@@ -20,7 +20,7 @@ import styles from './Executives.module.css';
 
 interface ExecutiveFormData {
   union_id: number;
-  mem_id: number;
+  member_code: string;
   position: string;
   appointed_date: string;
   term_length_years: number;
@@ -28,7 +28,7 @@ interface ExecutiveFormData {
 
 const executiveSchema = yup.object({
   union_id: yup.number().required('Union is required'),
-  mem_id: yup.number().required('Member ID is required').min(1, 'Member ID must be positive'),
+  member_code: yup.string().required('Member code is required'),
   position: yup.string().required('Position is required'),
   appointed_date: yup.string().required('Appointed date is required'),
   term_length_years: yup.number().required('Term length is required').min(1, 'Must be at least 1 year').max(10, 'Cannot exceed 10 years'),
@@ -96,7 +96,7 @@ export const ExecutivesForm: React.FC = () => {
       // Populate form with executive data
       reset({
         union_id: executive.union_id,
-        mem_id: executive.mem_id,
+        member_code: executive.member_code,
         position: executive.position,
         appointed_date: formattedDate,
         term_length_years: executive.term_length_years
@@ -205,14 +205,13 @@ export const ExecutivesForm: React.FC = () => {
               />
 
               <FormField
-                label={t('executives.memberId')}
-                type="number"
-                {...register('mem_id', { valueAsNumber: true })}
-                error={errors.mem_id?.message}
+                label={t('executives.memberCode')}
+                type="text"
+                {...register('member_code')}
+                error={errors.member_code?.message}
                 required
                 className={styles.formField}
-                min="1"
-                placeholder="e.g., 12345"
+                placeholder="e.g., M-008"
               />
             </div>
 
@@ -224,11 +223,18 @@ export const ExecutivesForm: React.FC = () => {
               className={styles.formField}
               options={[
                 { value: '', label: t('executives.selectPosition') },
-                { value: 'chairman', label: t('executives.positions.chairman') },
-                { value: 'vice_chairman', label: t('executives.positions.viceChairman') },
-                { value: 'secretary', label: t('executives.positions.secretary') },
-                { value: 'treasurer', label: t('executives.positions.treasurer') },
-                { value: 'member', label: t('executives.positions.member') }
+                { value: 'Chairman', label: 'Chairman' },
+                { value: 'Vice', label: 'Vice' },
+                { value: 'General Secretary', label: 'General Secretary' },
+                { value: 'Assistant General Secretary', label: 'Assistant General Secretary' },
+                { value: 'Executive-Member', label: 'Executive-Member' },
+                { value: 'Finance Head', label: 'Finance Head' },
+                { value: 'Assistant Accountant', label: 'Assistant Accountant' },
+                { value: 'Cashier', label: 'Cashier' },
+                { value: "Women's Representative", label: "Women's Representative" },
+                { value: 'General Audit', label: 'General Audit' },
+                { value: 'Audit Secretary', label: 'Audit Secretary' },
+                { value: 'Audit Member', label: 'Audit Member' }
               ]}
             />
 
