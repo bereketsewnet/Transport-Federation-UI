@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { DataTable, Column } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
+import { Select } from '@components/Select/Select';
 import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import useTable from '@hooks/useTable';
 import { useExportCsv } from '@hooks/useExportCsv';
-import { getMembers, deleteMember, archiveMember, Member } from '@api/endpoints';
+import { getMembers, deleteMember, archiveMember, Member, getUnions, Union } from '@api/endpoints';
 import { formatDate } from '@utils/formatters';
 import { toast } from 'react-hot-toast';
 import styles from './MembersList.module.css';
@@ -23,12 +24,42 @@ export const MembersList: React.FC = () => {
   
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [archiveId, setArchiveId] = useState<number | null>(null);
+  const [unionFilter, setUnionFilter] = useState<string>('');
+  const [unions, setUnions] = useState<Union[]>([]);
+  const [loadingUnions, setLoadingUnions] = useState<boolean>(false);
   const showDeleteButton = false;
+
+  useEffect(() => {
+    const fetchUnions = async () => {
+      try {
+        setLoadingUnions(true);
+        const response = await getUnions({ per_page: 500 });
+        const unionsData = (response.data?.data || []).map((union: any) => ({
+          ...union,
+          id: union.id || union.union_id,
+        }));
+        setUnions(unionsData);
+      } catch (error) {
+        console.error('Failed to load unions for member filter:', error);
+        toast.error(t('messages.errorLoadingData'));
+      } finally {
+        setLoadingUnions(false);
+      }
+    };
+
+    fetchUnions();
+  }, [t]);
 
   // Fetch members
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['members', { page, per_page, q: search }],
-    queryFn: () => getMembers({ page, per_page, q: search }),
+    queryKey: ['members', { page, per_page, q: search, union_id: unionFilter }],
+    queryFn: () =>
+      getMembers({
+        page,
+        per_page,
+        q: search,
+        union_id: unionFilter ? Number(unionFilter) : undefined,
+      }),
   });
 
   const rawMembers = data?.data?.data || [];
@@ -43,6 +74,22 @@ export const MembersList: React.FC = () => {
   // Debug: Check if members have IDs
   console.log('📊 Members data:', members);
   console.log('📊 First member:', members[0]);
+
+  const unionOptions = useMemo(
+    () => [
+      {
+        value: '',
+        label: 'All Union',
+      },
+      ...unions
+        .filter((union) => (union.id || (union as any).union_id) && union.name_en)
+        .map((union) => ({
+          value: String(union.id || (union as any).union_id),
+          label: union.name_en,
+        })),
+    ],
+    [t, unions]
+  );
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -181,6 +228,17 @@ export const MembersList: React.FC = () => {
             placeholder="Search members..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className={styles.filterSelect}>
+          <Select
+            value={unionFilter}
+            onChange={(event) => {
+              setUnionFilter(event.target.value);
+              setPage(1);
+            }}
+            options={unionOptions}
+            disabled={loadingUnions}
           />
         </div>
         <Button variant="secondary" onClick={handleExport}>

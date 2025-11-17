@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 // import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { getArchives, deleteArchive, restoreArchive } from '@api/endpoints';
@@ -8,6 +8,7 @@ import { Button } from '@components/Button/Button';
 import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
 import { toast } from 'react-hot-toast';
 import { formatDate } from '@utils/formatters';
+import { FormField } from '@components/FormField/FormField';
 import styles from './ArchivedMembers.module.css';
 
 interface ArchivedMember {
@@ -33,6 +34,7 @@ export const ArchivedMembers: React.FC = () => {
     member: null,
   });
   const [restoringId, setRestoringId] = useState<number | null>(null);
+  const [search, setSearch] = useState('');
   const showDeleteButton = false;
 
   useEffect(() => {
@@ -167,6 +169,19 @@ export const ArchivedMembers: React.FC = () => {
     </div>
   );
 
+  const filteredMembers = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) {
+      return archivedMembers;
+    }
+
+    return archivedMembers.filter((member) => {
+      const code = (member.member_code || '').toLowerCase();
+      const fullName = `${member.first_name || ''} ${member.father_name || ''} ${member.surname || ''}`.toLowerCase();
+      return code.includes(term) || fullName.includes(term);
+    });
+  }, [archivedMembers, search]);
+
   if (loading) return <Loading />;
 
   return (
@@ -185,9 +200,20 @@ export const ArchivedMembers: React.FC = () => {
           </div>
         </div>
 
+        <div className={styles.toolbar}>
+          <div className={styles.searchBox}>
+            <FormField
+              type="search"
+              placeholder="Search archived members by name or member code..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+        </div>
+
         <DataTable
           columns={columns}
-          data={archivedMembers}
+          data={filteredMembers}
           isLoading={loading}
           emptyMessage="No archived members found"
           actions={rowActions}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   getUnions, 
@@ -24,6 +24,7 @@ export const GeneralAssembly: React.FC = () => {
     isOpen: false,
     union: null,
   });
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchUnions();
@@ -143,6 +144,19 @@ export const GeneralAssembly: React.FC = () => {
     },
   ];
 
+  const filteredUnions = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) {
+      return unions;
+    }
+
+    return unions.filter((union) => {
+      const name = (union.name_en || '').toLowerCase();
+      const code = (union.union_code || '').toLowerCase();
+      return name.includes(term) || code.includes(term);
+    });
+  }, [searchTerm, unions]);
+
   // Row actions
   const rowActions = (union: Union) => (
     <>
@@ -192,9 +206,19 @@ export const GeneralAssembly: React.FC = () => {
           </div>
         </div>
 
+        <div className={styles.toolbar}>
+          <input
+            type="search"
+            className={styles.searchInput}
+            placeholder="Search unions..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+        </div>
+
         <DataTable
           columns={columns}
-          data={unions}
+          data={filteredUnions}
           actions={rowActions}
           isLoading={loading}
           emptyMessage="No unions found"

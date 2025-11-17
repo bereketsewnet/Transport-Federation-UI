@@ -451,8 +451,25 @@ export const getGalleries = (
   return apiClient.get('/api/galleries', { params });
 };
 
+export const getGallery = (id: number): Promise<AxiosResponse<Gallery>> => {
+  return apiClient.get(`/api/galleries/${id}`);
+};
+
 export const createGallery = (data: Partial<Gallery>): Promise<AxiosResponse<Gallery>> => {
   return apiClient.post('/api/galleries', data);
+};
+
+export const updateGallery = (id: number, data: Partial<Gallery>): Promise<AxiosResponse<Gallery>> => {
+  return apiClient.put(`/api/galleries/${id}`, data);
+};
+
+export const deleteGallery = (
+  id: number,
+  options: { confirm?: boolean } = { confirm: true }
+): Promise<AxiosResponse<void>> => {
+  return apiClient.delete(`/api/galleries/${id}`, {
+    params: { confirm: options.confirm ?? true },
+  });
 };
 
 export const getPhotos = (

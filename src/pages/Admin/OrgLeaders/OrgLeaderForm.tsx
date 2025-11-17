@@ -10,8 +10,12 @@ import {
   updateOrgLeader,
   getOrgLeader,
   getUnions,
+  getSectors,
+  getOrganizations,
   OrgLeader,
   Union,
+  Sector,
+  Organization,
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
@@ -34,16 +38,6 @@ interface OrgLeaderFormData {
 }
 
 const titles = ['Mr', 'Mrs', 'Ms', 'Dr', 'Prof'];
-
-const SECTOR_OPTIONS = [
-  'Aviation',
-  'Railway',
-  'Urban Transport',
-  'Road',
-  'Maritime maritime',
-  'Communication',
-] as const;
-const DEFAULT_SECTOR = SECTOR_OPTIONS[0];
 
 const POSITION_OPTIONS = [
   'CEO',
@@ -75,6 +69,9 @@ export const OrgLeaderForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [unions, setUnions] = useState<Union[]>([]);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState<boolean>(false);
 
   const {
     register,
@@ -94,7 +91,7 @@ export const OrgLeaderForm: React.FC = () => {
       position: '',
       phone: '',
       email: '',
-      sector: DEFAULT_SECTOR,
+      sector: '',
       organization: '',
     },
   });
@@ -114,6 +111,49 @@ export const OrgLeaderForm: React.FC = () => {
 
     loadUnions();
   }, [t]);
+
+  useEffect(() => {
+    const loadSectorsAndOrganizations = async () => {
+      setLoadingOptions(true);
+      try {
+        const [sectorsResult, organizationsResult] = await Promise.allSettled([
+          getSectors({ page: 1, per_page: 100 }),
+          getOrganizations({ page: 1, per_page: 100 }),
+        ]);
+
+        if (sectorsResult.status === 'fulfilled') {
+          const sectorsData = sectorsResult.value.data.data || [];
+          setSectors(sectorsData);
+          if (!isEdit && sectorsData.length > 0) {
+            setValue('sector', sectorsData[0].name, { shouldValidate: true });
+          }
+        } else {
+          console.error('💥 Error loading sectors:', sectorsResult.reason);
+          toast.error(t('messages.errorLoadingData'));
+          setSectors([]);
+        }
+
+        if (organizationsResult.status === 'fulfilled') {
+          const organizationsData = organizationsResult.value.data.data || [];
+          setOrganizations(organizationsData);
+          if (!isEdit && organizationsData.length > 0) {
+            setValue('organization', organizationsData[0].name, { shouldValidate: true });
+          }
+        } else {
+          console.error('💥 Error loading organizations:', organizationsResult.reason);
+          toast.error(t('messages.errorLoadingData'));
+          setOrganizations([]);
+        }
+      } catch (err) {
+        console.error('💥 Error loading sectors/organizations for org leader form:', err);
+        toast.error(t('messages.errorLoadingData'));
+      } finally {
+        setLoadingOptions(false);
+      }
+    };
+
+    loadSectorsAndOrganizations();
+  }, [isEdit, setValue, t]);
 
   useEffect(() => {
     if (!isEdit || !id) {
@@ -137,10 +177,7 @@ export const OrgLeaderForm: React.FC = () => {
           position: leader.position || '',
           phone: leader.phone || '',
           email: leader.email || '',
-          sector:
-            SECTOR_OPTIONS.find((option) => option === leader.sector) ||
-            SECTOR_OPTIONS.find((option) => option === leader.union?.sector) ||
-            DEFAULT_SECTOR,
+          sector: leader.sector || leader.union?.sector || '',
           organization: leader.organization || leader.union?.organization || '',
         });
       } catch (err: any) {
@@ -190,7 +227,7 @@ export const OrgLeaderForm: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || loadingOptions) {
     return <Loading />;
   }
 
@@ -345,24 +382,41 @@ export const OrgLeaderForm: React.FC = () => {
             <div className={styles.formRow}>
               <Select
                 label={t('orgLeaders.fields.sector')}
-                value={watchedValues.sector || DEFAULT_SECTOR}
+                  value={watchedValues.sector || ''}
                 onChange={(event) => {
                   setValue('sector', event.target.value, { shouldValidate: true });
                 }}
                 className={styles.formField}
                 error={errors.sector?.message}
-                options={SECTOR_OPTIONS.map((sector) => ({
-                  value: sector,
-                  label: sector,
-                }))}
+                  disabled={loadingOptions || sectors.length === 0}
+                  options={[
+                    { value: '', label: t('orgLeaders.placeholders.selectSector') || 'Select sector' },
+                    ...sectors.map((sector) => ({
+                      value: sector.name,
+                      label: sector.name,
+                    })),
+                  ]}
               />
-              <FormField
-                label={t('orgLeaders.fields.organization')}
-                className={styles.formField}
-                error={errors.organization?.message}
-                placeholder={t('orgLeaders.placeholders.organization')}
-                register={register('organization')}
-              />
+                <Select
+                  label={t('orgLeaders.fields.organization')}
+                  value={watch('organization') || ''}
+                  onChange={(event) => {
+                    setValue('organization', event.target.value, { shouldValidate: true });
+                  }}
+                  className={styles.formField}
+                  error={errors.organization?.message}
+                  disabled={loadingOptions || organizations.length === 0}
+                  options={[
+                    {
+                      value: '',
+                      label: t('orgLeaders.placeholders.selectOrganization') || 'Select organization',
+                    },
+                    ...organizations.map((organization) => ({
+                      value: organization.name,
+                      label: organization.name,
+                    })),
+                  ]}
+                />
             </div>
           </div>
         </div>

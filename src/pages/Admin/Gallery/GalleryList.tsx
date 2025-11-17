@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { getGalleries, Gallery } from '@api/endpoints';
+import { getGalleries, Gallery, deleteGallery } from '@api/endpoints';
 import { DataTable, Column } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
 import { useTable } from '@hooks/useTable';
+import { ConfirmDialog } from '@components/ConfirmDialog/ConfirmDialog';
+import { toast } from 'react-hot-toast';
 import styles from './Gallery.module.css';
 
 export const AdminGalleryList: React.FC = () => {
@@ -15,6 +17,10 @@ export const AdminGalleryList: React.FC = () => {
   const { page, per_page, setPage, setPerPage } = useTable();
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; gallery: Gallery | null }>({
+    isOpen: false,
+    gallery: null,
+  });
 
   useEffect(() => {
     loadGalleries();
@@ -31,6 +37,23 @@ export const AdminGalleryList: React.FC = () => {
       console.error('Failed to load galleries:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteDialog.gallery) {
+      return;
+    }
+
+    try {
+      console.log('🗑️ Deleting gallery:', deleteDialog.gallery.id);
+      await deleteGallery(deleteDialog.gallery.id, { confirm: true });
+      toast.success(t('messages.deleteSuccess') || 'Deleted successfully');
+      setDeleteDialog({ isOpen: false, gallery: null });
+      loadGalleries();
+    } catch (error) {
+      console.error('Failed to delete gallery:', error);
+      toast.error(t('messages.errorDeleting') || 'Failed to delete');
     }
   };
 
@@ -68,6 +91,13 @@ export const AdminGalleryList: React.FC = () => {
           {t('common.edit')}
         </Button>
       </Link>
+      <Button
+        size="sm"
+        variant="danger"
+        onClick={() => setDeleteDialog({ isOpen: true, gallery: row })}
+      >
+        {t('common.delete')}
+      </Button>
     </div>
   );
 
@@ -102,6 +132,20 @@ export const AdminGalleryList: React.FC = () => {
           onPageChange={setPage}
           onPerPageChange={setPerPage}
           emptyMessage={t('common.noData')}
+        />
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          title={t('gallery.deleteGallery') || 'Delete Gallery'}
+          message={
+            deleteDialog.gallery
+              ? t('gallery.confirmDeleteGallery', { title: deleteDialog.gallery.title }) ||
+                `Are you sure you want to delete "${deleteDialog.gallery.title}"?`
+              : ''
+          }
+          onConfirm={handleDelete}
+          onClose={() => setDeleteDialog({ isOpen: false, gallery: null })}
+          confirmText={t('common.delete')}
+          variant="danger"
         />
       </motion.div>
     </div>

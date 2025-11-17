@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { createGallery } from '@api/endpoints';
+import { createGallery, getGallery, updateGallery } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { FormField } from '@components/FormField/FormField';
 import { TextArea } from '@components/TextArea/TextArea';
+import { Loading } from '@components/Loading/Loading';
+import { toast } from 'react-hot-toast';
 import styles from './Gallery.module.css';
 
 interface GalleryFormData {
@@ -24,27 +26,75 @@ const schema = yup.object({
 export const AdminGalleryForm: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = Boolean(id);
+  const [initialLoading, setInitialLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<GalleryFormData>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      title: '',
+      description: '',
+    },
   });
+
+  useEffect(() => {
+    const loadGallery = async () => {
+      if (!isEdit || !id) {
+        return;
+      }
+
+      try {
+        setInitialLoading(true);
+        console.log('🎨 Loading gallery for edit, id:', id);
+        const response = await getGallery(Number(id));
+        console.log('🎨 Gallery data:', response.data);
+        const galleryData = (response.data as any)?.gallery || response.data;
+        reset({
+          title: galleryData?.title || '',
+          description: galleryData?.description || '',
+        });
+      } catch (error) {
+        console.error('Failed to load gallery:', error);
+        toast.error(t('messages.errorLoadingData'));
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    loadGallery();
+  }, [id, isEdit, reset, t]);
 
   const onSubmit = async (data: GalleryFormData) => {
     setIsSubmitting(true);
     try {
-      await createGallery(data);
+      if (isEdit && id) {
+        console.log('🎨 Updating gallery', id, data);
+        await updateGallery(Number(id), data);
+        toast.success(t('messages.updateSuccess'));
+      } else {
+        console.log('🎨 Creating gallery', data);
+        await createGallery(data);
+        toast.success(t('messages.createSuccess'));
+      }
       navigate('/admin/gallery');
     } catch (error) {
       console.error('Failed to create gallery:', error);
+      toast.error(t('messages.errorSavingData'));
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (initialLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.container}>
@@ -55,8 +105,12 @@ export const AdminGalleryForm: React.FC = () => {
       >
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>{t('gallery.addGallery')}</h1>
-            <p className={styles.subtitle}>Create a new photo gallery</p>
+            <h1 className={styles.title}>
+              {isEdit ? t('gallery.editGallery') || 'Edit Gallery' : t('gallery.addGallery')}
+            </h1>
+            <p className={styles.subtitle}>
+              {isEdit ? t('gallery.editGallerySubtitle') || 'Update gallery details' : 'Create a new photo gallery'}
+            </p>
           </div>
         </div>
 
@@ -88,7 +142,11 @@ export const AdminGalleryForm: React.FC = () => {
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('common.loading') : t('common.create')}
+              {isSubmitting
+                ? t('common.loading')
+                : isEdit
+                ? t('common.update')
+                : t('common.create')}
             </Button>
           </div>
         </form>
