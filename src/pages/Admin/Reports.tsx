@@ -32,6 +32,7 @@ import {
   getUnionExecutives,
   getOrganizationLeadersSummary,
   getOrganizationLeadersReportList,
+  getOrganizations,
   OrganizationLeadersReportRow,
 } from '@api/endpoints';
 import {
@@ -98,6 +99,11 @@ export const Reports: React.FC = () => {
   const { data: organizationLeadersList } = useQuery({
     queryKey: ['reports-organization-leaders-list'],
     queryFn: () => getOrganizationLeadersReportList({ per_page: 10 }),
+  });
+
+  const { data: organizationsList } = useQuery({
+    queryKey: ['reports-organizations-list'],
+    queryFn: () => getOrganizations({ per_page: 1000 }),
   });
 
   const firstUnionId = unionsList?.data?.data?.[0]?.union_id as number | undefined;
@@ -190,6 +196,19 @@ export const Reports: React.FC = () => {
     queryKey: ['all-members-for-export'],
     queryFn: () => getMembers({ per_page: 1000 }),
   });
+
+  const activeMembers = useMemo(() => {
+    const allMembers = allMembersData?.data?.data || [];
+    if (!allMembers.length) {
+      return allMembers;
+    }
+    return allMembers.filter((member: any) => {
+      if (member.is_active === undefined || member.is_active === null) {
+        return true;
+      }
+      return Boolean(member.is_active);
+    });
+  }, [allMembersData]);
 
   // Calculate overall executives gender breakdown
   const overallExecutivesByGender = useMemo(() => {
@@ -381,7 +400,7 @@ export const Reports: React.FC = () => {
   }, [allMembersData, unionsList]);
 
   // KPI values
-  const totalMembers = Number(((membersData?.data as any)?.summary?.grand_total) ?? 0);
+  const totalMembers = activeMembers.length;
   const maleCount = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('m'))?.count ?? 0);
   const femaleCount = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('f'))?.count ?? 0);
 
@@ -548,15 +567,9 @@ export const Reports: React.FC = () => {
   }, [unionsList]);
 
   const totalOrganizations = useMemo(() => {
-    const unions = unionsList?.data?.data || [];
-    const organizations = new Set<string>();
-    unions.forEach((u: any) => {
-      if (u.organization) {
-        organizations.add(u.organization.trim());
-      }
-    });
-    return organizations.size;
-  }, [unionsList]);
+    const organizations = organizationsList?.data?.data || [];
+    return organizations.length;
+  }, [organizationsList]);
 
   // NOTE: unionsBySector now comes from API above
 

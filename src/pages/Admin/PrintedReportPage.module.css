@@ -54,6 +54,13 @@
   padding: 40mm 20mm;
 }
 
+.coverLogo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: var(--spacing-4);
+}
+
 .mainTitle {
   font-size: 48px;
   font-weight: 700;
@@ -128,6 +135,12 @@
   font-size: 28px;
   font-weight: 700;
   color: #0B63D3;
+}
+
+.kpiSubtextSmall {
+  font-size: 10px;
+  color: #666;
+  margin-top: var(--spacing-1);
 }
 
 /* Section Styles */

@@ -5,8 +5,6 @@ import { Button } from '@components/Button/Button';
 import { Loading } from '@components/Loading/Loading';
 import { Select } from '@components/Select/Select';
 import {
-  getMembersSummaryFull,
-  getUnionsSummary,
   getExecutivesRemainingDays,
   getMembersUnder35,
   getMembersAbove35,
@@ -23,6 +21,7 @@ import {
   getUnionExecutives,
   getOrganizationLeadersSummary,
   getOrganizationLeadersReportList,
+  getOrganizations,
   OrganizationLeadersReportRow,
 } from '@api/endpoints';
 import {
@@ -65,16 +64,6 @@ const PrintedReportPage: React.FC = () => {
   const [filterEndDate, setFilterEndDate] = useState<string>(''); // Empty = show all data
 
   // Fetch all data
-  const { data: membersData, isLoading: loadingMembers } = useQuery({
-    queryKey: ['reports-members-summary-full'],
-    queryFn: getMembersSummaryFull,
-  });
-
-  const { data: unionsSummary } = useQuery({
-    queryKey: ['reports-unions-summary'],
-    queryFn: getUnionsSummary,
-  });
-
   const { data: organizationLeadersSummary } = useQuery({
     queryKey: ['reports-organization-leaders-summary'],
     queryFn: getOrganizationLeadersSummary,
@@ -95,16 +84,102 @@ const PrintedReportPage: React.FC = () => {
     queryFn: () => getOrganizationLeadersReportList({ per_page: 50 }),
   });
 
+  const { data: organizationsList } = useQuery({
+    queryKey: ['reports-organizations-list'],
+    queryFn: () => getOrganizations({ page: 1, per_page: 1000 }),
+  });
+
   const { data: allExecutivesData } = useQuery({
     queryKey: ['reports-executives-overall'],
     queryFn: () => getUnionExecutives({ per_page: 1000 }),
     enabled: true, // Always fetch
   });
 
-  const { data: allMembersData } = useQuery({
+  const { data: allMembersData, isLoading: loadingMembers } = useQuery({
     queryKey: ['all-members-for-export'],
     queryFn: () => getMembers({ per_page: 1000 }),
   });
+
+  const { data: terminatedList } = useQuery({
+    queryKey: ['reports-terminated-unions-list'],
+    queryFn: getTerminatedUnionsList,
+  });
+
+  const allMembers = useMemo(() => allMembersData?.data?.data || [], [allMembersData]);
+
+  const activeMembers = useMemo(() => {
+    if (!allMembers.length) {
+      return allMembers;
+    }
+    return allMembers.filter((member: any) => {
+      if (member.is_active === undefined || member.is_active === null) {
+        return true;
+      }
+      return Boolean(member.is_active);
+    });
+  }, [allMembers]);
+
+  const memberByIdMap = useMemo(() => {
+    const map = new Map<number, any>();
+    allMembers.forEach((member: any) => {
+      const id = member.mem_id || member.id;
+      if (id !== undefined && id !== null) {
+        map.set(Number(id), member);
+      }
+    });
+    return map;
+  }, [allMembers]);
+
+  const memberByCodeMap = useMemo(() => {
+    const map = new Map<string, any>();
+    allMembers.forEach((member: any) => {
+      if (member.member_code) {
+        map.set(String(member.member_code).toLowerCase(), member);
+      }
+    });
+    return map;
+  }, [allMembers]);
+
+  const terminatedUnionIds = useMemo(() => {
+    const ids = new Set<number>();
+    (terminatedList?.data?.data || []).forEach((item: any) => {
+      if (item.union_id) {
+        ids.add(Number(item.union_id));
+      }
+    });
+    return ids;
+  }, [terminatedList]);
+
+  const allUnions = useMemo(() => unionsList?.data?.data || [], [unionsList]);
+
+  const activeUnions = useMemo(() => {
+    if (!allUnions.length) {
+      return allUnions;
+    }
+    return allUnions.filter((union: any) => !terminatedUnionIds.has(Number(union.union_id)));
+  }, [allUnions, terminatedUnionIds]);
+
+  const unionSectorLookup = useMemo(() => {
+    const map = new Map<number, string>();
+    (unionsList?.data?.data || []).forEach((union: any) => {
+      if (union.union_id) {
+        map.set(Number(union.union_id), union.sector);
+      }
+    });
+    return map;
+  }, [unionsList]);
+
+  const resolvedTerminatedUnions = useMemo(() => {
+    return (terminatedList?.data?.data || []).map((union: any) => ({
+      ...union,
+      sector_display:
+        union.sector ||
+        union.union?.sector ||
+        (union.union_id ? unionSectorLookup.get(Number(union.union_id)) : undefined) ||
+        'N/A',
+    }));
+  }, [terminatedList, unionSectorLookup]);
+
 
   // Helper function to get organization from union data
   const getUnionOrganization = useMemo(() => {
@@ -160,9 +235,8 @@ const PrintedReportPage: React.FC = () => {
         
         // Get member name - lookup from allMembersData using mem_id
         let fullName = 'N/A';
-        if (exec.mem_id && allMembersData?.data?.data) {
-          const members: any[] = allMembersData.data.data;
-          const member = members.find((m: any) => (m.mem_id || m.id) === exec.mem_id);
+        if (exec.mem_id) {
+          const member = memberByIdMap.get(Number(exec.mem_id));
           if (member) {
             const firstName = member.first_name || '';
             const fatherName = member.father_name || '';
@@ -382,11 +456,6 @@ const PrintedReportPage: React.FC = () => {
     queryFn: () => getUnionsAssemblyRecent(3),
   });
 
-  const { data: terminatedList } = useQuery({
-    queryKey: ['reports-terminated-unions-list'],
-    queryFn: getTerminatedUnionsList,
-  });
-
   const { data: oshStatistics } = useQuery({
     queryKey: ['osh-statistics'],
     queryFn: () => getOSHStatistics(),
@@ -429,14 +498,14 @@ const PrintedReportPage: React.FC = () => {
 
   // Filter data by date range - MUST COME BEFORE useMemos that use them
   const filteredMembers = useMemo(() => {
-    const members: any[] = allMembersData?.data?.data || [];
+    const members: any[] = activeMembers;
     if (!filterStartDate && !filterEndDate) return members;
     
     return members.filter((m: any) => {
       const dateStr = m.registry_date || m.created_at;
       return isDateInRange(dateStr);
     });
-  }, [allMembersData, filterStartDate, filterEndDate]);
+  }, [activeMembers, filterStartDate, filterEndDate]);
 
   const filteredExecutivesByDate = useMemo(() => {
     const executives: any[] = allExecutivesData?.data?.data || [];
@@ -459,7 +528,7 @@ const PrintedReportPage: React.FC = () => {
   }, [allCBAsData, filterStartDate, filterEndDate]);
 
   const filteredUnions = useMemo(() => {
-    const unions: any[] = unionsList?.data?.data || [];
+    const unions: any[] = activeUnions;
     if (!filterStartDate && !filterEndDate) return unions;
     
     return unions.filter((u: any) => {
@@ -468,7 +537,7 @@ const PrintedReportPage: React.FC = () => {
       const ga = isDateInRange(u.general_assembly_date);
       return established || ga;
     });
-  }, [unionsList, filterStartDate, filterEndDate]);
+  }, [activeUnions, filterStartDate, filterEndDate]);
 
   const filteredOSHIncidents = useMemo(() => {
     const incidents: any[] = oshIncidents?.data?.data || [];
@@ -481,35 +550,40 @@ const PrintedReportPage: React.FC = () => {
 
   // Process data (using filtered data when date filter is active)
   const membersByGender = useMemo(() => {
-    // If filtered, recalculate from filteredMembers, otherwise use API summary
-    if (filterStartDate || filterEndDate) {
-      const genderCount: Record<string, number> = {};
-      filteredMembers.forEach((m: any) => {
-        const sex = String(m.sex || '').toLowerCase();
-        if (sex.startsWith('m')) genderCount['Male'] = (genderCount['Male'] || 0) + 1;
-        else if (sex.startsWith('f')) genderCount['Female'] = (genderCount['Female'] || 0) + 1;
-      });
-      return Object.entries(genderCount).map(([sex, cnt]) => ({ sex, cnt }));
-    }
-    
-    const totals = (membersData?.data as any)?.summary?.by_sex || [];
-    return totals.map((row: any) => ({ sex: row.sex, cnt: row.cnt ?? row.count ?? 0 }));
-  }, [membersData, filteredMembers, filterStartDate, filterEndDate]);
+    const normalizeSexLabel = (value: unknown) => {
+      const sex = String(value || '').toLowerCase();
+      if (sex.startsWith('m')) return 'Male';
+      if (sex.startsWith('f')) return 'Female';
+      return 'Unknown';
+    };
+
+    const source = (filterStartDate || filterEndDate) ? filteredMembers : activeMembers;
+    const counts: Record<string, number> = {};
+
+    source.forEach((member: any) => {
+      const label = normalizeSexLabel(member.sex);
+      counts[label] = (counts[label] || 0) + 1;
+    });
+
+    return Object.entries(counts)
+      .map(([sex, cnt]) => ({ sex, cnt }))
+      .filter((entry) => entry.cnt > 0);
+  }, [activeMembers, filteredMembers, filterStartDate, filterEndDate]);
 
   const unionsBySector = useMemo(() => {
-    return unionsSummary?.data?.by_sector || [];
-  }, [unionsSummary]);
+    const unions: any[] = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
+    const counts: Record<string, number> = {};
+    unions.forEach((union) => {
+      const sector = union.sector || 'Unknown';
+      counts[sector] = (counts[sector] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([sector, count]) => ({ sector, count }))
+      .sort((a, b) => a.sector.localeCompare(b.sector));
+  }, [activeUnions, filteredUnions, filterStartDate, filterEndDate]);
 
   const organizationLeadersTotal = useMemo(() => {
     return organizationLeadersSummary?.data?.total_leaders ?? 0;
-  }, [organizationLeadersSummary]);
-
-  const organizationLeadersBySector = useMemo(() => {
-    return organizationLeadersSummary?.data?.by_sector || [];
-  }, [organizationLeadersSummary]);
-
-  const organizationLeadersByOrganization = useMemo(() => {
-    return organizationLeadersSummary?.data?.by_organization || [];
   }, [organizationLeadersSummary]);
 
   const organizationLeadersReportRows = useMemo<OrganizationLeadersReportRow[]>(() => {
@@ -520,39 +594,27 @@ const PrintedReportPage: React.FC = () => {
     if (filterStartDate || filterEndDate) {
       return filteredMembers.length;
     }
-    return Number(((membersData?.data as any)?.summary?.grand_total) ?? 0);
-  }, [membersData, filteredMembers, filterStartDate, filterEndDate]);
+    return activeMembers.length;
+  }, [activeMembers, filteredMembers, filterStartDate, filterEndDate]);
 
   const membersByYearFull = useMemo(() => {
-    const apiByYear: any[] = (membersData?.data as any)?.by_year || [];
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
+    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : activeMembers;
     const yearAgg: Record<number, { total: number; Male: number; Female: number }> = {};
-    
+
     members.forEach((m) => {
       const dateStr = String(m.registry_date || m.created_at || '');
       const year = Number(dateStr.slice(0, 4));
       if (!year || Number.isNaN(year)) return;
       if (!yearAgg[year]) yearAgg[year] = { total: 0, Male: 0, Female: 0 };
       yearAgg[year].total += 1;
-      const key = String(m.sex).toLowerCase().startsWith('f') ? 'Female' : 'Male';
+      const key = String(m.sex || '').toLowerCase().startsWith('f') ? 'Female' : 'Male';
       yearAgg[year][key as 'Male' | 'Female'] += 1;
     });
-
-    // Only merge API data if no filter is applied
-    if (!filterStartDate && !filterEndDate) {
-      apiByYear.forEach((row: any) => {
-        const year = row.year;
-        if (!yearAgg[year]) yearAgg[year] = { total: 0, Male: 0, Female: 0 };
-        yearAgg[year].total = row.total ?? row.cnt ?? row.count ?? yearAgg[year].total;
-        if (row.Male !== undefined) yearAgg[year].Male = row.Male;
-        if (row.Female !== undefined) yearAgg[year].Female = row.Female;
-      });
-    }
 
     return Object.entries(yearAgg)
       .map(([year, v]) => ({ year: Number(year), total: v.total, Male: v.Male ?? 0, Female: v.Female ?? 0 }))
       .sort((a, b) => a.year - b.year);
-  }, [membersData, allMembersData, filteredMembers, filterStartDate, filterEndDate]);
+  }, [activeMembers, filteredMembers, filterStartDate, filterEndDate]);
 
   // Unused - replaced by youthByGender and eldersByGender
   // const youthVsElders = useMemo(() => {
@@ -577,7 +639,7 @@ const PrintedReportPage: React.FC = () => {
     }
     
     // Fallback to calculating from filtered members
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
+    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : activeMembers;
     const today = new Date();
     const genderCount = { Male: 0, Female: 0 };
     let totalProcessed = 0;
@@ -610,7 +672,7 @@ const PrintedReportPage: React.FC = () => {
     ].filter(item => item.value > 0);
     
     return result;
-  }, [allMembersData, youthData, filteredMembers, filterStartDate, filterEndDate]);
+  }, [activeMembers, youthData, filteredMembers, filterStartDate, filterEndDate]);
 
   // Elders above 35 by gender - Use API data if available, otherwise calculate
   const eldersByGender = useMemo(() => {
@@ -625,7 +687,7 @@ const PrintedReportPage: React.FC = () => {
     }
     
     // Fallback to calculating from filtered members
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
+    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : activeMembers;
     const today = new Date();
     const genderCount = { Male: 0, Female: 0 };
     let totalProcessed = 0;
@@ -658,22 +720,12 @@ const PrintedReportPage: React.FC = () => {
     ].filter(item => item.value > 0);
     
     return result;
-  }, [allMembersData, eldersData, youthByGender, filteredMembers, filterStartDate, filterEndDate]);
+  }, [activeMembers, eldersData, youthByGender, filteredMembers, filterStartDate, filterEndDate]);
 
   // Calculate overall executives gender breakdown (for "Overall" option)
   const overallExecutivesByGender = useMemo(() => {
     const executives: any[] = (filterStartDate || filterEndDate) ? filteredExecutivesByDate : (allExecutivesData?.data?.data || []);
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
     const genderCount: Record<string, number> = {};
-
-    // Create a map of mem_id to member sex for quick lookup
-    const memberSexMap = new Map<number, string>();
-    members.forEach((member: any) => {
-      if (member.mem_id || member.id) {
-        const memId = member.mem_id || member.id;
-        memberSexMap.set(memId, member.sex || '');
-      }
-    });
 
     const normalizeSex = (raw: unknown): 'Male' | 'Female' | 'Unknown' => {
       const v = String(raw || '').trim().toLowerCase();
@@ -688,7 +740,10 @@ const PrintedReportPage: React.FC = () => {
       
       // If still empty, try to get from members map using mem_id
       if (!sexValue && exec.mem_id) {
-        sexValue = memberSexMap.get(exec.mem_id) || '';
+        sexValue = memberByIdMap.get(Number(exec.mem_id))?.sex || '';
+      }
+      if (!sexValue && exec.member_code) {
+        sexValue = memberByCodeMap.get(String(exec.member_code).toLowerCase())?.sex || sexValue;
       }
       
       const sex = normalizeSex(sexValue);
@@ -698,7 +753,7 @@ const PrintedReportPage: React.FC = () => {
     return Object.entries(genderCount)
       .map(([sex, count]) => ({ name: sex, value: count }))
       .filter(item => item.value > 0);
-  }, [allExecutivesData, allMembersData, filteredExecutivesByDate, filteredMembers, filterStartDate, filterEndDate]);
+  }, [allExecutivesData, filteredExecutivesByDate, filterStartDate, filterEndDate, memberByIdMap, memberByCodeMap]);
 
   // Executives by selected union (or overall if no union selected) - For Report 7
   const executivesBySelectedUnion = useMemo(() => {
@@ -711,15 +766,7 @@ const PrintedReportPage: React.FC = () => {
     if (!execByUnion?.data?.data) return [];
     
     const executives: any[] = execByUnion.data.data;
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
     const genderCount: Record<string, number> = {};
-    
-    const memberSexMap = new Map<number, string>();
-    members.forEach((member: any) => {
-      if (member.mem_id || member.id) {
-        memberSexMap.set(member.mem_id || member.id, member.sex || '');
-      }
-    });
     
     const normalizeSex = (raw: unknown): string => {
       const v = String(raw || '').trim().toLowerCase();
@@ -731,7 +778,10 @@ const PrintedReportPage: React.FC = () => {
     executives.forEach((exec: any) => {
       let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || '';
       if (!sexValue && exec.mem_id) {
-        sexValue = memberSexMap.get(exec.mem_id) || '';
+        sexValue = memberByIdMap.get(Number(exec.mem_id))?.sex || '';
+      }
+      if (!sexValue && exec.member_code) {
+        sexValue = memberByCodeMap.get(String(exec.member_code).toLowerCase())?.sex || '';
       }
       const sex = normalizeSex(sexValue);
       genderCount[sex] = (genderCount[sex] || 0) + 1;
@@ -740,7 +790,7 @@ const PrintedReportPage: React.FC = () => {
     return Object.entries(genderCount)
       .map(([sex, count]) => ({ name: sex, value: count }))
       .filter(item => item.value > 0);
-  }, [execByUnion, allMembersData, selectedUnionId, overallExecutivesByGender, filteredMembers, filterStartDate, filterEndDate]);
+  }, [execByUnion, selectedUnionId, overallExecutivesByGender, memberByIdMap, memberByCodeMap]);
 
   // Executives by selected union for Report 3.1 (or overall if no union selected)
   const executivesBySelectedUnionForReport31 = useMemo(() => {
@@ -753,15 +803,7 @@ const PrintedReportPage: React.FC = () => {
     if (!execByUnionForReport31?.data?.data) return [];
     
     const executives: any[] = execByUnionForReport31.data.data;
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
     const genderCount: Record<string, number> = {};
-    
-    const memberSexMap = new Map<number, string>();
-    members.forEach((member: any) => {
-      if (member.mem_id || member.id) {
-        memberSexMap.set(member.mem_id || member.id, member.sex || '');
-      }
-    });
     
     const normalizeSex = (raw: unknown): string => {
       const v = String(raw || '').trim().toLowerCase();
@@ -773,7 +815,10 @@ const PrintedReportPage: React.FC = () => {
     executives.forEach((exec: any) => {
       let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || '';
       if (!sexValue && exec.mem_id) {
-        sexValue = memberSexMap.get(exec.mem_id) || '';
+        sexValue = memberByIdMap.get(Number(exec.mem_id))?.sex || '';
+      }
+      if (!sexValue && exec.member_code) {
+        sexValue = memberByCodeMap.get(String(exec.member_code).toLowerCase())?.sex || '';
       }
       const sex = normalizeSex(sexValue);
       genderCount[sex] = (genderCount[sex] || 0) + 1;
@@ -782,11 +827,11 @@ const PrintedReportPage: React.FC = () => {
     return Object.entries(genderCount)
       .map(([sex, count]) => ({ name: sex, value: count }))
       .filter(item => item.value > 0);
-  }, [execByUnionForReport31, allMembersData, selectedUnionIdForReport31, overallExecutivesByGender, filteredMembers, filterStartDate, filterEndDate]);
+  }, [execByUnionForReport31, selectedUnionIdForReport31, overallExecutivesByGender, memberByIdMap, memberByCodeMap]);
 
   // Annual Plan counts
   const strategicPlanStats = useMemo(() => {
-    const unions: any[] = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
+    const unions: any[] = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
     let withPlan = 0;
     let withoutPlan = 0;
     
@@ -799,7 +844,7 @@ const PrintedReportPage: React.FC = () => {
     });
     
     return { withPlan, withoutPlan, total: unions.length };
-  }, [unionsList, filteredUnions, filterStartDate, filterEndDate]);
+  }, [activeUnions, filteredUnions, filterStartDate, filterEndDate]);
 
   const cbaStatus = useMemo(() => {
     const allCBAs: any[] = (filterStartDate || filterEndDate) ? filteredCBAs : (allCBAsData?.data?.data || []);
@@ -849,8 +894,8 @@ const PrintedReportPage: React.FC = () => {
   }, [allCBAsData, filteredCBAs, filterStartDate, filterEndDate]);
 
   const membersBySector = useMemo(() => {
-    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : (allMembersData?.data?.data || []);
-    const unions: any[] = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
+    const members: any[] = (filterStartDate || filterEndDate) ? filteredMembers : activeMembers;
+    const unions: any[] = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
 
     const unionIdToSector = new Map<number, string>();
     unions.forEach((u) => unionIdToSector.set(u.union_id, String(u.sector || '').trim()));
@@ -868,7 +913,7 @@ const PrintedReportPage: React.FC = () => {
     return Object.entries(sectorAgg)
       .map(([sector, vals]) => ({ sector, ...vals }))
       .sort((a, b) => a.sector.localeCompare(b.sector));
-  }, [allMembersData, unionsList, filteredMembers, filteredUnions, filterStartDate, filterEndDate]);
+  }, [activeMembers, activeUnions, filteredMembers, filteredUnions, filterStartDate, filterEndDate]);
 
   const totalExecutives = useMemo(() => {
     const executives = (filterStartDate || filterEndDate) ? filteredExecutivesByDate : (allExecutivesData?.data?.data || []);
@@ -898,25 +943,19 @@ const PrintedReportPage: React.FC = () => {
   }, [allCBAsData, filteredCBAs, filterStartDate, filterEndDate]);
 
   const unionsWithGeneralAssembly = useMemo(() => {
-    const unions = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
+    const unions = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
     return unions.filter((u: any) => u.general_assembly_date && u.general_assembly_date !== null).length;
-  }, [unionsList, filteredUnions, filterStartDate, filterEndDate]);
+  }, [activeUnions, filteredUnions, filterStartDate, filterEndDate]);
 
   const totalOrganizations = useMemo(() => {
-    const unions = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
-    const organizations = new Set<string>();
-    unions.forEach((u: any) => {
-      if (u.organization) {
-        organizations.add(u.organization.trim());
-      }
-    });
-    return organizations.size;
-  }, [unionsList, filteredUnions, filterStartDate, filterEndDate]);
+    const organizations: any[] = organizationsList?.data?.data || [];
+    return organizations.length;
+  }, [organizationsList]);
 
   const totalUnions = useMemo(() => {
-    const unions = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
+    const unions = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
     return unions.length;
-  }, [unionsList, filteredUnions, filterStartDate, filterEndDate]);
+  }, [activeUnions, filteredUnions, filterStartDate, filterEndDate]);
 
   // Summary statistics for footer (using filtered data when applicable)
   const youthMembersCount = useMemo(() => {
@@ -950,7 +989,7 @@ const PrintedReportPage: React.FC = () => {
 
   const unionsWithoutCBACount = useMemo(() => {
     const cbas = (filterStartDate || filterEndDate) ? filteredCBAs : (allCBAsData?.data?.data || []);
-    const unions = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
+    const unions = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
     
     const unionsWithCBA = new Set<number>();
     cbas.forEach((cba: any) => {
@@ -958,17 +997,16 @@ const PrintedReportPage: React.FC = () => {
     });
     
     return unions.filter((u: any) => !unionsWithCBA.has(u.union_id || u.id)).length;
-  }, [allCBAsData, unionsList, filteredCBAs, filteredUnions, filterStartDate, filterEndDate]);
+  }, [allCBAsData, activeUnions, filteredCBAs, filteredUnions, filterStartDate, filterEndDate]);
 
   const unionsWithoutGACount = useMemo(() => {
-    const unions = (filterStartDate || filterEndDate) ? filteredUnions : (unionsList?.data?.data || []);
+    const unions = (filterStartDate || filterEndDate) ? filteredUnions : activeUnions;
     return unions.filter((u: any) => !u.general_assembly_date || u.general_assembly_date === null).length;
-  }, [unionsList, filteredUnions, filterStartDate, filterEndDate]);
+  }, [activeUnions, filteredUnions, filterStartDate, filterEndDate]);
 
   const terminatedUnionsCount = useMemo(() => {
-    // Terminated unions list typically doesn't have a date filter, but we can still respect it if the API supports it
-    return terminatedList?.data?.data?.length || 0;
-  }, [terminatedList]);
+    return resolvedTerminatedUnions.length;
+  }, [resolvedTerminatedUnions]);
 
   const expiredCBAs = (cbaExpiredList?.data?.data as any[]) || [];
 
@@ -1231,7 +1269,8 @@ const PrintedReportPage: React.FC = () => {
         {/* Cover Page - Phase 1 */}
         <div className={styles.page} data-print-phase="phase1">
           <div className={styles.coverPage}>
-            <h1 className={styles.mainTitle}>Transport Federation</h1>
+            <img src="/logo.png" alt="Transport & Communication Workers Federation logo" className={styles.coverLogo} />
+            <h1 className={styles.mainTitle}>Transport & Communication Workers Federation of Ethiopia (TCWF)</h1>
             <h2 className={styles.subTitle}>Comprehensive Reports</h2>
             <div className={styles.reportDate}>
               <p><strong>Report Generated:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
@@ -1255,6 +1294,7 @@ const PrintedReportPage: React.FC = () => {
                 <div className={styles.summaryStat}>
                   <span className={styles.statLabel}>Total Organizations</span>
                   <span className={styles.statValue}>{totalOrganizations.toLocaleString()}</span>
+                  <p className={styles.kpiSubtextSmall}>From organization registry</p>
                 </div>
               </div>
             </div>
@@ -1530,25 +1570,6 @@ const PrintedReportPage: React.FC = () => {
                 </table>
               </div>
             </div>
-
-            {/* 2.3 Unions by Organization */}
-            {unionsSummary?.data?.by_organization && unionsSummary.data.by_organization.length > 0 && (
-              <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>2.3 Unions by Organization</h3>
-                <div className={styles.chartContainer}>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={unionsSummary.data.by_organization}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="organization" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="count" name="Unions" fill={COLORS[4]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
 
             {/* 2.4 Members by Sector */}
             <div className={styles.reportItem}>
@@ -2403,7 +2424,7 @@ const PrintedReportPage: React.FC = () => {
         </div>
 
         {/* Report Section 6: Terminated Unions (Report 19) - Phase 1 */}
-        {terminatedList?.data?.data && terminatedList.data.data.length > 0 && (
+        {resolvedTerminatedUnions.length > 0 && (
           <div className={styles.page} data-print-phase="phase1">
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>6. Terminated Unions (Report 19)</h2>
@@ -2413,7 +2434,7 @@ const PrintedReportPage: React.FC = () => {
                 <h3 className={styles.reportQuestion}>6.0 (Report 19) Total Terminated Unions</h3>
                 <div className={styles.kpiBox}>
                   <p className={styles.kpiLabel}>Total Terminated Unions</p>
-                  <p className={styles.kpiValue}>{terminatedList.data.data.length.toLocaleString()}</p>
+                  <p className={styles.kpiValue}>{resolvedTerminatedUnions.length.toLocaleString()}</p>
                 </div>
               </div>
 
@@ -2430,10 +2451,10 @@ const PrintedReportPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {terminatedList.data.data.map((u: any, idx: number) => (
+                      {resolvedTerminatedUnions.map((u: any, idx: number) => (
                         <tr key={idx}>
                           <td>{u.name_en}</td>
-                          <td>{u.sector}</td>
+                          <td>{u.sector_display}</td>
                           <td>{u.terminated_date}</td>
                           <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', wordWrap: 'break-word' }} title={u.reason || u.termination_reason || 'N/A'}>
                             {u.reason || u.termination_reason || 'N/A'}
@@ -2452,62 +2473,6 @@ const PrintedReportPage: React.FC = () => {
                 <div className={styles.kpiBox}>
                   <p className={styles.kpiLabel}>Total Organization Leaders</p>
                   <p className={styles.kpiValue}>{organizationLeadersTotal.toLocaleString()}</p>
-                </div>
-              </div>
-            )}
-
-            {organizationLeadersBySector.length > 0 && (
-              <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>2.7 Organization Leaders by Sector</h3>
-                <div className={styles.chartContainer}>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={organizationLeadersBySector}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="sector" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="count" name="Leaders" fill={COLORS[3]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className={styles.dataTable}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Sector</th>
-                        <th>Leaders</th>
-                        <th>Percentage</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {organizationLeadersBySector.map((item, idx) => (
-                        <tr key={`leaders-sector-${idx}`}>
-                          <td><strong>{item.sector}</strong></td>
-                          <td>{item.count.toLocaleString()}</td>
-                          <td>{organizationLeadersTotal > 0 ? ((item.count / organizationLeadersTotal) * 100).toFixed(2) : '0.00'}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {organizationLeadersByOrganization.length > 0 && (
-              <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>2.8 Organization Leaders by Organization</h3>
-                <div className={styles.chartContainer}>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={organizationLeadersByOrganization}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="organization" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="count" name="Leaders" fill={COLORS[4]} />
-                    </BarChart>
-                  </ResponsiveContainer>
                 </div>
               </div>
             )}

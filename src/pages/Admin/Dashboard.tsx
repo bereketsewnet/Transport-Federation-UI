@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { KPICard } from '@components/KPICard/KPICard';
 import { ChartCard } from '@components/ChartCard/ChartCard';
 import { Loading } from '@components/Loading/Loading';
-import { getMembersSummaryFull, getUnionsSummary, getVisitors } from '@api/endpoints';
+import { getMembersSummaryFull, getUnionsSummary, getVisitors, getOrganizations } from '@api/endpoints';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, startOfWeek, startOfMonth } from 'date-fns';
 import styles from './Dashboard.module.css';
@@ -23,6 +23,11 @@ export const Dashboard: React.FC = () => {
   const { data: unionsSummary } = useQuery({
     queryKey: ['dashboard-unions-summary'],
     queryFn: getUnionsSummary,
+  });
+
+  const { data: organizationsList } = useQuery({
+    queryKey: ['dashboard-organizations'],
+    queryFn: () => getOrganizations({ per_page: 1000 }),
   });
 
   // Fetch visitors
@@ -61,11 +66,14 @@ export const Dashboard: React.FC = () => {
   const visitorsWeek = sumVisitors(visitorsWeekData);
   const visitorsMonth = sumVisitors(visitorsMonthData);
 
+  const totalOrganizations = organizationsList?.data?.data?.length || 0;
+
   const kpis = {
     totalMembers,
     maleMembers,
     femaleMembers,
     totalUnions,
+    totalOrganizations,
     visitorsToday,
     visitorsWeek,
     visitorsMonth,
@@ -156,6 +164,22 @@ export const Dashboard: React.FC = () => {
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
               <path
                 d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
+        />
+        <KPICard
+          title={t('dashboard.totalOrganizations', { defaultValue: 'Total Organizations' })}
+          value={kpis.totalOrganizations.toLocaleString()}
+          variant="default"
+          icon={
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path
+                d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-5v-7H10v7H5a2 2 0 01-2-2V9z"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
