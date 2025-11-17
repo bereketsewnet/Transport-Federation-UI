@@ -48,61 +48,64 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
-  height: 100%;
-  padding: 40mm 20mm;
+  min-height: 100%;
+  padding: 20mm 15mm;
+  page-break-inside: avoid;
 }
 
 .coverLogo {
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
-  margin-bottom: var(--spacing-4);
+  margin-bottom: 15px;
 }
 
 .mainTitle {
-  font-size: 48px;
+  font-size: 36px;
   font-weight: 700;
   color: #0B63D3;
-  margin: 0 0 var(--spacing-4) 0;
+  margin: 0 0 15px 0;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
+  line-height: 1.2;
 }
 
 .subTitle {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 600;
   color: #333;
-  margin: 0 0 var(--spacing-8) 0;
+  margin: 0 0 20px 0;
   text-decoration: underline;
 }
 
 .reportDate {
-  margin: var(--spacing-6) 0;
-  font-size: 14px;
+  margin: 15px 0;
+  font-size: 12px;
   color: #666;
 }
 
 .reportDate p {
-  margin: var(--spacing-2) 0;
+  margin: 5px 0;
 }
 
 .summaryBox {
-  margin-top: var(--spacing-8);
-  padding: var(--spacing-6);
+  margin-top: 20px;
+  padding: 15px;
   background: #f8f9fa;
   border: 2px solid #0B63D3;
   border-radius: var(--radius-lg);
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
+  page-break-inside: avoid;
 }
 
 .summaryBox h3 {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
   color: #0B63D3;
-  margin: 0 0 var(--spacing-4) 0;
+  margin: 0 0 12px 0;
   text-align: center;
   text-decoration: underline;
 }
@@ -110,29 +113,29 @@
 .summaryStats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-4);
+  gap: 10px;
 }
 
 .summaryStat {
   text-align: center;
-  padding: var(--spacing-3);
+  padding: 10px;
   background: white;
   border-radius: var(--radius);
 }
 
 .statLabel {
   display: block;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: var(--spacing-2);
+  margin-bottom: 5px;
 }
 
 .statValue {
   display: block;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: #0B63D3;
 }
@@ -438,7 +441,7 @@
 
   .page {
     margin: 0;
-    padding: 15mm;
+    padding: 12mm;
     box-shadow: none;
     page-break-after: always;
     page-break-inside: avoid;
@@ -450,6 +453,11 @@
     widows: 3;
   }
 
+  /* Cover page specific - less padding */
+  .page:first-child {
+    padding: 10mm 12mm !important;
+  }
+
   .page:last-child {
     page-break-after: auto;
     min-height: auto;
@@ -457,37 +465,87 @@
 
   /* Cover Page */
   .coverPage {
-    padding: 30mm 20mm;
+    padding: 5mm 0 !important;
     page-break-after: always;
+    page-break-inside: avoid;
+    min-height: auto;
+    max-height: 275mm;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+
+  .coverLogo {
+    width: 80px !important;
+    height: 80px !important;
+    margin-bottom: 10px !important;
   }
 
   .mainTitle {
-    font-size: 42px;
+    font-size: 26px !important;
     color: #0B63D3 !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.2 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .subTitle {
-    font-size: 28px;
+    font-size: 18px !important;
     color: #333 !important;
+    margin: 0 0 10px 0 !important;
+  }
+
+  .reportDate {
+    margin: 8px 0 !important;
+    font-size: 10px !important;
+  }
+
+  .reportDate p {
+    margin: 3px 0 !important;
   }
 
   .summaryBox {
     background: #f8f9fa !important;
     border: 2px solid #0B63D3 !important;
+    padding: 10px !important;
+    margin-top: 10px !important;
+    max-width: 400px !important;
+    page-break-inside: avoid !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  .summaryBox h3 {
+    font-size: 14px !important;
+    margin: 0 0 8px 0 !important;
+  }
+
+  .summaryStats {
+    gap: 6px !important;
   }
 
   .summaryStat {
     background: white !important;
+    padding: 6px !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
+  .statLabel {
+    font-size: 9px !important;
+    margin-bottom: 4px !important;
+  }
+
   .statValue {
+    font-size: 18px !important;
     color: #0B63D3 !important;
+  }
+
+  .kpiSubtextSmall {
+    font-size: 8px !important;
+    margin-top: 2px !important;
   }
 
   /* Section Styles */
