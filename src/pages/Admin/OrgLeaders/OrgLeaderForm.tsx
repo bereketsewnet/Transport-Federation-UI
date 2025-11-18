@@ -88,7 +88,7 @@ export const OrgLeaderForm: React.FC = () => {
       first_name: '',
       father_name: '',
       surname: '',
-      position: '',
+      position: 'CEO', // Default to CEO
       phone: '',
       email: '',
       sector: '',
@@ -155,6 +155,7 @@ export const OrgLeaderForm: React.FC = () => {
     loadSectorsAndOrganizations();
   }, [isEdit, setValue, t]);
 
+
   useEffect(() => {
     if (!isEdit || !id) {
       return;
@@ -174,7 +175,7 @@ export const OrgLeaderForm: React.FC = () => {
           first_name: leader.first_name || '',
           father_name: leader.father_name || '',
           surname: leader.surname || '',
-          position: leader.position || '',
+          position: leader.position || 'CEO', // Default to CEO if not set
           phone: leader.phone || '',
           email: leader.email || '',
           sector: leader.sector || leader.union?.sector || '',
@@ -203,7 +204,7 @@ export const OrgLeaderForm: React.FC = () => {
         first_name: data.first_name,
         father_name: data.father_name,
         surname: data.surname,
-        position: data.position,
+        position: data.position || 'CEO', // Default to CEO if not set
         phone: data.phone,
         email: data.email || undefined,
         sector: data.sector || undefined,
@@ -337,20 +338,17 @@ export const OrgLeaderForm: React.FC = () => {
               />
               <Select
                 label={t('orgLeaders.fields.position')}
-                value={watch('position') || ''}
+                value={watch('position') || 'CEO'}
                 onChange={(e) => {
                   setValue('position', e.target.value, { shouldValidate: true });
                 }}
                 error={errors.position?.message}
                 required
                 className={styles.formField}
-                options={[
-                  { value: '', label: t('orgLeaders.placeholders.position') || 'Select Position' },
-                  ...POSITION_OPTIONS.map((position) => ({
-                    value: position,
-                    label: position,
-                  })),
-                ]}
+                options={POSITION_OPTIONS.map((position) => ({
+                  value: position,
+                  label: position,
+                }))}
               />
             </div>
           </div>
