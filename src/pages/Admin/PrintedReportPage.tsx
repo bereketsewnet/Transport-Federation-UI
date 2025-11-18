@@ -1318,6 +1318,27 @@ const PrintedReportPage: React.FC = () => {
     };
   }, [oshIncidents]);
 
+  // Monthly Incident Trends (All Months) - Report 23
+  const oshIncidentsByMonth = useMemo(() => {
+    const incidents: any[] = (filterStartDate || filterEndDate) ? filteredOSHIncidents : (oshIncidents?.data?.data || []);
+    const monthCount: Record<string, number> = {};
+    
+    incidents.forEach((incident) => {
+      if (!incident.dateTimeOccurred) return;
+      const date = new Date(incident.dateTimeOccurred);
+      if (isNaN(date.getTime())) return; // Skip invalid dates
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
+    });
+    
+    return Object.entries(monthCount)
+      .map(([month, count]) => ({
+        month,
+        count,
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+  }, [oshIncidents, filteredOSHIncidents, filterStartDate, filterEndDate]);
+
   // Report 23: Monthly Incident Trends (Last 5 Years)
   const oshIncidentsByMonthLast5Years = useMemo(() => {
     const incidents: any[] = (filterStartDate || filterEndDate) ? filteredOSHIncidents : (oshIncidents?.data?.data || []);
@@ -1830,7 +1851,7 @@ const PrintedReportPage: React.FC = () => {
 
             {/* 2.5 Report 22: Annual Plan in Place */}
             <div className={styles.reportItem}>
-              <h3 className={styles.reportQuestion}>2.5 (Report 22) Unions with Annual Plan In-Place vs Not In-Place</h3>
+              <h3 className={styles.reportQuestion}>2.5 Unions with Annual Plan In-Place vs Not In-Place</h3>
               <div className={styles.chartContainer}>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
@@ -2045,7 +2066,7 @@ const PrintedReportPage: React.FC = () => {
             {/* 3.4 (Report 5 & 6) Executives Remaining Days */}
             {(execRemaining?.data?.data || allExecutivesData?.data?.data) && (
               <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>3.4 (Report 5 & 6) List All Executives Who Their Remaining Date is Less Than (Specific Period)</h3>
+                <h3 className={styles.reportQuestion}>3.4 Executives with Remaining Term Less Than (Specific Period)</h3>
                 <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   <label htmlFor="executive-filter-period" style={{ fontSize: '14px', fontWeight: 500 }}>Filter by Period:</label>
                   <div style={{ minWidth: '200px' }}>
@@ -2113,7 +2134,7 @@ const PrintedReportPage: React.FC = () => {
             {/* 3.5 Executives by Selected Union (Report 7) */}
             {(allExecutivesData?.data?.data || execByUnion?.data?.data) && (
               <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>3.5 (Report 7) Executive Committee by Selected Union</h3>
+                <h3 className={styles.reportQuestion}>3.5 Executive Committee by Selected Union</h3>
                 <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   <label htmlFor="union-select-report7" style={{ fontSize: '14px', fontWeight: 500 }}>Select Union:</label>
                   <div style={{ minWidth: '200px' }}>
@@ -2306,7 +2327,7 @@ const PrintedReportPage: React.FC = () => {
               const unionsWithoutCBA = unions.filter((u: any) => !unionsWithCBA.has(u.union_id));
               return unionsWithoutCBA.length > 0 ? (
                 <div className={styles.reportItem}>
-                  <h3 className={styles.reportQuestion}>4.4 (Report 12) Unions Without Collective Bargaining Agreement</h3>
+                  <h3 className={styles.reportQuestion}>4.4 Unions Without Collective Bargaining Agreement</h3>
                   <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
                     <p className={styles.kpiLabel}>Total Count</p>
                     <p className={styles.kpiValue}>{unionsWithoutCBA.length}</p>
@@ -2339,7 +2360,7 @@ const PrintedReportPage: React.FC = () => {
 
             {/* 4.5 Report 14: CBA Expiring Soon */}
             <div className={styles.reportItem}>
-              <h3 className={styles.reportQuestion}>4.5 (Report 14) Unions with CBA Expiring Soon</h3>
+              <h3 className={styles.reportQuestion}>4.5 Unions with CBA Expiring Soon</h3>
               <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <label htmlFor="cba-expiring-period" style={{ fontSize: '14px', fontWeight: 500 }}>Filter by Period:</label>
                 <Select
@@ -2396,7 +2417,7 @@ const PrintedReportPage: React.FC = () => {
             {/* 4.6 Report 15: CBA Ongoing */}
             {ongoingCBAs && ongoingCBAs.length > 0 && (
               <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>4.6 (Report 15) Unions with Ongoing Collective Bargaining Agreement</h3>
+                <h3 className={styles.reportQuestion}>4.6 Unions with Ongoing Collective Bargaining Agreement</h3>
                 <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
                   <p className={styles.kpiLabel}>Total Count</p>
                   <p className={styles.kpiValue}>{ongoingCBAs.length}</p>
@@ -2569,7 +2590,7 @@ const PrintedReportPage: React.FC = () => {
             {/* 5.5 Report 18: Upcoming General Assembly Meetings */}
             {unionsList?.data?.data && (
               <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>5.5 (Report 18) List Unions Those Last Congress/General Assembly Meeting is Within (Future Dates)</h3>
+                <h3 className={styles.reportQuestion}>5.5 Unions with Upcoming General Assembly Meetings</h3>
                 <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   <label htmlFor="ga-upcoming-period" style={{ fontSize: '14px', fontWeight: 500 }}>Filter by Period:</label>
                   <div style={{ minWidth: '200px' }}>
@@ -2643,11 +2664,11 @@ const PrintedReportPage: React.FC = () => {
         {resolvedTerminatedUnions.length > 0 && (
           <div className={styles.page} data-print-phase="phase1">
             <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>6. Terminated Unions (Report 19)</h2>
+              <h2 className={styles.sectionTitle}>6. Terminated Unions</h2>
               
               {/* Report 19: Total Terminated Unions Count */}
               <div className={styles.reportItem}>
-                <h3 className={styles.reportQuestion}>6.0 (Report 19) Total Terminated Unions</h3>
+                <h3 className={styles.reportQuestion}>6.0 Total Terminated Unions</h3>
                 <div className={styles.kpiBox}>
                   <p className={styles.kpiLabel}>Total Terminated Unions</p>
                   <p className={styles.kpiValue}>{resolvedTerminatedUnions.length.toLocaleString()}</p>
@@ -2805,10 +2826,51 @@ const PrintedReportPage: React.FC = () => {
                 </div>
               )}
 
+              {/* Report 23: Monthly Incident Trends (All Months) */}
+              {oshIncidentsByMonth.length > 0 && (
+                <div className={styles.reportItem}>
+                  <h3 className={styles.reportQuestion}>7.4 Monthly Incident Trends</h3>
+                  <div className={styles.chartContainer}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={oshIncidentsByMonth}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="count" name="Incidents" fill={COLORS[2]} radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className={styles.dataTable}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Month</th>
+                          <th>Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {oshIncidentsByMonth.map((item, idx) => (
+                          <tr key={idx}>
+                            <td><strong>{item.month}</strong></td>
+                            <td>{item.count.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                        <tr className={styles.totalRow}>
+                          <td><strong>Total</strong></td>
+                          <td><strong>{oshIncidentsByMonth.reduce((sum, item) => sum + item.count, 0).toLocaleString()}</strong></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               {/* Report 23: Monthly Incident Trends (Last 5 Years) */}
               {oshIncidentsByMonthLast5Years.length > 0 && (
                 <div className={styles.reportItem}>
-                  <h3 className={styles.reportQuestion}>7.4 (Report 23) Number of Accidents That Happened in the Last 5 Years</h3>
+                  <h3 className={styles.reportQuestion}>7.5 Accidents in the Last 5 Years</h3>
                   <div className={styles.chartContainer}>
                     <ResponsiveContainer width="100%" height={250}>
                       <LineChart data={oshIncidentsByMonthLast5Years}>
@@ -2849,7 +2911,7 @@ const PrintedReportPage: React.FC = () => {
               {/* Report 24: List Accidents by Union */}
               {oshIncidents?.data?.data && (
                 <div className={styles.reportItem}>
-                  <h3 className={styles.reportQuestion}>7.5 (Report 24) List Accidents That Happened in the Following Union</h3>
+                  <h3 className={styles.reportQuestion}>7.6 Accidents by Union</h3>
                   <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <label htmlFor="union-select-accidents" style={{ fontSize: '14px', fontWeight: 500 }}>Select Union:</label>
                     <div style={{ minWidth: '200px' }}>

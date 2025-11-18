@@ -81,7 +81,49 @@ export const useAuth = () => {
         navigate(dashboardPath);
       } catch (error: any) {
         console.error('Login error:', error);
-        toast.error(error.response?.data?.message || 'Invalid credentials');
+        
+        // Get error message from API response
+        const errorMessage = error.response?.data?.message || '';
+        const statusCode = error.response?.status;
+        
+        // Provide clearer error messages based on the error
+        let userFriendlyMessage = '';
+        
+        // Check for network errors first
+        if (!error.response) {
+          userFriendlyMessage = 'Network error. Please check your internet connection and try again.';
+        } else if (statusCode === 401) {
+          // Unauthorized - wrong credentials
+          const lowerMessage = errorMessage.toLowerCase();
+          if (lowerMessage.includes('password') || lowerMessage.includes('incorrect')) {
+            userFriendlyMessage = 'Incorrect password. Please check your password and try again.';
+          } else if (lowerMessage.includes('user') || lowerMessage.includes('not found') || lowerMessage.includes('username')) {
+            userFriendlyMessage = 'Username not found. Please verify your username or contact your administrator.';
+          } else {
+            userFriendlyMessage = 'Incorrect username or password. Please check your credentials and try again.';
+          }
+        } else if (statusCode === 403) {
+          // Forbidden - user exists but not authorized
+          userFriendlyMessage = 'Access denied. You are not authorized to access this system. Please contact your administrator.';
+        } else if (statusCode === 404) {
+          // Not found
+          userFriendlyMessage = 'User account not found. Please verify your username or contact your administrator.';
+        } else if (errorMessage && errorMessage.trim().length > 0) {
+          const lowerMessage = errorMessage.toLowerCase();
+          if (lowerMessage.includes('not a member') || lowerMessage.includes('not registered')) {
+            userFriendlyMessage = 'You are not a registered member. Please contact your administrator for access.';
+          } else if (lowerMessage.includes('incorrect') || lowerMessage.includes('wrong')) {
+            userFriendlyMessage = 'Incorrect information provided. Please check your username and password.';
+          } else {
+            // Use the API message if it's clear enough
+            userFriendlyMessage = errorMessage;
+          }
+        } else {
+          // Default fallback message
+          userFriendlyMessage = 'Incorrect username or password. Please check your credentials and try again.';
+        }
+        
+        toast.error(userFriendlyMessage);
         throw error;
       }
     },
