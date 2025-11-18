@@ -314,6 +314,48 @@ export const About: React.FC = () => {
               <p className={styles.sectionText}>{content.history[lang]}</p>
             </div>
           </div>
+          
+          {/* History Images Horizontal Scroll */}
+          <div className={styles.historyImagesContainer}>
+            <div className={styles.historyImagesScroll}>
+              <div className={styles.historyImagesTrack}>
+                {/* First set of images */}
+                {[
+                  'https://images.unsplash.com/photo-1556761175-5973dc4f32a9?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
+                ].map((img, index) => (
+                  <div key={`img-${index}`} className={styles.historyImageWrapper}>
+                    <img 
+                      src={img} 
+                      alt={`History ${index + 1}`}
+                      className={styles.historyImage}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+                {/* Duplicate set for seamless loop */}
+                {[
+                  'https://images.unsplash.com/photo-1556761175-5973dc4f32a9?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop',
+                  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
+                ].map((img, index) => (
+                  <div key={`img-dup-${index}`} className={styles.historyImageWrapper}>
+                    <img 
+                      src={img} 
+                      alt={`History ${index + 1}`}
+                      className={styles.historyImage}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </motion.section>
 
         {/* Objectives Section */}

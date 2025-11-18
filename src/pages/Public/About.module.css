@@ -80,6 +80,63 @@
   margin-bottom: var(--spacing-20);
 }
 
+/* History Images Horizontal Scroll */
+.historyImagesContainer {
+  margin-top: var(--spacing-8);
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: var(--spacing-4) 0;
+}
+
+.historyImagesScroll {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.historyImagesTrack {
+  display: flex;
+  gap: var(--spacing-4);
+  animation: scrollHistoryImages 30s linear infinite;
+  width: fit-content;
+}
+
+.historyImagesTrack:hover {
+  animation-play-state: paused;
+}
+
+.historyImageWrapper {
+  flex-shrink: 0;
+  width: 400px;
+  height: 300px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform var(--transition-base);
+}
+
+.historyImageWrapper:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.historyImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@keyframes scrollHistoryImages {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* Description Section - Simple Paragraph Style */
 .descriptionSection {
   margin-bottom: var(--spacing-16);
@@ -704,5 +761,10 @@
     width: 40px;
     height: 40px;
     font-size: 16px;
+  }
+
+  .historyImageWrapper {
+    width: 280px;
+    height: 200px;
   }
 }
