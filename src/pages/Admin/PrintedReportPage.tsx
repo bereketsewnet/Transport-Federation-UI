@@ -45,6 +45,20 @@ import styles from './PrintedReportPage.module.css';
 
 const COLORS = ['#0B63D3', '#E53935', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
+const formatPersonName = (source: any): string => {
+  if (!source) return '';
+  const parts = [
+    source.first_name || source.firstName || source.given_name || source.name,
+    source.father_name || source.middle_name || source.middleName || source.fathers_name,
+    source.surname || source.last_name || source.lastName || source.family_name,
+  ];
+  return parts
+    .map((part) => (part ? String(part).trim() : ''))
+    .filter((part) => part.length > 0)
+    .join(' ')
+    .trim();
+};
+
 const PrintedReportPage: React.FC = () => {
   const navigate = useNavigate();
   const dateFrom = '2020-01-01';
@@ -140,6 +154,78 @@ const PrintedReportPage: React.FC = () => {
     return map;
   }, [allMembers]);
 
+  const executiveNameByExecIdMap = useMemo(() => {
+    const map = new Map<number, string>();
+    (allExecutivesData?.data?.data || []).forEach((exec: any) => {
+      const possibleName =
+        exec.executive_name ||
+        exec.full_name ||
+        exec.member_full_name ||
+        exec.member_name ||
+        exec.name ||
+        formatPersonName(exec) ||
+        formatPersonName(exec.member) ||
+        formatPersonName(exec.member_data);
+
+      const normalized = possibleName && possibleName.trim().length > 0 ? possibleName.trim() : '';
+      if (normalized) {
+        if (exec.id !== undefined && exec.id !== null) {
+          map.set(Number(exec.id), normalized);
+        }
+      }
+    });
+    return map;
+  }, [allExecutivesData]);
+
+  const executiveNameByMemIdMap = useMemo(() => {
+    const map = new Map<number, string>();
+    (allExecutivesData?.data?.data || []).forEach((exec: any) => {
+      const possibleName =
+        exec.executive_name ||
+        exec.full_name ||
+        exec.member_full_name ||
+        exec.member_name ||
+        exec.name ||
+        formatPersonName(exec) ||
+        formatPersonName(exec.member) ||
+        formatPersonName(exec.member_data);
+
+      const normalized = possibleName && possibleName.trim().length > 0 ? possibleName.trim() : '';
+      if (normalized && exec.mem_id !== undefined && exec.mem_id !== null) {
+        map.set(Number(exec.mem_id), normalized);
+      }
+    });
+    return map;
+  }, [allExecutivesData]);
+
+  // Create lookup map: union_id + position -> member_code
+  const executiveMemberCodeByUnionPosition = useMemo(() => {
+    const map = new Map<string, string>();
+    (allExecutivesData?.data?.data || []).forEach((exec: any) => {
+      const unionId = exec.union_id;
+      const position = exec.position || exec.designation || exec.role || exec.title;
+      if (unionId && position && exec.member_code) {
+        const key = `${unionId}-${String(position).trim().toLowerCase()}`;
+        map.set(key, exec.member_code);
+      }
+    });
+    return map;
+  }, [allExecutivesData]);
+
+  // Create lookup map: union_id + position -> mem_id
+  const executiveMemIdByUnionPosition = useMemo(() => {
+    const map = new Map<string, number>();
+    (allExecutivesData?.data?.data || []).forEach((exec: any) => {
+      const unionId = exec.union_id;
+      const position = exec.position || exec.designation || exec.role || exec.title;
+      if (unionId && position && exec.mem_id) {
+        const key = `${unionId}-${String(position).trim().toLowerCase()}`;
+        map.set(key, Number(exec.mem_id));
+      }
+    });
+    return map;
+  }, [allExecutivesData]);
+
   const terminatedUnionIds = useMemo(() => {
     const ids = new Set<number>();
     (terminatedList?.data?.data || []).forEach((item: any) => {
@@ -162,22 +248,34 @@ const PrintedReportPage: React.FC = () => {
   const unionSectorLookup = useMemo(() => {
     const map = new Map<number, string>();
     (unionsList?.data?.data || []).forEach((union: any) => {
-      if (union.union_id) {
-        map.set(Number(union.union_id), union.sector);
+      const key = union.union_id ?? union.id;
+      if (key !== undefined && key !== null) {
+        map.set(Number(key), union.sector || union.sector_name || union.sector_en || union.sector_am);
       }
     });
     return map;
   }, [unionsList]);
 
   const resolvedTerminatedUnions = useMemo(() => {
-    return (terminatedList?.data?.data || []).map((union: any) => ({
-      ...union,
-      sector_display:
+    return (terminatedList?.data?.data || []).map((union: any) => {
+      const directSector =
         union.sector ||
+        union.sector_name ||
+        union.sector_en ||
+        union.union_sector ||
         union.union?.sector ||
+        union.union?.sector_name ||
+        union.union?.sector_en;
+
+      const lookupSector =
         (union.union_id ? unionSectorLookup.get(Number(union.union_id)) : undefined) ||
-        'N/A',
-    }));
+        (union.id ? unionSectorLookup.get(Number(union.id)) : undefined);
+
+      return {
+        ...union,
+        sector_display: directSector || lookupSector || 'N/A',
+      };
+    });
   }, [terminatedList, unionSectorLookup]);
 
 
@@ -195,6 +293,108 @@ const PrintedReportPage: React.FC = () => {
 
   // Filter executives by remaining days - use execRemaining API first, fallback to allExecutivesData
   const filteredExecutives = useMemo(() => {
+    const resolveExecutiveName = (exec: any): string => {
+      let name =
+        exec.executive_name ||
+        exec.full_name ||
+        exec.member_full_name ||
+        exec.member_name ||
+        exec.name ||
+        exec.person_name ||
+        formatPersonName(exec);
+
+      if (!name) {
+        name = formatPersonName(exec.member) || formatPersonName(exec.member_data);
+      }
+
+      // Try to get member_code from lookup if not present
+      let memberCode = exec.member_code;
+      let memId = exec.mem_id;
+      
+      if (!memberCode && !memId) {
+        const unionId = exec.union_id;
+        const position = exec.position || exec.designation || exec.role || exec.title;
+        if (unionId && position) {
+          const lookupKey = `${unionId}-${String(position).trim().toLowerCase()}`;
+          memberCode = executiveMemberCodeByUnionPosition.get(lookupKey);
+          memId = executiveMemIdByUnionPosition.get(lookupKey);
+        }
+      }
+
+      if (!name && memId) {
+        const member = memberByIdMap.get(Number(memId));
+        if (member) {
+          name =
+            formatPersonName(member) ||
+            member.full_name ||
+            member.member_full_name ||
+            executiveNameByMemIdMap.get(Number(memId));
+        }
+      }
+
+      if (!name && memberCode) {
+        const member = memberByCodeMap.get(String(memberCode).toLowerCase());
+        if (member) {
+          name = formatPersonName(member) || member.full_name || member.member_full_name;
+        }
+      }
+
+      if (!name && exec.id) {
+        name = executiveNameByExecIdMap.get(Number(exec.id));
+      }
+
+      if (!name && memId) {
+        name = executiveNameByMemIdMap.get(Number(memId));
+      }
+
+      return (name && name.trim().length > 0 ? name.trim() : 'N/A');
+    };
+
+    const resolveUnionName = (exec: any): string => {
+      const unions: any[] = unionsList?.data?.data || [];
+      const unionId = exec.union_id ?? exec.union?.union_id ?? exec.union?.id;
+      const union = unions.find(
+        (u: any) => Number(u.union_id ?? u.id) === (unionId !== undefined && unionId !== null ? Number(unionId) : NaN)
+      );
+      return (
+        exec.union_name ||
+        union?.name_en ||
+        union?.name ||
+        exec.union?.name_en ||
+        exec.union?.name ||
+        (unionId ? `Union ${unionId}` : 'N/A')
+      );
+    };
+
+    const normalizeExecutiveRecord = (exec: any) => {
+      const resolvedTermEnd =
+        exec.term_end_date ||
+        exec.termEndDate ||
+        exec.term_end ||
+        exec.termEnd ||
+        exec.term_end_dt ||
+        exec.term_endtime;
+
+      const resolvedDaysRemaining =
+        exec.days_remaining ??
+        exec.remaining_days ??
+        exec.daysLeft ??
+        exec.days_left ??
+        exec.days_to_expire ??
+        exec.remainingDays ??
+        null;
+
+      return {
+        ...exec,
+        union_id: exec.union_id ?? exec.union?.union_id ?? exec.union?.id,
+        union_name: resolveUnionName(exec),
+        executive_name: resolveExecutiveName(exec),
+        position: exec.position || exec.designation || exec.role || exec.title || 'N/A',
+        term_end_date: resolvedTermEnd,
+        days_remaining: resolvedDaysRemaining,
+      };
+    };
+
     // Try API data first
     let allExecutives: any[] = execRemaining?.data?.data || [];
     
@@ -233,10 +433,24 @@ const PrintedReportPage: React.FC = () => {
           }
         }
         
-        // Get member name - lookup from allMembersData using mem_id
+        // Get member name - lookup from allMembersData using mem_id or member_code
         let fullName = 'N/A';
+        
+        // Try mem_id first
         if (exec.mem_id) {
           const member = memberByIdMap.get(Number(exec.mem_id));
+          if (member) {
+            const firstName = member.first_name || '';
+            const fatherName = member.father_name || '';
+            const surname = member.surname || '';
+            const nameParts = [firstName, fatherName, surname].filter(part => part && part.trim());
+            fullName = nameParts.length > 0 ? nameParts.join(' ') : 'N/A';
+          }
+        }
+        
+        // Try member_code if mem_id didn't work
+        if (fullName === 'N/A' && exec.member_code) {
+          const member = memberByCodeMap.get(String(exec.member_code).toLowerCase());
           if (member) {
             const firstName = member.first_name || '';
             const fatherName = member.father_name || '';
@@ -277,6 +491,8 @@ const PrintedReportPage: React.FC = () => {
       
     }
     
+    allExecutives = allExecutives.map(normalizeExecutiveRecord);
+
     if (executiveFilterDays === 'all') {
       return allExecutives;
     }
@@ -296,7 +512,7 @@ const PrintedReportPage: React.FC = () => {
     
     
     return filtered;
-  }, [execRemaining, executiveFilterDays, allExecutivesData, unionsList, allMembersData]);
+  }, [execRemaining, executiveFilterDays, allExecutivesData, unionsList, allMembersData, memberByIdMap, memberByCodeMap, executiveNameByExecIdMap, executiveNameByMemIdMap, executiveMemberCodeByUnionPosition, executiveMemIdByUnionPosition]);
 
   const { data: youthData } = useQuery({
     queryKey: ['reports-members-under-35'],
@@ -1270,7 +1486,7 @@ const PrintedReportPage: React.FC = () => {
         <div className={styles.page} data-print-phase="phase1">
           <div className={styles.coverPage}>
             <img src="/logo.png" alt="Transport & Communication Workers Federation logo" className={styles.coverLogo} />
-            <h1 className={styles.mainTitle}>Transport & Communication Workers Federation of Ethiopia (TCWF)</h1>
+            <h1 className={styles.mainTitle}>Ethiopian Transport and Communication Workers Union Industrial Federation (ETCWUIF)</h1>
             <h2 className={styles.subTitle}>Comprehensive Reports</h2>
             <div className={styles.reportDate}>
               <p><strong>Report Generated:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
