@@ -197,7 +197,7 @@ export const Home: React.FC = () => {
           >
             <h2 className={styles.sectionTitle}>{t('home.overview.title')}</h2>
             <p className={styles.overviewText}>
-              {t('home.overview.content')}
+              {content ? (lang === 'en' ? content.overviewEn : content.overviewAm) : t('home.overview.content')}
             </p>
           </motion.div>
         </div>

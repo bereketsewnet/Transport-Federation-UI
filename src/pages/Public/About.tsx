@@ -184,8 +184,8 @@ export const About: React.FC = () => {
             transition={{ delay: 0.4 }}
           >
             {lang === 'en' 
-              ? 'Industrial Federation of Transport and Communication Trade Unions'
-              : 'የትራንስፖርትና መገናኛ ሠራተኞች ማኅበራት ኢንዱስትሪ ፌዴሬሽን'}
+              ? 'Ethiopian Transport and Communication Workers Union Industrial Federation'
+              : 'የኢትዮጵያ የትራንስፖርትና ኮሙኒኬሽን ሠራተኞች ህብረት የኢንዱስትሪ ፌዴሬሽን'}
           </motion.p>
         </div>
         <div className={styles.heroOverlay} />
