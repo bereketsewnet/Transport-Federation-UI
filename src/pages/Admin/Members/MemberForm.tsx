@@ -381,8 +381,8 @@ export const MemberForm: React.FC = () => {
                   { value: 'Diploma', label: 'Diploma' },
                   { value: 'Degree', label: 'Degree' },
                   { value: 'Masters', label: 'Masters' },
-                  { value: 'Doctor', label: 'Doctor' },
-                  { value: 'PhD', label: 'PhD' }
+                  { value: 'PhD', label: 'PhD' },
+                  { value: 'AbovePhD', label: 'Above PhD' }
                 ]}
               />
             </div>

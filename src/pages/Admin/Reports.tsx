@@ -278,14 +278,6 @@ export const Reports: React.FC = () => {
 
   const organizationLeadersTotal = organizationLeadersSummary?.data?.total_leaders ?? 0;
 
-  const organizationLeadersBySector = useMemo(() => {
-    return organizationLeadersSummary?.data?.by_sector || [];
-  }, [organizationLeadersSummary]);
-
-  const organizationLeadersByOrganization = useMemo(() => {
-    return organizationLeadersSummary?.data?.by_organization || [];
-  }, [organizationLeadersSummary]);
-
   const organizationLeadersPreview = useMemo<OrganizationLeadersReportRow[]>(() => {
     return (organizationLeadersList?.data?.data ?? []) as OrganizationLeadersReportRow[];
   }, [organizationLeadersList]);
@@ -530,8 +522,8 @@ export const Reports: React.FC = () => {
     
     return {
       totalIncidents: incidents.length,
-      fatalIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Fatal').length,
-      majorIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Major').length,
+      fatalityIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Fatality').length,
+      permanentDisabilityIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Permanent Disability/Major Injury').length,
     };
   }, [oshIncidents]);
 
@@ -589,8 +581,8 @@ export const Reports: React.FC = () => {
     <div className={styles.reports}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>{t('reports.title')}</h1>
-          <p className={styles.subtitle}>Comprehensive federation reports and analytics</p>
+          <h1 className={styles.title}>Union Operations Suite (UOS)</h1>
+          <p className={styles.subtitle}>Reports</p>
         </div>
         <div className={styles.headerActions}>
           <Button variant="primary" onClick={() => navigate('/admin/printed-report')}>
@@ -776,56 +768,6 @@ export const Reports: React.FC = () => {
             </ChartCard> */}
           </div>
 
-          {organizationLeadersBySector.length > 0 && (
-            <div className={styles.chartsGrid}>
-              <ChartCard
-                title="Organization Leaders by Sector"
-                description="Distribution of organization leaders across sectors"
-              >
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={organizationLeadersBySector}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="sector" stroke="var(--text-muted)" />
-                    <YAxis stroke="var(--text-muted)" />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'var(--bg)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="count" name="Leaders" fill={COLORS[3]} radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartCard>
-
-              {organizationLeadersByOrganization.length > 0 && (
-                <ChartCard
-                  title="Organization Leaders by Organization"
-                  description="Top organizations represented by leaders"
-                >
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={organizationLeadersByOrganization}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="organization" stroke="var(--text-muted)" />
-                      <YAxis stroke="var(--text-muted)" />
-                      <Tooltip
-                        contentStyle={{
-                          background: 'var(--bg)',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius)',
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="count" name="Leaders" fill={COLORS[4]} radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              )}
-            </div>
-          )}
-
           {/* Row 4: Members by Sector (Stacked) */}
           <div className={styles.fullWidth}>
             <ChartCard
@@ -893,30 +835,6 @@ export const Reports: React.FC = () => {
                   )}
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Unions by Organization */}
-          {unionsSummary?.data?.by_organization && unionsSummary.data.by_organization.length > 0 && (
-            <div className={styles.fullWidth}>
-              <ChartCard title="Unions by Organization" description="Distribution across organizations">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={unionsSummary.data.by_organization}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="organization" stroke="var(--text-muted)" />
-                    <YAxis stroke="var(--text-muted)" />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'var(--bg)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="count" name="Unions" fill={COLORS[4]} radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartCard>
             </div>
           )}
 
@@ -1299,14 +1217,14 @@ export const Reports: React.FC = () => {
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
                 <KPICard
-                  title="Fatal Incidents"
-                  value={computedOSHStatistics.fatalIncidents.toLocaleString()}
+                  title="Fatality Incidents"
+                  value={computedOSHStatistics.fatalityIncidents.toLocaleString()}
                   variant="danger"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
                 <KPICard
-                  title="Major Incidents"
-                  value={computedOSHStatistics.majorIncidents.toLocaleString()}
+                  title="Permanent Disability/Major Injury Incidents"
+                  value={computedOSHStatistics.permanentDisabilityIncidents.toLocaleString()}
                   variant="warning"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
@@ -1421,9 +1339,9 @@ export const Reports: React.FC = () => {
                               <td>{incident.accidentCategory || 'Not Set'}</td>
                               <td>
                                 <span className={`${styles.statusBadge} ${
-                                  incident.injurySeverity === 'Fatal' ? styles.danger :
-                                  incident.injurySeverity === 'Major' ? styles.warning :
-                                  incident.injurySeverity === 'Minor' ? styles.success : styles.info
+                                  incident.injurySeverity === 'Fatality' ? styles.danger :
+                                  incident.injurySeverity === 'Permanent Disability/Major Injury' ? styles.warning :
+                                  incident.injurySeverity === 'None' ? styles.success : styles.info
                                 }`}>
                                   {incident.injurySeverity}
                                 </span>

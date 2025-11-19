@@ -1313,8 +1313,8 @@ const PrintedReportPage: React.FC = () => {
     const incidents: any[] = oshIncidents?.data?.data || [];
     return {
       totalIncidents: incidents.length,
-      fatalIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Fatal').length,
-      majorIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Major').length,
+      fatalityIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Fatality').length,
+      permanentDisabilityIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Permanent Disability/Major Injury').length,
     };
   }, [oshIncidents]);
 
@@ -1508,6 +1508,7 @@ const PrintedReportPage: React.FC = () => {
           <div className={styles.coverPage}>
             <img src="/logo.png" alt="Transport & Communication Workers Federation logo" className={styles.coverLogo} />
             <h1 className={styles.mainTitle}>Ethiopian Transport and Communication Workers Union Industrial Federation (ETCWUIF)</h1>
+            <h2 className={styles.subTitle}>Union Operations Suite (UOS)</h2>
             <h2 className={styles.subTitle}>Comprehensive Reports</h2>
             <div className={styles.reportDate}>
               <p><strong>Report Generated:</strong> {format(new Date(), 'MMMM dd, yyyy')}</p>
@@ -2769,12 +2770,12 @@ const PrintedReportPage: React.FC = () => {
                     <p className={styles.kpiValue}>{computedOSHStatistics.totalIncidents.toLocaleString()}</p>
                   </div>
                   <div className={styles.kpiBox}>
-                    <p className={styles.kpiLabel}>Fatal Incidents</p>
-                    <p className={styles.kpiValue}>{computedOSHStatistics.fatalIncidents.toLocaleString()}</p>
+                    <p className={styles.kpiLabel}>Fatality Incidents</p>
+                    <p className={styles.kpiValue}>{computedOSHStatistics.fatalityIncidents.toLocaleString()}</p>
                   </div>
                   <div className={styles.kpiBox}>
-                    <p className={styles.kpiLabel}>Major Incidents</p>
-                    <p className={styles.kpiValue}>{computedOSHStatistics.majorIncidents.toLocaleString()}</p>
+                    <p className={styles.kpiLabel}>Permanent Disability/Major Injury Incidents</p>
+                    <p className={styles.kpiValue}>{computedOSHStatistics.permanentDisabilityIncidents.toLocaleString()}</p>
                   </div>
                 </div>
               </div>

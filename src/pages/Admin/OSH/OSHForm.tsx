@@ -68,11 +68,7 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
     { value: 'Medical Treatment Case (MTC)', label: 'Medical Treatment Case (MTC)' },
     { value: 'Restricted Work Case (RWC)', label: 'Restricted Work Case (RWC)' },
     { value: 'Permanent Disability/Major Injury', label: 'Permanent Disability/Major Injury' },
-    { value: 'Fatality', label: 'Fatality' },
-    { value: 'Minor', label: 'Minor' },
-    { value: 'Moderate', label: 'Moderate' },
-    { value: 'Major', label: 'Major' },
-    { value: 'Fatal', label: 'Fatal' }
+    { value: 'Fatality', label: 'Fatality' }
   ];
 
   const damageSeverityOptions = [

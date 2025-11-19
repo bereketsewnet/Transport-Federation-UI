@@ -93,8 +93,8 @@ export const Dashboard: React.FC = () => {
   return (
     <div className={styles.dashboard}>
       <div className={styles.header}>
-        <h1 className={styles.title}>{t('dashboard.title')}</h1>
-        <p className={styles.subtitle}>Welcome to your dashboard overview</p>
+        <h1 className={styles.title}>Union Operations Suite (UOS)</h1>
+        <p className={styles.subtitle}>Welcome to your overview</p>
       </div>
 
       {/* KPIs Grid */}
