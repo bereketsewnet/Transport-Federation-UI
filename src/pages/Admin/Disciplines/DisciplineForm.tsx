@@ -13,14 +13,12 @@ import {
 import { Button } from '@components/Button/Button';
 import { Modal } from '@components/Modal/Modal';
 import { TextArea } from '@components/TextArea/TextArea';
-import { FormField } from '@components/FormField/FormField';
 import { 
   FaTimes, 
   FaSave, 
-  FaGavel,
   FaUser
 } from 'react-icons/fa';
-import styles from './DisciplineForm.module.css';
+import styles from './DisciplineForm.module.css'; 
 
 interface DisciplineFormProps {
   discipline?: Discipline | null;
@@ -71,7 +69,6 @@ export const DisciplineForm: React.FC<DisciplineFormProps> = ({ discipline, onCl
         const response = await getUnions({ per_page: 1000 });
         setUnions(response.data.data);
       } catch (err) {
-        console.error('Error fetching unions:', err);
       }
     };
 
@@ -374,7 +371,7 @@ export const DisciplineForm: React.FC<DisciplineFormProps> = ({ discipline, onCl
       isOpen={true}
       onClose={onClose}
       title={discipline ? t('disciplines.editDiscipline') : t('disciplines.newDiscipline')}
-      size="large"
+      size="xl"
     >
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && (

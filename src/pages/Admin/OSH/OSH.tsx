@@ -29,7 +29,7 @@ import styles from './OSH.module.css';
 
 export const OSH: React.FC = () => {
   const [incidents, setIncidents] = useState<OSHIncident[]>([]);
-  const [statistics, setStatistics] = useState<OSHStatistics | null>(null);
+  const [_statistics, setStatistics] = useState<OSHStatistics | null>(null);
   const [statisticsLoading, setStatisticsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,14 +47,10 @@ export const OSH: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching incidents with filters:', filters);
       const response = await getOSHIncidents(filters);
-      console.log('Fetched incidents count:', response.data.data.length);
-      console.log('First incident sample:', response.data.data[0]);
       setIncidents(response.data.data);
     } catch (err) {
       setError('Failed to load OSH incidents');
-      console.error('Error fetching incidents:', err);
     } finally {
       setLoading(false);
     }
@@ -66,7 +62,6 @@ export const OSH: React.FC = () => {
       const response = await getOSHStatistics();
       setStatistics(response.data);
     } catch (err) {
-      console.error('Error fetching statistics:', err, statistics);
       setStatistics(null);
     } finally {
       setStatisticsLoading(false);
@@ -84,7 +79,6 @@ export const OSH: React.FC = () => {
   };
 
   const handleEdit = (incident: OSHIncident) => {
-    console.log('Editing incident:', incident);
     setEditingIncident(incident);
     setShowForm(true);
   };
@@ -105,7 +99,6 @@ export const OSH: React.FC = () => {
       setDeletingId(null);
     } catch (err) {
       setError('Failed to delete incident');
-      console.error('Error deleting incident:', err);
     }
   };
 

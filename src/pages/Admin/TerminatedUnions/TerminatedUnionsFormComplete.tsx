@@ -60,8 +60,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
   });
 
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
 
   // Load unions for dropdown
   useEffect(() => {
@@ -77,14 +75,10 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
 
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for form...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
     } catch (err) {
-      console.error('💥 Error loading unions:', err);
       toast.error('Failed to load unions');
     }
   };
@@ -99,7 +93,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
         return;
       }
       
-      console.log('🔍 Loading terminated union for edit, ID:', tu_id);
       const response = await getTerminatedUnion(tu_id);
       const tuData = response.data;
       
@@ -110,7 +103,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
         termination_reason: tuData.termination_reason || '',
       });
     } catch (err) {
-      console.error('💥 Error loading terminated union:', err);
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
     } finally {
@@ -130,7 +122,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
         termination_reason: String(data.termination_reason)
       } as any; // Use 'as any' to allow terminated_date field
 
-      console.log('📤 Sending data to API:', tuData);
 
       if (isEdit && id) {
         const tu_id = parseInt(id);
@@ -139,23 +130,15 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
           toast.error(t('messages.errorSavingData'));
           return;
         }
-        console.log('✏️ Updating terminated union with ID:', tu_id);
-        const response = await updateTerminatedUnion(tu_id, tuData);
-        console.log('✅ Update successful:', response);
+        await updateTerminatedUnion(tu_id, tuData);
         toast.success('Terminated union updated successfully!');
       } else {
-        console.log('➕ Creating new terminated union');
-        const response = await createTerminatedUnion(tuData);
-        console.log('✅ Create successful:', response);
+        await createTerminatedUnion(tuData);
         toast.success('Terminated union added successfully!');
       }
 
-      console.log('🎉 Navigating to terminated unions list');
       navigate('/admin/terminated-unions');
     } catch (err: any) {
-      console.error('💥 Error saving terminated union:', err);
-      console.error('💥 Error response:', err.response);
-      console.error('💥 Error details:', err.response?.data);
       const errorMsg = err.response?.data?.message || t('messages.errorSavingData');
       setError(errorMsg);
       toast.error(errorMsg);
@@ -222,7 +205,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
                 value={watchedValues.union_id?.toString() || ''}
                 onChange={(e) => {
                   const val = e.target.value;
-                  console.log('🔄 Union selected:', val);
                   if (val) {
                     setValue('union_id', parseInt(val));
                   }
@@ -256,7 +238,6 @@ export const TerminatedUnionsFormComplete: React.FC = () => {
               value={watchedValues.termination_reason || ''}
               onChange={(e) => {
                 const val = e.target.value;
-                console.log('🔄 Reason selected:', val);
                 if (val) {
                   setValue('termination_reason', val);
                 }

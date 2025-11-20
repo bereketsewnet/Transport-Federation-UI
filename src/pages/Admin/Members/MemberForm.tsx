@@ -80,24 +80,16 @@ export const MemberForm: React.FC = () => {
     }
   });
 
-  // Debug: Watch form values
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
 
   // Load unions for dropdown
   useEffect(() => {
     const loadUnions = async () => {
       try {
-        console.log('🔄 Loading unions for dropdown...');
         const response = await getUnions({ per_page: 1000 }); // Fetch more unions
-        console.log('✅ Unions response:', response);
         const unionsData = response.data.data || [];
-        console.log('📊 Unions loaded:', unionsData.length, 'unions');
-        console.log('📋 First union:', unionsData[0]);
         setUnions(unionsData);
       } catch (err) {
-        console.error('💥 Error loading unions:', err);
         toast.error('Failed to load unions');
       }
     };
@@ -119,9 +111,7 @@ export const MemberForm: React.FC = () => {
         setError(t('messages.errorLoadingData'));
         return;
       }
-      console.log('🔍 Loading member for edit, mem_id:', mem_id);
       const response = await getMember(mem_id);
-      console.log('✅ Member data for edit:', response.data);
       const memberData = response.data;
       
       // Populate form with existing data
@@ -142,23 +132,18 @@ export const MemberForm: React.FC = () => {
     } catch (err) {
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
-      console.error('Error loading member:', err);
     } finally {
       setLoading(false);
     }
   };
 
   const onSubmit = async (data: MemberFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    
     try {
       setError('');
       setLoading(true);
 
       // Auto-generate member_code if not provided
       const finalMemberCode = data.member_code?.trim() || generateMemberCode();
-      console.log('🔑 Member code:', finalMemberCode);
 
       const memberData = {
         ...data,
@@ -167,25 +152,16 @@ export const MemberForm: React.FC = () => {
         registry_date: new Date(data.registry_date).toISOString(),
       };
 
-      console.log('📤 Sending data to API:', memberData);
-
       if (isEdit && id) {
-        console.log('✏️ Updating member with ID:', id);
-        const response = await updateMember(parseInt(id), memberData);
-        console.log('✅ Update response:', response);
+        await updateMember(parseInt(id), memberData);
         toast.success(t('messages.updateSuccess'));
       } else {
-        console.log('➕ Creating new member');
-        const response = await createMember(memberData);
-        console.log('✅ Create response:', response);
+        await createMember(memberData);
         toast.success(t('messages.createSuccess'));
       }
 
-      console.log('🎉 Success! Navigating to members list');
       navigate('/admin/members');
     } catch (err: any) {
-      console.error('💥 Error saving member:', err);
-      console.error('💥 Error details:', err.response?.data);
       const errorMessage = err.response?.data?.message || t('messages.errorSavingData');
       setError(errorMessage);
       toast.error(errorMessage);
@@ -252,7 +228,6 @@ export const MemberForm: React.FC = () => {
                 value={watchedValues.union_id?.toString() || ''}
                 onChange={(e) => {
                   const val = e.target.value;
-                  console.log('🔄 Union selected:', val);
                   if (val) {
                     setValue('union_id', parseInt(val));
                   }
@@ -270,7 +245,6 @@ export const MemberForm: React.FC = () => {
                         label: union.name_en
                       }))
                   ];
-                  console.log('📋 Union dropdown options:', options);
                   return options;
                 })()}
               />

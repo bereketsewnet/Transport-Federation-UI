@@ -45,13 +45,11 @@ export const UnionsListComplete: React.FC = () => {
 
   // Filter handlers
   const handleFilterChange = (key: string, value: string) => {
-    console.log(`🔧 Filter changed: ${key} = ${value}`);
     setFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
   const handleSearch = (value: string) => {
-    console.log('🔍 Search:', value);
     setSearchTerm(value);
     setCurrentPage(1);
   };
@@ -89,9 +87,7 @@ export const UnionsListComplete: React.FC = () => {
         ...filters
       };
 
-      console.log('📊 Loading unions with params:', params);
       const response = await getUnions(params);
-      console.log('✅ Unions response:', response);
       
       const rawUnions = response.data.data || [];
       
@@ -101,9 +97,6 @@ export const UnionsListComplete: React.FC = () => {
         id: u.id || (u as any).union_id // Handle both id and union_id
       }));
       
-      console.log('📋 Transformed unions:', transformedUnions.length, 'unions');
-      console.log('📋 First union:', transformedUnions[0]);
-      
       setUnions(transformedUnions);
       
       // Update pagination info
@@ -112,7 +105,6 @@ export const UnionsListComplete: React.FC = () => {
         setTotalPages(response.data.meta.total_pages || Math.ceil((response.data.meta.total || 0) / pageSize));
       }
     } catch (err: any) {
-      console.error('💥 Error loading unions:', err);
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
     } finally {
@@ -130,8 +122,6 @@ export const UnionsListComplete: React.FC = () => {
     
     try {
       setTerminating(true);
-      console.log('🛑 Terminating union:', terminateDialog.union.id);
-      console.log('📝 Termination data:', data);
       
       // Create terminated union record
       // The backend will automatically copy all union data to terminated_unions table
@@ -151,7 +141,6 @@ export const UnionsListComplete: React.FC = () => {
       setTerminateDialog({ isOpen: false, union: null });
       await loadUnions(); // Reload data to remove terminated union from list
     } catch (err: any) {
-      console.error('💥 Error terminating union:', err);
       const errorMsg = err.response?.data?.message || 'Failed to terminate union';
       setError(errorMsg);
       toast.error(errorMsg);
@@ -203,8 +192,6 @@ export const UnionsListComplete: React.FC = () => {
 
   // Row actions
   const rowActions = (union: UnionRow) => {
-    console.log('🔧 Rendering actions for union:', union);
-    console.log('🆔 Union ID:', union.id, 'Type:', typeof union.id);
     
     return (
       <div className={styles.rowActions}>
@@ -213,7 +200,6 @@ export const UnionsListComplete: React.FC = () => {
           variant="secondary"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('✏️ Edit clicked for union ID:', union.id);
             navigate(`/admin/unions/${union.id}/edit`);
           }}
         >
@@ -224,7 +210,6 @@ export const UnionsListComplete: React.FC = () => {
           variant="danger"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🛑 Terminate clicked for union ID:', union.id);
             setTerminateDialog({ isOpen: true, union });
           }}
         >

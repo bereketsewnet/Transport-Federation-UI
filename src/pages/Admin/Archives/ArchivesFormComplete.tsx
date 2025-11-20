@@ -68,8 +68,6 @@ export const ArchivesFormComplete: React.FC = () => {
   });
 
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
 
   // Load archive data for editing
   useEffect(() => {
@@ -88,9 +86,7 @@ export const ArchivesFormComplete: React.FC = () => {
         return;
       }
       
-      console.log('🔍 Loading archive for edit, ID:', archive_id);
       const response = await getArchive(archive_id);
-      console.log('✅ Archive data for edit:', response.data);
       const archiveData = response.data;
       
       // Populate form with existing data
@@ -113,9 +109,6 @@ export const ArchivesFormComplete: React.FC = () => {
   };
 
   const onSubmit = async (data: ArchiveFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    console.log('❌ Form errors:', errors);
     
     try {
       setError('');
@@ -131,7 +124,6 @@ export const ArchivesFormComplete: React.FC = () => {
         is_public: Boolean(data.is_public)
       };
 
-      console.log('📤 Sending data to API:', archiveData);
 
       if (isEdit && id) {
         const archive_id = parseInt(id);
@@ -140,23 +132,15 @@ export const ArchivesFormComplete: React.FC = () => {
           toast.error(t('messages.errorSavingData'));
           return;
         }
-        console.log('✏️ Updating archive with ID:', archive_id);
-        const response = await updateArchive(archive_id, archiveData);
-        console.log('✅ Update successful:', response);
+        await updateArchive(archive_id, archiveData);
         toast.success('Archive updated successfully!');
       } else {
-        console.log('➕ Creating new archive');
-        const response = await createArchive(archiveData);
-        console.log('✅ Create successful:', response);
+        await createArchive(archiveData);
         toast.success('Archive added successfully!');
       }
 
-      console.log('🎉 Navigating to archives list');
       navigate('/admin/archives');
     } catch (err: any) {
-      console.error('💥 Error saving archive:', err);
-      console.error('💥 Error response:', err.response);
-      console.error('💥 Error details:', err.response?.data);
       const errorMsg = err.response?.data?.message || t('messages.errorSavingData');
       setError(errorMsg);
       toast.error(errorMsg);
@@ -241,7 +225,6 @@ export const ArchivesFormComplete: React.FC = () => {
                 value={watchedValues.category || ''}
                 onChange={(e) => {
                   const val = e.target.value;
-                  console.log('🔄 Category selected:', val);
                   if (val) {
                     setValue('category', val);
                   }

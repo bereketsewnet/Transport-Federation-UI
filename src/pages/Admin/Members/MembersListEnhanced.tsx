@@ -92,9 +92,7 @@ export const MembersListEnhanced: React.FC = () => {
         ...filters
       };
 
-      console.log('🔍 Loading Members with params:', params);
       const response = await getMembers(params);
-      console.log('✅ Members response:', response);
       
       const membersData = response.data.data || [];
       // Filter out any invalid members
@@ -107,7 +105,6 @@ export const MembersListEnhanced: React.FC = () => {
         setTotalPages(response.data.meta.total_pages || Math.ceil((response.data.meta.total || 0) / pageSize));
       }
     } catch (err: any) {
-      console.error('💥 Error loading members:', err);
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
     } finally {
@@ -124,7 +121,6 @@ export const MembersListEnhanced: React.FC = () => {
       const validUnions = unionsData.filter(union => union && union.id && union.name_en);
       setUnions(validUnions);
     } catch (err) {
-      console.error('Error loading unions:', err);
       setUnions([]); // Set empty array on error
     }
   };
@@ -149,7 +145,6 @@ export const MembersListEnhanced: React.FC = () => {
     } catch (err) {
       setError(t('messages.errorDeletingData'));
       toast.error(t('messages.errorDeletingData'));
-      console.error('Error deleting member:', err);
     }
   };
 
@@ -165,7 +160,6 @@ export const MembersListEnhanced: React.FC = () => {
     } catch (err) {
       setError(t('messages.errorArchivingData'));
       toast.error(t('messages.errorArchivingData'));
-      console.error('Error archiving member:', err);
     }
   };
 

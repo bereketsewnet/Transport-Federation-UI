@@ -89,38 +89,29 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
     const fetchUnions = async () => {
       try {
         const response = await getUnions({ per_page: 1000 });
-        console.log('Fetched unions response:', response);
-        console.log('Unions data:', response.data.data);
-        console.log('First union:', response.data.data[0]);
-        console.log('First union ID:', response.data.data[0]?.union_id, typeof response.data.data[0]?.union_id);
         setUnions(response.data.data);
       } catch (err) {
-        console.error('Error fetching unions:', err);
       }
     };
 
     fetchUnions();
 
     if (incident) {
-      console.log('Editing incident in form:', incident);
       const formDataToSet = {
         ...incident,
         dateTimeOccurred: incident.dateTimeOccurred 
           ? new Date(incident.dateTimeOccurred).toISOString().slice(0, 16)
           : new Date().toISOString().slice(0, 16)
       };
-      console.log('Setting form data:', formDataToSet);
       setFormData(formDataToSet);
     }
   }, [incident]);
 
   const handleInputChange = (field: keyof OSHIncident, value: any) => {
-    console.log(`Setting ${field} to:`, value, typeof value);
     
     // Ensure we're not storing DOM elements or circular references
     let cleanValue = value;
     if (value && typeof value === 'object' && value.constructor && value.constructor.name === 'HTMLOptionElement') {
-      console.error('Attempted to store HTMLOptionElement in formData!');
       return;
     }
     
@@ -128,17 +119,13 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
     if (field === 'unionId') {
       if (typeof value === 'string') {
         cleanValue = parseInt(value, 10);
-        console.log(`Converting union_id from string "${value}" to number:`, cleanValue);
       } else if (typeof value === 'number') {
         cleanValue = value;
-        console.log(`Union_id is already a number:`, cleanValue);
       } else {
-        console.error(`Invalid union_id value type:`, typeof value, value);
         cleanValue = 0;
       }
       
       if (isNaN(cleanValue)) {
-        console.error(`Union_id conversion resulted in NaN:`, value);
         cleanValue = 0;
       }
     }
@@ -183,7 +170,6 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
   };
 
   const validateField = (field: string, value: any): string => {
-    console.log(`Validating ${field}:`, value, typeof value);
     switch (field) {
       case 'unionId':
         if (!value || value === 0 || isNaN(value) || (typeof value === 'object' && value.constructor && value.constructor.name === 'SyntheticBaseEvent')) {
@@ -223,9 +209,6 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
     const errors: Record<string, string> = {};
     let isValid = true;
 
-    console.log('Current formData:', formData);
-    console.log('Current formData.unionId:', formData.unionId, typeof formData.unionId);
-
     // Validate each required field
     const requiredFields = [
       'unionId', 'accidentCategory', 'dateTimeOccurred', 
@@ -257,9 +240,6 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
       setLoading(true);
       setError(null);
 
-      console.log('Form data before submission:', formData);
-      console.log('accidentCategory value:', formData.accidentCategory, typeof formData.accidentCategory);
-
       // Create a completely clean copy of the data
       const submitData: Partial<OSHIncident> = {
         unionId: Number(formData.unionId) || 0,
@@ -288,8 +268,6 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
         preventiveMeasures: formData.preventiveMeasures ? String(formData.preventiveMeasures) : undefined,
       };
 
-      console.log('Submit data:', submitData);
-
       if (incident) {
         await updateOSHIncident(incident.id, submitData);
       } else {
@@ -299,7 +277,6 @@ export const OSHForm: React.FC<OSHFormProps> = ({ incident, onClose }) => {
       onClose();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save incident');
-      console.error('Error saving incident:', err);
     } finally {
       setLoading(false);
     }

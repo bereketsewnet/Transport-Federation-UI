@@ -45,8 +45,6 @@ export const useAuth = () => {
         const response = await loginApi(credentials);
         const data: LoginResponse = response.data;
 
-        console.log('Login response:', data);
-
         // Check if password change is required (first-time login)
         if (data.requirePasswordChange && data.tempToken) {
           setAuthToken(data.tempToken);

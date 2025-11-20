@@ -70,10 +70,7 @@ export const AboutEditor: React.FC = () => {
         ]);
 
         const about = aboutResponse.data.data;
-        
-        // Debug: Log raw API response
-        console.log('Admin - Executives from API:', executivesResponse.data.data);
-        console.log('Admin - Experts from API:', expertsResponse.data.data);
+
         
         // Helper to normalize image path
         // Backend might return: uploads/executive-123.png or executive-123.png
@@ -173,10 +170,6 @@ export const AboutEditor: React.FC = () => {
           };
         });
         
-        // Debug: Log mapped data with image URLs
-        console.log('Admin - Executives with images:', executivesData);
-        console.log('Admin - Experts with images:', expertsData);
-        
         setExecutives(executivesData);
         setExperts(expertsData);
       } catch (error) {
@@ -198,7 +191,6 @@ export const AboutEditor: React.FC = () => {
   ): Promise<void> => {
     try {
       const response = await uploadExecutiveImage(id, file);
-      console.log('Upload response:', response.data);
       toast.success('Image uploaded successfully');
       
       // Normalize image path (backend might return various formats)
@@ -224,8 +216,6 @@ export const AboutEditor: React.FC = () => {
       
       // Convert relative URL to full URL
       const fullImageUrl = getImageUrl(imagePath);
-      console.log('Normalized image path:', imagePath);
-      console.log('Full image URL:', fullImageUrl);
       
       // Update local state
       if (type === 'executive') {

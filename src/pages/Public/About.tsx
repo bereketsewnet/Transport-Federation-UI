@@ -46,10 +46,6 @@ export const About: React.FC = () => {
 
         const about = aboutResponse.data.data;
         
-        // Debug: Log raw API response
-        console.log('Executives from API:', executivesResponse.data.data);
-        console.log('Experts from API:', expertsResponse.data.data);
-        
         // Helper to normalize image path
         // Backend might return: uploads/executive-123.png or executive-123.png
         // Should be: /uploads/cms/executives/executive-123.png
@@ -130,14 +126,9 @@ export const About: React.FC = () => {
           };
         });
         
-        // Debug: Log mapped data with image URLs
-        console.log('Executives with images:', executivesWithImages);
-        console.log('Experts with images:', expertsWithImages);
-        
         setExecutives(executivesWithImages);
         setExperts(expertsWithImages);
       } catch (error) {
-        console.error('Failed to load about content:', error);
       } finally {
         setLoading(false);
       }

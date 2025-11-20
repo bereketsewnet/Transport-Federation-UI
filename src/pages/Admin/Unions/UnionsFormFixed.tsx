@@ -67,8 +67,7 @@ export const UnionsFormFixed: React.FC = () => {
 
   // Debug: Watch form values
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
+
 
   // Load union data for editing
   useEffect(() => {
@@ -104,14 +103,9 @@ export const UnionsFormFixed: React.FC = () => {
   };
 
   const onSubmit = async (data: UnionFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    console.log('❌ Form errors:', errors);
-    console.log('⏳ Is submitting:', isSubmitting);
     
     // Validate form data
     if (Object.keys(errors).length > 0) {
-      console.error('❌ Form has validation errors:', errors);
       setError('Please fix the form errors before submitting');
       return;
     }
@@ -125,23 +119,14 @@ export const UnionsFormFixed: React.FC = () => {
         established_date: new Date(data.established_date).toISOString(),
       };
 
-      console.log('📤 Sending data to API:', unionData);
-
       if (isEdit && id) {
-        console.log('✏️ Updating union with ID:', id);
-        const response = await updateUnion(parseInt(id), unionData);
-        console.log('✅ Update response:', response);
+        await updateUnion(parseInt(id), unionData);
       } else {
-        console.log('➕ Creating new union');
-        const response = await createUnion(unionData);
-        console.log('✅ Create response:', response);
+        await createUnion(unionData);
       }
 
-      console.log('🎉 Success! Navigating to unions list');
       navigate('/admin/unions');
     } catch (err: any) {
-      console.error('💥 Error saving union:', err);
-      console.error('💥 Error details:', err.response?.data);
       setError(err.response?.data?.message || t('messages.errorSavingData'));
     } finally {
       setLoading(false);

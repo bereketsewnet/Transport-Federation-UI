@@ -45,8 +45,6 @@ export const ArchivedMembers: React.FC = () => {
     try {
       setLoading(true);
       const response = await getArchives({ per_page: 1000 });
-      console.log('📊 Archived members API response:', response);
-      console.log('📊 Response data:', response.data);
       
       const membersData: ArchivedMember[] = (response.data.data || []).map((item: any) => ({
         id: Number(item.id),

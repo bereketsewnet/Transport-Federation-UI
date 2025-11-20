@@ -46,13 +46,11 @@ export const AdminGalleryList: React.FC = () => {
     }
 
     try {
-      console.log('🗑️ Deleting gallery:', deleteDialog.gallery.id);
       await deleteGallery(deleteDialog.gallery.id, { confirm: true });
       toast.success(t('messages.deleteSuccess') || 'Deleted successfully');
       setDeleteDialog({ isOpen: false, gallery: null });
       loadGalleries();
     } catch (error) {
-      console.error('Failed to delete gallery:', error);
       toast.error(t('messages.errorDeleting') || 'Failed to delete');
     }
   };

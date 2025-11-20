@@ -71,14 +71,10 @@ export const ExecutivesForm: React.FC = () => {
 
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for form...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
     } catch (err) {
-      console.error('💥 Error loading unions:', err);
     }
   };
 

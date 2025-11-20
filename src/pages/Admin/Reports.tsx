@@ -1155,10 +1155,7 @@ export const Reports: React.FC = () => {
             // Get all data from API - API should already filter by 3 months
             const allData = unionsGARecent?.data?.data || [];
             
-            // Debug: Log raw data to see what we're getting
-            if (allData.length > 0) {
-              console.log('🔍 Raw GA Recent Data:', allData);
-            }
+            
             
             // Map and calculate days correctly (always calculate from date to ensure correct sign)
             // Positive = past, Negative = future
@@ -1197,13 +1194,9 @@ export const Reports: React.FC = () => {
               // Only show past assemblies within 3 months (0-90 days ago)
               const isValid = !isNaN(daysSince) && daysSince >= 0 && daysSince <= 90;
               if (!isValid && daysSince !== undefined) {
-                console.log('🚫 Filtered out:', u.union_name || u.name_en, 'days_since:', daysSince);
               }
               return isValid;
             });
-            
-            // Debug: Log filtered results
-            console.log('✅ Filtered GA Recent Data:', recentGAData.length, 'out of', allData.length);
             
             // Show table if we have data, or show message if API returned data but it was filtered out
             if (recentGAData.length > 0) {

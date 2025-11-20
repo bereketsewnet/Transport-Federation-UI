@@ -64,8 +64,6 @@ export const ExecutivesFormComplete: React.FC = () => {
   });
 
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
 
   // Calculate end date
   const calculateEndDate = () => {
@@ -92,14 +90,10 @@ export const ExecutivesFormComplete: React.FC = () => {
 
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for form...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
     } catch (err) {
-      console.error('💥 Error loading unions:', err);
       toast.error('Failed to load unions');
     }
   };
@@ -107,10 +101,8 @@ export const ExecutivesFormComplete: React.FC = () => {
   const loadExecutive = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Loading executive with ID:', id);
       const response = await getUnionExecutive(Number(id));
       const executive = response.data;
-      console.log('✅ Executive loaded:', executive);
       
       // Format the date to YYYY-MM-DD for the date input
       const formattedDate = executive.appointed_date 
@@ -128,7 +120,6 @@ export const ExecutivesFormComplete: React.FC = () => {
       
       toast.success('Executive data loaded');
     } catch (err: any) {
-      console.error('💥 Error loading executive:', err);
       const errorMsg = err.response?.data?.message || 'Failed to load executive data';
       setError(errorMsg);
       toast.error(errorMsg);
@@ -138,10 +129,6 @@ export const ExecutivesFormComplete: React.FC = () => {
   };
 
   const onSubmit = async (data: ExecutiveFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    console.log('❌ Form errors:', errors);
-    console.log('✏️ Is Edit Mode:', isEdit, 'ID:', id);
     
     try {
       setError('');
@@ -155,33 +142,16 @@ export const ExecutivesFormComplete: React.FC = () => {
         term_length_years: Number(data.term_length_years)
       };
 
-      console.log('📤 Sending data to API:', executiveData);
-      console.log('📤 Data types:', {
-        union_id: typeof executiveData.union_id,
-        member_code: typeof executiveData.member_code,
-        position: typeof executiveData.position,
-        appointed_date: typeof executiveData.appointed_date,
-        term_length_years: typeof executiveData.term_length_years
-      });
-
       if (isEdit && id) {
-        console.log('✏️ Updating executive with ID:', id);
-        const response = await updateUnionExecutive(Number(id), executiveData);
-        console.log('✅ Update successful:', response);
+        await updateUnionExecutive(Number(id), executiveData);
         toast.success('Executive updated successfully!');
       } else {
-        console.log('➕ Creating new executive');
-        const response = await createUnionExecutive(executiveData);
-        console.log('✅ Create successful:', response);
+        await createUnionExecutive(executiveData);
         toast.success('Executive added successfully!');
       }
 
-      console.log('🎉 Navigating to executives list');
       navigate('/admin/executives');
     } catch (err: any) {
-      console.error('💥 Error saving executive:', err);
-      console.error('💥 Error response:', err.response);
-      console.error('💥 Error details:', err.response?.data);
       const errorMsg = err.response?.data?.message || t('messages.errorSavingData');
       setError(errorMsg);
       toast.error(errorMsg);
@@ -250,7 +220,6 @@ export const ExecutivesFormComplete: React.FC = () => {
                 value={watchedValues.union_id?.toString() || ''}
                 onChange={(e) => {
                   const val = e.target.value;
-                  console.log('🔄 Union selected:', val);
                   if (val) {
                     setValue('union_id', parseInt(val));
                   }
@@ -285,7 +254,6 @@ export const ExecutivesFormComplete: React.FC = () => {
               value={watchedValues.position || ''}
               onChange={(e) => {
                 const val = e.target.value;
-                console.log('🔄 Position selected:', val);
                 if (val) {
                   setValue('position', val);
                 }

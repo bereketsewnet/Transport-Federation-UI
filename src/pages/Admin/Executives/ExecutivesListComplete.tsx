@@ -45,13 +45,11 @@ export const ExecutivesListComplete: React.FC = () => {
 
   // Filter handlers
   const handleFilterChange = (key: string, value: string) => {
-    console.log(`🔧 Filter changed: ${key} = ${value}`);
     setFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
   const handleSearch = (value: string) => {
-    console.log('🔍 Search:', value);
     setSearchTerm(value);
     setCurrentPage(1);
   };
@@ -100,13 +98,9 @@ export const ExecutivesListComplete: React.FC = () => {
         ...filters
       };
 
-      console.log('📊 Loading Executives with params:', params);
       const response = await getUnionExecutives(params);
-      console.log('✅ Executives response:', response);
       
       const executivesData = response.data.data || [];
-      console.log('📋 Executives loaded:', executivesData.length);
-      console.log('📋 First executive:', executivesData[0]);
       
       setExecutives(executivesData);
       
@@ -127,11 +121,8 @@ export const ExecutivesListComplete: React.FC = () => {
   // Load unions for filter
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for filter...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
     } catch (err) {
       console.error('💥 Error loading unions:', err);
@@ -151,13 +142,11 @@ export const ExecutivesListComplete: React.FC = () => {
     if (!deleteDialog.executive) return;
     
     try {
-      console.log('🗑️ Deleting executive:', deleteDialog.executive.id);
       await deleteUnionExecutive(deleteDialog.executive.id);
       toast.success(t('messages.deleteSuccess'));
       setDeleteDialog({ isOpen: false, executive: null });
       await loadExecutives(); // Reload data
     } catch (err) {
-      console.error('💥 Error deleting executive:', err);
       setError(t('messages.errorDeletingData'));
       toast.error(t('messages.errorDeletingData'));
     }
@@ -215,8 +204,6 @@ export const ExecutivesListComplete: React.FC = () => {
 
   // Row actions - Edit and Delete
   const rowActions = (executive: UnionExecutive) => {
-    console.log('🔧 Rendering actions for executive:', executive);
-    console.log('🆔 Executive ID:', executive.id, 'Type:', typeof executive.id);
     
     return (
       <div className={styles.rowActions}>
@@ -225,7 +212,6 @@ export const ExecutivesListComplete: React.FC = () => {
           variant="secondary"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('✏️ Edit clicked for executive ID:', executive.id);
             navigate(`/admin/executives/${executive.id}/edit`);
           }}
         >
@@ -236,7 +222,6 @@ export const ExecutivesListComplete: React.FC = () => {
           variant="danger"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🗑️ Delete clicked for executive ID:', executive.id);
             setDeleteDialog({ isOpen: true, executive });
           }}
         >

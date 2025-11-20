@@ -45,13 +45,11 @@ export const CBAsListComplete: React.FC = () => {
 
   // Filter handlers
   const handleFilterChange = (key: string, value: string) => {
-    console.log(`🔧 Filter changed: ${key} = ${value}`);
     setFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
   const handleSearch = (value: string) => {
-    console.log('🔍 Search:', value);
     setSearchTerm(value);
     setCurrentPage(1);
   };
@@ -92,9 +90,7 @@ export const CBAsListComplete: React.FC = () => {
         ...(filters.status && ['signed','expired','pending'].includes(String(filters.status).toLowerCase()) ? { status: filters.status } : {})
       };
 
-      console.log('📊 Loading CBAs with params:', params);
       const response = await getCBAs(params);
-      console.log('✅ CBAs response:', response);
       
       let cbasData: CBA[] = response.data.data || [];
 
@@ -120,8 +116,6 @@ export const CBAsListComplete: React.FC = () => {
         const wanted = String(filters.status) as 'Signed'|'Ongoing'|'Not-Signed';
         cbasData = cbasData.filter(c => unifyStatus(c) === wanted);
       }
-      console.log('📋 CBAs loaded:', cbasData.length);
-      console.log('📋 First CBA:', cbasData[0]);
       
       setCBAs(cbasData);
       
@@ -142,11 +136,8 @@ export const CBAsListComplete: React.FC = () => {
   // Load unions for filter
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for filter...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
     } catch (err) {
       console.error('💥 Error loading unions:', err);
@@ -166,7 +157,6 @@ export const CBAsListComplete: React.FC = () => {
     if (!deleteDialog.cba) return;
     
     try {
-      console.log('🗑️ Deleting CBA:', deleteDialog.cba.id);
       await deleteCBA(deleteDialog.cba.id);
       toast.success(t('messages.deleteSuccess'));
       setDeleteDialog({ isOpen: false, cba: null });
@@ -255,8 +245,6 @@ export const CBAsListComplete: React.FC = () => {
 
   // Row actions
   const rowActions = (cba: CBA) => {
-    console.log('🔧 Rendering actions for CBA:', cba);
-    console.log('🆔 CBA ID:', cba.id, 'Type:', typeof cba.id);
     
     return (
       <div className={styles.rowActions}>
@@ -265,7 +253,6 @@ export const CBAsListComplete: React.FC = () => {
           variant="secondary"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('✏️ Edit clicked for CBA ID:', cba.id);
             navigate(`/admin/cbas/${cba.id}/edit`);
           }}
         >
@@ -276,7 +263,6 @@ export const CBAsListComplete: React.FC = () => {
           variant="danger"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🗑️ Delete clicked for CBA ID:', cba.id);
             setDeleteDialog({ isOpen: true, cba });
           }}
         >

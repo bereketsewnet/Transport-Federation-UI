@@ -40,7 +40,6 @@ export const MembersList: React.FC = () => {
         }));
         setUnions(unionsData);
       } catch (error) {
-        console.error('Failed to load unions for member filter:', error);
         toast.error(t('messages.errorLoadingData'));
       } finally {
         setLoadingUnions(false);
@@ -71,9 +70,6 @@ export const MembersList: React.FC = () => {
     id: m.mem_id // DataTable needs 'id' field
   }));
 
-  // Debug: Check if members have IDs
-  console.log('📊 Members data:', members);
-  console.log('📊 First member:', members[0]);
 
   const unionOptions = useMemo(
     () => [
@@ -100,7 +96,6 @@ export const MembersList: React.FC = () => {
       refetch();
       setDeleteId(null);
     } catch (error) {
-      console.error('Delete error:', error);
     }
   };
 
@@ -113,7 +108,6 @@ export const MembersList: React.FC = () => {
       refetch();
       setArchiveId(null);
     } catch (error) {
-      console.error('Archive error:', error);
     }
   };
 
@@ -163,8 +157,6 @@ export const MembersList: React.FC = () => {
   ];
 
   const renderActions = (row: MemberRow) => {
-    console.log('🔧 Rendering actions for member:', row);
-    console.log('🆔 Member ID:', row.id, 'Type:', typeof row.id);
     
     return (
       <div className={styles.rowActions}>
@@ -174,7 +166,6 @@ export const MembersList: React.FC = () => {
           className={styles.actionButton}
           onClick={(e) => {
             e.stopPropagation();
-            console.log('👁️ View clicked for member ID:', row.mem_id);
             navigate(`/admin/members/${row.mem_id}`);
           }}
         >
@@ -186,7 +177,6 @@ export const MembersList: React.FC = () => {
           className={styles.actionButton}
           onClick={(e) => {
             e.stopPropagation();
-            console.log('📦 Archive clicked for member ID:', row.mem_id);
             setArchiveId(row.mem_id);
           }}
         >
@@ -197,8 +187,7 @@ export const MembersList: React.FC = () => {
             size="sm" 
             variant="danger" 
             onClick={(e) => {
-              e.stopPropagation();
-              console.log('🗑️ Delete clicked for member ID:', row.mem_id);
+              e.stopPropagation();  
               setDeleteId(row.mem_id);
             }}
           >

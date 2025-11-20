@@ -103,10 +103,7 @@ export const UnionFormComplete: React.FC = () => {
     }
   });
 
-  // Debug: Watch form values
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
 
   // Load sectors and organizations on mount
   useEffect(() => {
@@ -138,7 +135,6 @@ export const UnionFormComplete: React.FC = () => {
           setValue('sector', sectorsData[0].name);
         }
       } else {
-        console.error('💥 Error loading sectors:', sectorsResponse.reason);
         toast.error('Failed to load sectors. Please check backend connection.');
         setSectors([]);
       }
@@ -151,12 +147,10 @@ export const UnionFormComplete: React.FC = () => {
           setValue('organization', organizationsData[0].name);
         }
       } else {
-        console.error('💥 Error loading organizations:', organizationsResponse.reason);
         toast.error('Failed to load organizations. Please check backend connection.');
         setOrganizations([]);
       }
     } catch (err) {
-      console.error('💥 Error loading sectors/organizations:', err);
       toast.error('Failed to load sectors and organizations');
     } finally {
       setLoadingOptions(false);
@@ -172,9 +166,7 @@ export const UnionFormComplete: React.FC = () => {
         return;
       }
       
-      console.log('🔍 Loading union for edit, ID:', union_id);
       const response = await getUnion(union_id);
-      console.log('✅ Union data for edit:', response.data);
       const unionData = response.data;
       
       // Populate form with existing data
@@ -197,7 +189,6 @@ export const UnionFormComplete: React.FC = () => {
         location_area: (unionData as any).location_area || '',
       });
     } catch (err) {
-      console.error('💥 Error loading union:', err);
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
     } finally {
@@ -206,10 +197,6 @@ export const UnionFormComplete: React.FC = () => {
   };
 
   const onSubmit = async (data: UnionFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    console.log('❌ Form errors:', errors);
-    
     try {
       setError('');
       setLoading(true);
@@ -225,30 +212,21 @@ export const UnionFormComplete: React.FC = () => {
           : undefined,
       };
 
-      console.log('📤 Sending data to API:', unionData);
-
       if (isEdit && id) {
         const union_id = parseInt(id);
         if (isNaN(union_id)) {
           setError(t('messages.errorSavingData'));
           return;
         }
-        console.log('✏️ Updating union with ID:', union_id);
-        const response = await updateUnion(union_id, unionData);
-        console.log('✅ Update response:', response);
+        await updateUnion(union_id, unionData);
         toast.success(t('messages.updateSuccess'));
       } else {
-        console.log('➕ Creating new union');
-        const response = await createUnion(unionData);
-        console.log('✅ Create response:', response);
+        await createUnion(unionData);
         toast.success(t('messages.createSuccess'));
       }
 
-      console.log('🎉 Success! Navigating to unions list');
       navigate('/admin/unions');
     } catch (err: any) {
-      console.error('💥 Error saving union:', err);
-      console.error('💥 Error details:', err.response?.data);
       const errorMsg = err.response?.data?.message || t('messages.errorSavingData');
       setError(errorMsg);
       toast.error(errorMsg);
@@ -341,7 +319,6 @@ export const UnionFormComplete: React.FC = () => {
                 label="Organization *"
                 value={watchedValues.organization || ''}
                 onChange={(e) => {
-                  console.log('🔄 Organization selected:', e.target.value);
                   setValue('organization', e.target.value, { shouldValidate: true });
                 }}
                 error={errors.organization?.message}
@@ -360,7 +337,6 @@ export const UnionFormComplete: React.FC = () => {
                 label={t('unions.sector') + ' *'}
                 value={watchedValues.sector || ''}
                 onChange={(e) => {
-                  console.log('🔄 Sector selected:', e.target.value);
                   setValue('sector', e.target.value, { shouldValidate: true });
                 }}
                 error={errors.sector?.message}

@@ -52,7 +52,6 @@ export const TerminatedUnionsListComplete: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const handleSearch = (value: string) => {
-    console.log('🔍 Search:', value);
     setSearchTerm(value);
     setCurrentPage(1);
   };
@@ -87,17 +86,9 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         params.q = searchTerm.trim();
       }
 
-      console.log('📊 Loading terminated unions with params:', params);
       const response = await getTerminatedUnions(params);
-      console.log('✅ Terminated unions response:', response);
       
       const data = response.data.data || [];
-      console.log('📋 Terminated unions data:', data);
-      console.log('📋 First terminated union:', data[0]);
-      if (data[0]) {
-        console.log('📋 First union termination_date:', data[0].termination_date);
-        console.log('📋 First union terminated_date:', (data[0] as any).terminated_date);
-      }
       
       setTerminatedUnions(data);
       
@@ -107,9 +98,6 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         setTotalPages(response.data.meta.total_pages || Math.ceil((response.data.meta.total || 0) / pageSize));
       }
     } catch (err: any) {
-      console.error('💥 Error loading terminated unions:', err);
-      console.error('💥 Error response:', err.response);
-      console.error('💥 Error data:', err.response?.data);
       
       const errorMessage = err.response?.data?.message || err.message || t('messages.errorLoadingData');
       setError(errorMessage);
@@ -122,13 +110,10 @@ export const TerminatedUnionsListComplete: React.FC = () => {
   // Load unions for reference
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for reference...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
       setUnions(rawUnions);
     } catch (err) {
-      console.error('💥 Error loading unions:', err);
     }
   };
 
@@ -146,14 +131,11 @@ export const TerminatedUnionsListComplete: React.FC = () => {
     
     try {
       setRestoring(true);
-      console.log('♻️ Restoring terminated union:', restoreDialog.terminatedUnion.id);
-      const response = await restoreTerminatedUnion(restoreDialog.terminatedUnion.id);
-      console.log('✅ Restore response:', response.data);
+      await restoreTerminatedUnion(restoreDialog.terminatedUnion.id);
       toast.success('Union restored successfully');
       setRestoreDialog({ isOpen: false, terminatedUnion: null });
       await loadTerminatedUnions(); // Reload data to remove restored union from list
     } catch (err: any) {
-      console.error('💥 Error restoring terminated union:', err);
       const errorMsg = err.response?.data?.message || 'Failed to restore union';
       setError(errorMsg);
       toast.error(errorMsg);
@@ -191,7 +173,6 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         // Check both field names (terminated_date and termination_date)
         // Backend might use either field name
         const dateValue = value || (row as any).terminated_date || row.termination_date;
-        console.log('📅 Date value for row:', row.id, 'terminated_date:', (row as any).terminated_date, 'termination_date:', row.termination_date, 'value:', value);
         return dateValue ? formatDate(String(dateValue)) : '-';
       }
     },
@@ -246,22 +227,17 @@ export const TerminatedUnionsListComplete: React.FC = () => {
   const loadEditData = async (terminatedUnion: TerminatedUnion) => {
     try {
       setLoadingEditData(true);
-      console.log('🔍 Loading terminated union for edit, ID:', terminatedUnion.id);
-      console.log('📋 Terminated union data (from row):', terminatedUnion);
       
       // Fetch fresh data from API to ensure we have all fields
       const response = await getTerminatedUnion(terminatedUnion.id);
       const tuData = response.data;
       
-      console.log('📋 Fetched terminated union data:', tuData);
       
       // Get union_id - check if it matches union.id or union.union_id
       const unionId = tuData.union_id;
-      console.log('🔍 Union ID from terminated union:', unionId);
       
       // Get termination date - check both field names
       const terminationDate = (tuData as any).terminated_date || tuData.termination_date;
-      console.log('📅 Raw termination date:', terminationDate);
       
       const formattedDate = terminationDate 
         ? (typeof terminationDate === 'string' 
@@ -269,25 +245,13 @@ export const TerminatedUnionsListComplete: React.FC = () => {
             : new Date(terminationDate).toISOString().split('T')[0])
         : new Date().toISOString().split('T')[0];
       
-      console.log('📅 Formatted termination date:', formattedDate);
-      console.log('📝 Termination reason:', tuData.termination_reason);
-      
       // Find the union to get the correct ID format
       const matchingUnion = unions.find(u => {
         const uId = u.id || (u as any).union_id;
         return uId === unionId;
       });
       
-      console.log('🔍 Matching union found:', matchingUnion);
-      console.log('🔍 Union ID to use:', matchingUnion ? (matchingUnion.id || (matchingUnion as any).union_id) : unionId);
-      
       const finalUnionId = matchingUnion ? (matchingUnion.id || (matchingUnion as any).union_id) : unionId;
-      
-      console.log('✅ Setting form values:', {
-        union_id: finalUnionId,
-        termination_date: formattedDate,
-        termination_reason: tuData.termination_reason
-      });
       
       resetEdit({
         union_id: finalUnionId || 0,
@@ -302,7 +266,6 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         setEditValue('termination_reason', tuData.termination_reason || '', { shouldValidate: false });
       }, 100);
     } catch (err) {
-      console.error('💥 Error loading terminated union for edit:', err);
       toast.error('Failed to load terminated union data');
     } finally {
       setLoadingEditData(false);
@@ -327,13 +290,11 @@ export const TerminatedUnionsListComplete: React.FC = () => {
         termination_reason: String(data.termination_reason),
       } as any;
 
-      console.log('📤 Updating terminated union:', editDialog.terminatedUnion.id, tuData);
       await updateTerminatedUnion(editDialog.terminatedUnion.id, tuData);
       toast.success('Terminated union updated successfully!');
       setEditDialog({ isOpen: false, terminatedUnion: null });
       await loadTerminatedUnions(); // Reload data
     } catch (err: any) {
-      console.error('💥 Error updating terminated union:', err);
       const errorMsg = err.response?.data?.message || 'Failed to update terminated union';
       toast.error(errorMsg);
     } finally {
@@ -342,10 +303,7 @@ export const TerminatedUnionsListComplete: React.FC = () => {
   };
 
   // Row actions
-  const rowActions = (terminatedUnion: TerminatedUnion) => {
-    console.log('🔧 Rendering actions for terminated union:', terminatedUnion);
-    console.log('🆔 Terminated Union ID:', terminatedUnion.id, 'Type:', typeof terminatedUnion.id);
-    
+  const rowActions = (terminatedUnion: TerminatedUnion) => {    
     return (
       <div className={styles.rowActions}>
         <Button
@@ -353,7 +311,6 @@ export const TerminatedUnionsListComplete: React.FC = () => {
           variant="secondary"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('✏️ Edit clicked for terminated union ID:', terminatedUnion.id);
             handleEditClick(terminatedUnion);
           }}
         >
@@ -364,7 +321,6 @@ export const TerminatedUnionsListComplete: React.FC = () => {
           variant="success"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('♻️ Restore clicked for terminated union ID:', terminatedUnion.id);
             setRestoreDialog({ isOpen: true, terminatedUnion });
           }}
         >

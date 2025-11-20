@@ -68,8 +68,7 @@ export const CBAsFormComplete: React.FC = () => {
   });
 
   const watchedValues = watch();
-  console.log('👀 Form values:', watchedValues);
-  console.log('❌ Form errors:', errors);
+  
 
   // Calculate next end date
   const calculateNextEndDate = () => {
@@ -104,14 +103,10 @@ export const CBAsFormComplete: React.FC = () => {
 
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for form...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
     } catch (err) {
-      console.error('💥 Error loading unions:', err);
       toast.error('Failed to load unions');
     }
   };
@@ -126,9 +121,7 @@ export const CBAsFormComplete: React.FC = () => {
         return;
       }
       
-      console.log('🔍 Loading CBA for edit, ID:', cba_id);
       const response = await getCBA(cba_id);
-      console.log('✅ CBA data for edit:', response.data);
       const cbaData = response.data;
       
       // Populate form with existing data
@@ -140,8 +133,7 @@ export const CBAsFormComplete: React.FC = () => {
         next_end_date: cbaData.next_end_date?.split('T')[0] || '',
         round: cbaData.round ? (typeof cbaData.round === 'string' ? parseInt(cbaData.round) || 1 : cbaData.round) : 1,
       });
-    } catch (err) {
-      console.error('💥 Error loading CBA:', err);
+    } catch (err) {   
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
     } finally {
@@ -150,9 +142,6 @@ export const CBAsFormComplete: React.FC = () => {
   };
 
   const onSubmit = async (data: CBAFormData) => {
-    console.log('🔍 Form submission started');
-    console.log('📝 Form data:', data);
-    console.log('❌ Form errors:', errors);
     
     try {
       setError('');
@@ -167,16 +156,6 @@ export const CBAsFormComplete: React.FC = () => {
         round: String(data.round)
       };
 
-      console.log('📤 Sending data to API:', cbaData);
-      console.log('📤 Data types:', {
-        union_id: typeof cbaData.union_id,
-        duration_years: typeof cbaData.duration_years,
-        status: typeof cbaData.status,
-        registration_date: typeof cbaData.registration_date,
-        next_end_date: typeof cbaData.next_end_date,
-        round: typeof cbaData.round
-      });
-
       if (isEdit && id) {
         const cba_id = parseInt(id);
         if (isNaN(cba_id)) {
@@ -184,23 +163,15 @@ export const CBAsFormComplete: React.FC = () => {
           toast.error(t('messages.errorSavingData'));
           return;
         }
-        console.log('✏️ Updating CBA with ID:', cba_id);
-        const response = await updateCBA(cba_id, cbaData);
-        console.log('✅ Update successful:', response);
+        await updateCBA(cba_id, cbaData);
         toast.success('CBA updated successfully!');
       } else {
-        console.log('➕ Creating new CBA');
-        const response = await createCBA(cbaData);
-        console.log('✅ Create successful:', response);
+        await createCBA(cbaData);
         toast.success('CBA added successfully!');
       }
 
-      console.log('🎉 Navigating to CBAs list');
       navigate('/admin/cbas');
     } catch (err: any) {
-      console.error('💥 Error saving CBA:', err);
-      console.error('💥 Error response:', err.response);
-      console.error('💥 Error details:', err.response?.data);
       const errorMsg = err.response?.data?.message || t('messages.errorSavingData');
       setError(errorMsg);
       toast.error(errorMsg);
@@ -267,7 +238,6 @@ export const CBAsFormComplete: React.FC = () => {
                 value={watchedValues.union_id?.toString() || ''}
                 onChange={(e) => {
                   const val = e.target.value;
-                  console.log('🔄 Union selected:', val);
                   if (val) {
                     setValue('union_id', parseInt(val));
                   }
@@ -305,7 +275,6 @@ export const CBAsFormComplete: React.FC = () => {
                 value={watchedValues.status || ''}
                 onChange={(e) => {
                   const val = e.target.value;
-                  console.log('🔄 Status selected:', val);
                   if (val) {
                     setValue('status', val);
                   }

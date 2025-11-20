@@ -131,7 +131,7 @@ export const HomeEditor: React.FC = () => {
 
   const onSubmit = async (data: HomeFormData) => {
     try {
-      console.log('📤 Raw form data:', data);
+     
       // Update text content
       const updatePayload = {
         heroTitleEn: data.heroTitleEn,
@@ -150,9 +150,7 @@ export const HomeEditor: React.FC = () => {
         stat4LabelEn: data.stat4LabelEn,
         stat4LabelAm: data.stat4LabelAm,
       };
-      console.log('📤 Sending payload to API:', updatePayload);
-      const response = await updateHomeContent(updatePayload);
-      console.log('✅ API response:', response);
+      await updateHomeContent(updatePayload);
 
       // Upload hero image if selected
       if (heroImageFile) {
@@ -184,12 +182,8 @@ export const HomeEditor: React.FC = () => {
       toast.success('Home page updated successfully!');
       
       // Reload the form data to show updated values
-      console.log('🔄 Reloading content after update...');
       const reloadResponse = await getHomeContent();
       const updatedContent = reloadResponse.data.data;
-      console.log('🔄 Reloaded content from API:', updatedContent);
-      console.log('🔄 stat2LabelEn value:', updatedContent.stat2LabelEn);
-      console.log('🔄 stat2LabelAm value:', updatedContent.stat2LabelAm);
       
       reset({
         heroTitleEn: updatedContent.heroTitleEn,

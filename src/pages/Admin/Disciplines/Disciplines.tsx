@@ -8,8 +8,6 @@ import {
   DisciplineParams,
   getUnions,
   Union,
-  getMembers,
-  Member
 } from '@api/endpoints';
 import { Button } from '@components/Button/Button';
 import { DataTable } from '@components/DataTable/DataTable';
@@ -63,13 +61,10 @@ export const Disciplines: React.FC = () => {
       };
       // Remove q parameter - we'll filter by member name client-side
       delete params.q;
-      console.log('Fetching disciplines with params:', params);
       const response = await getDisciplines(params);
-      console.log('Disciplines response:', response.data);
       setAllDisciplines(response.data.data || []);
     } catch (err) {
       setError('Failed to load disciplines');
-      console.error('Error fetching disciplines:', err);
     } finally {
       setLoading(false);
     }

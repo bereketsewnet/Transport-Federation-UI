@@ -76,13 +76,9 @@ export const ArchivesList: React.FC = () => {
         params.sortOrder = sortDirection;
       }
 
-      console.log('📊 Loading archives with params:', params);
       const response = await getArchives(params);
-      console.log('✅ Archives response:', response);
       
       const archivesData = response.data.data || [];
-      console.log('📋 Archives loaded:', archivesData.length, 'items');
-      console.log('📋 First archive:', archivesData[0]);
       
       setArchives(archivesData);
 

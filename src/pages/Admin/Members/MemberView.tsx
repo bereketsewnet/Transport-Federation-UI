@@ -42,9 +42,7 @@ export const MemberView: React.FC = () => {
   const loadMember = async (mem_id: number) => {
     try {
       setLoading(true);
-      console.log('🔍 Loading member with mem_id:', mem_id);
       const response = await getMember(mem_id);
-      console.log('✅ Member loaded:', response.data);
       const memberData = response.data;
       setMember(memberData);
       
@@ -54,13 +52,11 @@ export const MemberView: React.FC = () => {
           const unionResponse = await getUnion(memberData.union_id);
           setUnion(unionResponse.data);
         } catch (err) {
-          console.error('Error loading union:', err);
         }
       }
     } catch (err: any) {
       setError(t('messages.errorLoadingData'));
       toast.error(t('messages.errorLoadingData'));
-      console.error('Error loading member:', err);
     } finally {
       setLoading(false);
     }
@@ -85,7 +81,6 @@ export const MemberView: React.FC = () => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || t('members.resetPasswordError');
       toast.error(errorMessage);
-      console.error('Error resetting password:', err);
     } finally {
       setResettingPassword(false);
     }

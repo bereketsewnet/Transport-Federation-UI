@@ -87,9 +87,7 @@ export const CBAsListFixed: React.FC = () => {
         ...filters
       };
 
-      console.log('🔍 Loading CBAs with params:', params);
       const response = await getCBAs(params);
-      console.log('✅ CBAs response:', response);
       
       setCbas(response.data.data || []);
       
@@ -99,7 +97,6 @@ export const CBAsListFixed: React.FC = () => {
         setTotalPages(response.data.meta.total_pages || Math.ceil((response.data.meta.total || 0) / pageSize));
       }
     } catch (err: any) {
-      console.error('💥 Error loading CBAs:', err);
       setError(t('messages.errorLoadingData'));
     } finally {
       setLoading(false);
@@ -109,14 +106,10 @@ export const CBAsListFixed: React.FC = () => {
   // Load unions for filter
   const loadUnions = async () => {
     try {
-      console.log('🔄 Loading unions for filter...');
       const response = await getUnions({ per_page: 1000 });
       const rawUnions = response.data.data || [];
-      console.log('✅ Unions loaded:', rawUnions.length);
-      console.log('📋 First union:', rawUnions[0]);
       setUnions(rawUnions);
-    } catch (err) {
-      console.error('💥 Error loading unions:', err);
+    } catch (err) { 
     }
   };
 
@@ -133,7 +126,6 @@ export const CBAsListFixed: React.FC = () => {
       await loadCBAs(); // Reload data
     } catch (err) {
       setError(t('messages.errorDeletingData'));
-      console.error('Error deleting CBA:', err);
     }
   };
 

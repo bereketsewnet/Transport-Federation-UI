@@ -39,7 +39,6 @@ export const ArchivesListComplete: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const handleSearch = (value: string) => {
-    console.log('🔍 Search:', value);
     setSearchTerm(value);
     setCurrentPage(1);
   };
@@ -70,14 +69,9 @@ export const ArchivesListComplete: React.FC = () => {
         q: searchTerm
       };
 
-      console.log('📊 Loading documents with params:', params);
       const response = await getDocuments(params);
-      console.log('✅ Documents response:', response);
       
       const archivesData = response.data.data || [];
-      console.log('📋 Documents loaded:', archivesData.length);
-      console.log('📋 First document:', archivesData[0]);
-      
       setArchives(archivesData);
       
       // Update pagination info
@@ -103,7 +97,6 @@ export const ArchivesListComplete: React.FC = () => {
     if (!deleteDialog.archive) return;
     
     try {
-      console.log('🗑️ Deleting document:', deleteDialog.archive.id);
       await deleteDocument(deleteDialog.archive.id);
       toast.success(t('messages.deleteSuccess'));
       setDeleteDialog({ isOpen: false, archive: null });
@@ -122,7 +115,6 @@ export const ArchivesListComplete: React.FC = () => {
 
     try {
       setRestoringId(archive.id);
-      console.log('♻️ Restoring archive:', archive.id);
       const response = await restoreArchive(archive.id);
       const message =
         response.data?.message ||
@@ -217,8 +209,6 @@ export const ArchivesListComplete: React.FC = () => {
 
   // Row actions
   const rowActions = (archive: Archive) => {
-    console.log('🔧 Rendering actions for archive:', archive);
-    console.log('🆔 Archive ID:', archive.id, 'Type:', typeof archive.id);
     
     return (
       <div className={styles.rowActions}>
@@ -229,7 +219,6 @@ export const ArchivesListComplete: React.FC = () => {
           style={{ display: 'none' }}
           onClick={(e) => {
             e.stopPropagation();
-            console.log('✏️ Edit clicked for archive ID:', archive.id);
             navigate(`/admin/archives/${archive.id}/edit`);
           }}
         >
@@ -252,7 +241,6 @@ export const ArchivesListComplete: React.FC = () => {
           variant="danger"
           onClick={(e) => {
             e.stopPropagation();
-            console.log('🗑️ Delete clicked for archive ID:', archive.id);
             setDeleteDialog({ isOpen: true, archive });
           }}
         >

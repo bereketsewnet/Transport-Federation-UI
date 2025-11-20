@@ -6,7 +6,7 @@ import { Button } from '@components/Button/Button';
 import { Loading } from '@components/Loading/Loading';
 import { getHomeContent } from '@api/cms-endpoints';
 import { getImageUrl } from '@api/client';
-import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaBook, FaHeartbeat, FaFemale, FaHospital, FaNetworkWired } from 'react-icons/fa';
+import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaBook, FaHeartbeat, FaFemale, FaHospital, FaNetworkWired, FaArrowRight } from 'react-icons/fa';
 import styles from './Home.module.css';
 
 export const Home: React.FC = () => {
@@ -199,6 +199,23 @@ export const Home: React.FC = () => {
             <p className={styles.overviewText}>
               {content ? (lang === 'en' ? content.overviewEn : content.overviewAm) : t('home.overview.content')}
             </p>
+            <motion.div
+              className={styles.seeMoreWrapper}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              <Link to="/about" className={styles.seeMoreButton}>
+                <span>{lang === 'en' ? 'See More' : 'ተጨማሪ ይመልከቱ'}</span>
+                <motion.span
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <FaArrowRight />
+                </motion.span>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>

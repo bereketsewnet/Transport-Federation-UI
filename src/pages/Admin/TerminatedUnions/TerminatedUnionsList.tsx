@@ -62,14 +62,10 @@ export const TerminatedUnionsList: React.FC = () => {
   useEffect(() => {
     const loadUnions = async () => {
       try {
-        console.log('🔄 Loading unions for filter...');
-        const response = await getUnions({ per_page: 1000 }); // Get all unions for filter
+        const response = await getUnions({ per_page: 1000 });
         const rawUnions = response.data.data || [];
-        console.log('✅ Unions loaded:', rawUnions.length);
-        console.log('📋 First union:', rawUnions[0]);
         setUnions(rawUnions);
       } catch (err) {
-        console.error('💥 Error loading unions:', err);
       }
     };
     loadUnions();
@@ -103,7 +99,6 @@ export const TerminatedUnionsList: React.FC = () => {
       }
     } catch (err) {
       setError(t('messages.errorLoadingData'));
-      console.error('Error loading terminated unions:', err);
     } finally {
       setLoading(false);
     }
@@ -122,7 +117,6 @@ export const TerminatedUnionsList: React.FC = () => {
       loadTerminatedUnions();
     } catch (err) {
       setError(t('messages.errorDeletingData'));
-      console.error('Error deleting terminated union:', err);
     } finally {
       setLoading(false);
     }

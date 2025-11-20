@@ -55,14 +55,11 @@ export const MembersListSimple: React.FC = () => {
       if (selectedUnion) params.union_id = selectedUnion;
       if (selectedSex) params.sex = selectedSex;
 
-      console.log('🔍 Loading Members with params:', params);
       const response = await getMembers(params);
-      console.log('✅ Members response:', response);
       
       const membersData = response.data.data || [];
       setMembers(membersData);
     } catch (err: any) {
-      console.error('💥 Error loading members:', err);
       setError('Failed to load members');
       toast.error('Failed to load members');
     } finally {
@@ -77,7 +74,6 @@ export const MembersListSimple: React.FC = () => {
       const unionsData = response.data.data || [];
       setUnions(unionsData);
     } catch (err) {
-      console.error('Error loading unions:', err);
     }
   };
 
@@ -100,7 +96,6 @@ export const MembersListSimple: React.FC = () => {
       await loadMembers();
     } catch (err) {
       toast.error('Failed to delete member');
-      console.error('Error deleting member:', err);
     }
   };
 

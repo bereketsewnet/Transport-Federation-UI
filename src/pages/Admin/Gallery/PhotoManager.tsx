@@ -57,7 +57,6 @@ export const PhotoManager: React.FC = () => {
       const response = await getPhotos({ gallery_id: parseInt(galleryId!), per_page: 100 });
       setPhotos(response.data.data);
     } catch (error) {
-      console.error('Failed to load photos:', error);
       toast.error('Failed to load photos');
     } finally {
       setIsLoading(false);
@@ -120,11 +119,9 @@ export const PhotoManager: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (uploadMethod === 'file' && selectedFile) {
-        console.log('📤 Uploading file:', selectedFile.name);
         await uploadPhoto(selectedFile, parseInt(galleryId!), caption, takenAt);
         toast.success('Photo uploaded successfully!');
       } else if (uploadMethod === 'url') {
-        console.log('📤 Adding photo from URL:', imageUrl);
         await createPhotoFromURL({
           gallery_id: parseInt(galleryId!),
           image_url: imageUrl,
@@ -137,7 +134,6 @@ export const PhotoManager: React.FC = () => {
       resetForm();
       await loadPhotos();
     } catch (error: any) {
-      console.error('Failed to add photo:', error);
       const errorMsg = error.response?.data?.message || 'Failed to add photo';
       toast.error(errorMsg);
     } finally {
@@ -165,7 +161,6 @@ export const PhotoManager: React.FC = () => {
       setEditingPhoto(null);
       await loadPhotos();
     } catch (error: any) {
-      console.error('Failed to update photo:', error);
       const errorMsg = error.response?.data?.message || 'Failed to update photo';
       toast.error(errorMsg);
     } finally {
@@ -186,7 +181,6 @@ export const PhotoManager: React.FC = () => {
       setDeletePhotoId(null);
       await loadPhotos();
     } catch (error: any) {
-      console.error('Failed to delete photo:', error);
       const errorMsg = error.response?.data?.message || 'Failed to delete photo';
       toast.error(errorMsg);
     }

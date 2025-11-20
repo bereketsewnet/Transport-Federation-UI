@@ -92,7 +92,6 @@ export const AdminNewsForm: React.FC = () => {
       const response = await getNewsItem(newsId);
       const news = response.data;
       
-      console.log('Loaded news data:', news); // Debug log
       
       // Prepare form data
       const formData = {
@@ -104,7 +103,6 @@ export const AdminNewsForm: React.FC = () => {
         image_url: (!news.is_local && news.image_url) ? news.image_url : '',
       };
       
-      console.log('Resetting form with:', formData); // Debug log
       
       // Reset the form with the loaded data
       reset(formData);
@@ -124,8 +122,6 @@ export const AdminNewsForm: React.FC = () => {
         setImageSource('none');
       }
     } catch (error: any) {
-      console.error('Failed to load news:', error);
-      console.error('Error details:', error.response?.data);
       setError(error.response?.data?.message || 'Failed to load news');
     } finally {
       setIsLoading(false);
@@ -199,7 +195,6 @@ export const AdminNewsForm: React.FC = () => {
   }, [imageUrlValue, imageSource]);
 
   const onSubmit = async (data: NewsFormData) => {
-    console.log('Form submitted with data:', data); // Debug log
     setIsSubmitting(true);
     setError(null);
     
@@ -212,13 +207,8 @@ export const AdminNewsForm: React.FC = () => {
         is_published: Boolean(data.is_published),
       };
 
-      console.log('Prepared payload:', payload); // Debug log
-      console.log('Is edit mode:', isEdit, 'ID:', id); // Debug log
-
       if (isEdit && id) {
-        // Update existing news
         if (removeImage) {
-          // Remove image
           await updateNews(parseInt(id), { ...payload, remove_image: true } as any);
         } else if (selectedFile) {
           // Update with new file
@@ -227,31 +217,20 @@ export const AdminNewsForm: React.FC = () => {
           // Update with URL
           await updateNews(parseInt(id), { ...payload, image_url: data.image_url.trim() });
         } else {
-          // Update without changing image
           await updateNews(parseInt(id), payload);
         }
       } else {
-        // Create new news
         if (selectedFile) {
-          // Create with file
           await uploadNewsWithImage(selectedFile, payload);
         } else if (imageSource === 'url' && data.image_url && data.image_url.trim()) {
-          // Create with URL
           await createNewsFromURL({ ...payload, image_url: data.image_url.trim() });
         } else {
-          // Create without image
           await createNews(payload);
         }
       }
 
       navigate('/admin/news');
     } catch (error: any) {
-      console.error('Failed to save news:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
       const errorMessage = error.response?.data?.message || error.message || 'Failed to save news';
       setError(errorMessage);
     } finally {

@@ -52,16 +52,13 @@ export const AdminGalleryForm: React.FC = () => {
 
       try {
         setInitialLoading(true);
-        console.log('🎨 Loading gallery for edit, id:', id);
         const response = await getGallery(Number(id));
-        console.log('🎨 Gallery data:', response.data);
         const galleryData = (response.data as any)?.gallery || response.data;
         reset({
           title: galleryData?.title || '',
           description: galleryData?.description || '',
         });
       } catch (error) {
-        console.error('Failed to load gallery:', error);
         toast.error(t('messages.errorLoadingData'));
       } finally {
         setInitialLoading(false);
@@ -75,17 +72,14 @@ export const AdminGalleryForm: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (isEdit && id) {
-        console.log('🎨 Updating gallery', id, data);
         await updateGallery(Number(id), data);
         toast.success(t('messages.updateSuccess'));
       } else {
-        console.log('🎨 Creating gallery', data);
         await createGallery(data);
         toast.success(t('messages.createSuccess'));
       }
       navigate('/admin/gallery');
     } catch (error) {
-      console.error('Failed to create gallery:', error);
       toast.error(t('messages.errorSavingData'));
     } finally {
       setIsSubmitting(false);
