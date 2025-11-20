@@ -168,7 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/osh',
-          label: 'OSH Incidents',
+          label: t('nav.oshIncidents'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -180,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/general-assembly',
-          label: 'General Assembly',
+          label: t('nav.generalAssembly'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -206,7 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/archived-members',
-          label: 'Archived Members',
+          label: t('nav.archivedMembers'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -224,7 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/contacts',
-          label: 'Contact Forms',
+          label: t('nav.contactForms'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -245,7 +245,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       items: [
         {
           path: '/admin/home-editor',
-          label: 'Homepage Editor',
+          label: t('nav.homeEditor'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -257,7 +257,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/about-editor',
-          label: 'About Us Editor',
+          label: t('nav.aboutEditor'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -269,7 +269,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/news',
-          label: 'News Editor',
+          label: t('nav.newsEditor'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -285,7 +285,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/gallery',
-          label: 'Gallery Editor',
+          label: t('nav.galleryEditor'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -299,7 +299,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/contact-info-editor',
-          label: 'Contact Editor',
+          label: t('nav.contactEditor'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path
@@ -315,7 +315,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         },
         {
           path: '/admin/sectors-organizations-editor',
-          label: 'Org & Sector Editor',
+          label: t('nav.orgSectorEditor'),
           icon: (
             <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
               <path

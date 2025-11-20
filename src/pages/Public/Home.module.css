@@ -221,9 +221,8 @@
   font-size: var(--text-lg);
   line-height: 1.8;
   color: var(--text-secondary);
-  max-width: 900px;
   margin: var(--spacing-8) auto 0;
-  text-align: center;
+  text-align: justify;
 }
 
 /* Activities Section */

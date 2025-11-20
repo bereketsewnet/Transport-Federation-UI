@@ -6,7 +6,7 @@ import { Button } from '@components/Button/Button';
 import { Loading } from '@components/Loading/Loading';
 import { getHomeContent } from '@api/cms-endpoints';
 import { getImageUrl } from '@api/client';
-import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaBook, FaHeartbeat, FaFemale, FaHospital } from 'react-icons/fa';
+import { FaUsers, FaHandshake, FaChalkboardTeacher, FaShieldAlt, FaBalanceScale, FaBook, FaHeartbeat, FaFemale, FaHospital, FaNetworkWired } from 'react-icons/fa';
 import styles from './Home.module.css';
 
 export const Home: React.FC = () => {
@@ -304,6 +304,11 @@ export const Home: React.FC = () => {
             <motion.div className={styles.serviceCard} variants={fadeInUp}>
               <div className={styles.serviceIcon}><FaHospital size={40} /></div>
               <h4 className={styles.serviceTitle}>{t('home.services.hiv')}</h4>
+            </motion.div>
+
+            <motion.div className={styles.serviceCard} variants={fadeInUp}>
+              <div className={styles.serviceIcon}><FaNetworkWired size={40} /></div>
+              <h4 className={styles.serviceTitle}>{t('home.services.relations')}</h4>
             </motion.div>
           </motion.div>
         </div>

@@ -216,38 +216,82 @@ export const Reports: React.FC = () => {
     const members: any[] = allMembersData?.data?.data || [];
     const genderCount: Record<string, number> = {};
 
-    // Create a map of mem_id to member sex for quick lookup
-    const memberSexMap = new Map<number, string>();
+    // Create multiple lookup maps for better matching
+    const memberSexByMemId = new Map<number, string>();
+    const memberSexByMemberCode = new Map<string, string>();
+    const memberSexById = new Map<number, string>();
+    
     members.forEach((member: any) => {
-      if (member.mem_id || member.id) {
-        const memId = member.mem_id || member.id;
-        memberSexMap.set(memId, member.sex || '');
+      const sex = member.sex || '';
+      if (member.mem_id) {
+        memberSexByMemId.set(member.mem_id, sex);
+      }
+      if (member.member_code) {
+        memberSexByMemberCode.set(String(member.member_code).toLowerCase().trim(), sex);
+      }
+      if (member.id) {
+        memberSexById.set(member.id, sex);
       }
     });
 
     const normalizeSex = (raw: unknown): 'Male' | 'Female' | 'Unknown' => {
       const v = String(raw || '').trim().toLowerCase();
-      if (v.startsWith('m')) return 'Male';
-      if (v.startsWith('f')) return 'Female';
+      // Handle various formats: 'm', 'male', 'male ', 'M', 'Male', etc.
+      if (v.startsWith('m') && v.length <= 5) return 'Male';
+      // Handle various formats: 'f', 'female', 'female ', 'F', 'Female', etc.
+      if (v.startsWith('f') && v.length <= 6) return 'Female';
       return 'Unknown';
     };
 
     executives.forEach((exec: any) => {
       // Try multiple sources: direct sex field, member object, or lookup from members map
-      let sexValue = exec.sex || exec.member?.sex || exec.member_data?.sex || exec.gender || '';
+      let sexValue = exec.sex || 
+                    exec.member?.sex || 
+                    exec.member_data?.sex || 
+                    exec.gender || 
+                    exec.member_sex || '';
       
-      // If still empty, try to get from members map using mem_id
-      if (!sexValue && exec.mem_id) {
-        sexValue = memberSexMap.get(exec.mem_id) || '';
+      // If still empty, try to get from members map using multiple identifiers
+      if (!sexValue) {
+        // Try mem_id first
+        if (exec.mem_id) {
+          sexValue = memberSexByMemId.get(exec.mem_id) || '';
+        }
+        // Try member_code
+        if (!sexValue && exec.member_code) {
+          sexValue = memberSexByMemberCode.get(String(exec.member_code).toLowerCase().trim()) || '';
+        }
+        // Try member.member_code
+        if (!sexValue && exec.member?.member_code) {
+          sexValue = memberSexByMemberCode.get(String(exec.member.member_code).toLowerCase().trim()) || '';
+        }
+        // Try id
+        if (!sexValue && exec.member_id) {
+          sexValue = memberSexById.get(exec.member_id) || '';
+        }
+        // Try member.id
+        if (!sexValue && exec.member?.id) {
+          sexValue = memberSexById.get(exec.member.id) || '';
+        }
       }
       
       const sex = normalizeSex(sexValue);
       genderCount[sex] = (genderCount[sex] || 0) + 1;
     });
 
-    return Object.entries(genderCount)
+    // Return only Male and Female, exclude Unknown if we have valid data
+    const result = Object.entries(genderCount)
       .map(([sex, count]) => ({ name: sex, value: count }))
       .filter(item => item.value > 0);
+    
+    // If we have Unknown but also have Male/Female, prioritize showing Male/Female
+    // Only show Unknown if it's the only category
+    const hasValidData = result.some(item => item.name === 'Male' || item.name === 'Female');
+    if (hasValidData) {
+      return result.filter(item => item.name !== 'Unknown');
+    }
+    
+    return result;
   }, [allExecutivesData, allMembersData]);
 
   // OSH Data Queries
@@ -586,7 +630,7 @@ export const Reports: React.FC = () => {
         </div>
         <div className={styles.headerActions}>
           <Button variant="primary" onClick={() => navigate('/admin/printed-report')}>
-            Print Report
+            {t('reports.printReport')}
           </Button>
         </div>
       </div>
@@ -612,7 +656,7 @@ export const Reports: React.FC = () => {
           icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 16a6 6 0 100-12 6 6 0 000 12zM12 16v6M9 19h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
         />
         <KPICard
-          title="Organization Leaders"
+          title={t('reports.organizationLeaders')}
           value={organizationLeadersTotal.toLocaleString()}
           variant="info"
           icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM19 8v6m0-6a3 3 0 010 6m0-6c-1.657 0-3-1.79-3-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
@@ -622,14 +666,14 @@ export const Reports: React.FC = () => {
       {/* Filters removed by request */}
 
       {isLoading ? (
-        <Loading fullScreen message="Loading reports..." />
+        <Loading fullScreen message={t('reports.loadingReports')} />
       ) : (
         <>
           {/* Row 1: Members by Gender and Year */}
           <div className={styles.chartsGrid}>
             <ChartCard
               title={t('reports.membersByGender')}
-              description="Total members by gender distribution"
+              description={t('reports.totalMembersByGender')}
             >
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={membersByGender}>
@@ -644,14 +688,14 @@ export const Reports: React.FC = () => {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="cnt" name="Count" fill={COLORS[0]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="cnt" name={t('reports.count')} fill={COLORS[0]} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
 
             <ChartCard
               title={t('reports.membersByYear')}
-              description="New member registrations over time"
+              description={t('reports.newMemberRegistrations')}
             >
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={filteredMembersByYear}>
@@ -666,9 +710,9 @@ export const Reports: React.FC = () => {
                     }}
                   />
                   <Legend />
-                  <Line type="monotone" dataKey="total" name="Total" stroke={COLORS[0]} strokeWidth={3} />
-                  <Line type="monotone" dataKey="Male" name="Male" stroke={COLORS[2]} strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="Female" name="Female" stroke={COLORS[1]} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="total" name={t('reports.total')} stroke={COLORS[0]} strokeWidth={3} />
+                  <Line type="monotone" dataKey="Male" name={t('reports.male')} stroke={COLORS[2]} strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="Female" name={t('reports.female')} stroke={COLORS[1]} strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -676,7 +720,7 @@ export const Reports: React.FC = () => {
 
           {/* Row 2: Youth vs Elders, CBA Status */}
           <div className={styles.chartsGrid}>
-            <ChartCard title={t('reports.youthMembers')} description="Members by age category">
+            <ChartCard title={t('reports.youthMembers')} description={t('reports.membersByAgeCategory')}>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -700,7 +744,7 @@ export const Reports: React.FC = () => {
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title={t('reports.cbaStatus')} description="CBA statuses overview">
+            <ChartCard title={t('reports.cbaStatus')} description={t('reports.cbaStatusesOverview')}>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -728,7 +772,7 @@ export const Reports: React.FC = () => {
 
           {/* Row 3: Unions by Sector, Members by Age */}
           <div className={styles.chartsGrid}>
-            <ChartCard title={t('reports.unionsBySector')} description="Distribution of unions">
+            <ChartCard title={t('reports.unionsBySector')} description={t('reports.distributionOfUnions')}>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={filteredUnionsBySector}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -787,9 +831,9 @@ export const Reports: React.FC = () => {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="Total" name="Total" fill={COLORS[5]} radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="Male" name="Male" fill={COLORS[0]} radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="Female" name="Female" fill={COLORS[1]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Total" name={t('reports.total')} fill={COLORS[5]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Male" name={t('reports.male')} fill={COLORS[0]} radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Female" name={t('reports.female')} fill={COLORS[1]} radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -830,7 +874,7 @@ export const Reports: React.FC = () => {
                   </table>
                   {organizationLeadersTotal > 10 && (
                     <p className={styles.tableNote}>
-                      Showing 10 of {organizationLeadersTotal.toLocaleString()} leaders
+                      {t('reports.showingLeaders', { count: 10, total: organizationLeadersTotal.toLocaleString() })}
                     </p>
                   )}
                 </div>
@@ -912,14 +956,14 @@ export const Reports: React.FC = () => {
               {/* Executives Count By Union */}
               {((selectedUnionId === '' && overallExecutivesByGender.length > 0) || (selectedUnionId !== '' && execByUnion?.data?.executives_count)) && (
               <ChartCard
-                title="Executives by Gender (Selected Union)"
-                  description={selectedUnionId === '' ? 'Overall - All Unions' : execByUnion?.data?.union_name || ''}
+                title={t('reports.executivesByGender')}
+                  description={selectedUnionId === '' ? t('reports.overallAllUnions') : execByUnion?.data?.union_name || ''}
                 actions={
                   unionsList?.data?.data ? (
                     <Select
-                      label="Union"
+                      label={t('reports.union')}
                       options={[
-                          { value: '', label: 'Overall' },
+                          { value: '', label: t('reports.overall') },
                           ...unionsList.data.data.map((u: any) => ({ value: String(u.union_id), label: u.name_en }))
                         ]}
                         value={selectedUnionId === '' ? '' : String(selectedUnionId)}
@@ -958,13 +1002,13 @@ export const Reports: React.FC = () => {
 
           {/* General Assembly Status */}
           {gaStatus?.data && (
-              <ChartCard title="General Assembly Status" description="Conducted vs Not Conducted">
+              <ChartCard title={t('reports.generalAssemblyStatus')} description={t('reports.conductedVsNotConducted')}>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
                       data={[
-                        { name: 'Conducted', value: gaStatus.data.conducted_general_assembly },
-                        { name: 'Not Conducted', value: gaStatus.data.not_conducted },
+                        { name: t('reports.conducted'), value: gaStatus.data.conducted_general_assembly },
+                        { name: t('reports.notConducted'), value: gaStatus.data.not_conducted },
                       ]}
                       cx="50%"
                       cy="50%"
@@ -1211,19 +1255,19 @@ export const Reports: React.FC = () => {
               {/* OSH KPI Cards */}
               <div className={styles.summaryGrid}>
                 <KPICard
-                  title="Total Incidents"
+                  title={t('reports.totalIncidents')}
                   value={computedOSHStatistics.totalIncidents.toLocaleString()}
                   variant="primary"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
                 <KPICard
-                  title="Fatality Incidents"
+                  title={t('reports.fatalityIncidents')}
                   value={computedOSHStatistics.fatalityIncidents.toLocaleString()}
                   variant="danger"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 />
                 <KPICard
-                  title="Permanent Disability/Major Injury Incidents"
+                  title={t('reports.permanentDisabilityMajorInjury')}
                   value={computedOSHStatistics.permanentDisabilityIncidents.toLocaleString()}
                   variant="warning"
                   icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
@@ -1233,8 +1277,8 @@ export const Reports: React.FC = () => {
               {/* OSH Charts */}
               <div className={styles.chartsGrid}>
                 <ChartCard
-                  title="Incidents by Category"
-                  description="Distribution of incidents by accident category"
+                  title={t('reports.incidentsByCategory')}
+                  description={t('reports.distributionByAccidentCategory')}
                 >
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
@@ -1260,8 +1304,8 @@ export const Reports: React.FC = () => {
                 </ChartCard>
 
                 <ChartCard
-                  title="Incidents by Severity"
-                  description="Distribution of incidents by injury severity"
+                  title={t('reports.incidentsBySeverity')}
+                  description={t('reports.distributionByInjurySeverity')}
                 >
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={oshIncidentsBySeverity}>
@@ -1276,7 +1320,7 @@ export const Reports: React.FC = () => {
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="count" name="Count" fill={COLORS[1]} radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="count" name={t('reports.count')} fill={COLORS[1]} radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartCard>
@@ -1286,8 +1330,8 @@ export const Reports: React.FC = () => {
               {oshIncidentsByMonth.length > 0 && (
                 <div className={styles.fullWidth}>
                   <ChartCard
-                    title="Monthly Incident Trends"
-                    description="Incident trends over time"
+                    title={t('reports.monthlyIncidentTrends')}
+                    description={t('reports.incidentTrendsOverTime')}
                   >
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={oshIncidentsByMonth}>
@@ -1302,7 +1346,7 @@ export const Reports: React.FC = () => {
                           }}
                         />
                         <Legend />
-                        <Line type="monotone" dataKey="count" name="Incidents" stroke={COLORS[2]} strokeWidth={3} />
+                        <Line type="monotone" dataKey="count" name={t('reports.incidents')} stroke={COLORS[2]} strokeWidth={3} />
                       </LineChart>
                     </ResponsiveContainer>
                   </ChartCard>
@@ -1368,22 +1412,22 @@ export const Reports: React.FC = () => {
 
           {/* Summary Statistics */}
           <div className={styles.summarySection}>
-            <h3 className={styles.sectionTitle}>Summary Statistics</h3>
+            <h3 className={styles.sectionTitle}>{t('reports.summaryStatistics')}</h3>
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
-                <h4>Total Executive Members</h4>
+                <h4>{t('reports.totalExecutiveMembers')}</h4>
                 <p className={styles.summaryValue}>{totalExecutives.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Unions with CBAs</h4>
+                <h4>{t('reports.unionsWithCBAs')}</h4>
                 <p className={styles.summaryValue}>{unionsWithCBAs.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Unions with General Assembly</h4>
+                <h4>{t('reports.unionsWithGeneralAssembly')}</h4>
                 <p className={styles.summaryValue}>{unionsWithGeneralAssembly.toLocaleString()}</p>
               </div>
               <div className={styles.summaryCard}>
-                <h4>Total Organizations</h4>
+                <h4>{t('reports.totalOrganizations')}</h4>
                 <p className={styles.summaryValue}>{totalOrganizations.toLocaleString()}</p>
               </div>
             </div>

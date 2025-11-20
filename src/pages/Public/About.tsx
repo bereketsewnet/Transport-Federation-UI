@@ -7,6 +7,25 @@ import { getAboutContent, getExecutives } from '@api/cms-endpoints';
 import { getImageUrl } from '@api/client';
 import styles from './About.module.css';
 
+// Helper function to process text and convert line break indicators to actual line breaks
+const processTextWithLineBreaks = (text: string): string => {
+  if (!text) return '';
+  
+  let processed = text;
+  
+  // Replace <br> or <br /> tags with newlines
+  processed = processed.replace(/<br\s*\/?>/gi, '\n');
+  
+  // Replace /n (user typo for \n) with newlines
+  processed = processed.replace(/\/n/g, '\n');
+  
+  // Note: We don't replace commas to avoid breaking up addresses and normal text
+  // Users should use \n, /n, or <br> for explicit line breaks
+  
+  // Ensure \n is preserved (whiteSpace: pre-line will handle this)
+  return processed;
+};
+
 export const About: React.FC = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'am';
@@ -192,27 +211,78 @@ export const About: React.FC = () => {
       </motion.section>
 
       <div className={styles.content}>
-        {/* About Us Description Section */}
-        {content.description[lang] && (
-          <motion.section
-            className={styles.descriptionSection}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={sectionVariants}
-            transition={{ duration: 0.6 }}
-          >
-            <div className={styles.descriptionContent}>
-              <div className={styles.descriptionText} style={{ whiteSpace: 'pre-line' }}>
-                {content.description[lang]}
+        {/* History Section */}
+        <motion.section
+          className={styles.section}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={sectionVariants}
+          transition={{ duration: 0.6 }}
+        >
+          <div className={styles.sectionGrid}>
+            <motion.div 
+              className={styles.iconBadge}
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              style={{ backgroundColor: '#F59E0B' }}
+            >
+              <FaBook color="white" size={20} />
+            </motion.div>
+            <div className={styles.sectionContent}>
+              <h2 className={styles.sectionTitle}>{t('about.history')}</h2>
+              <div className={styles.sectionText} style={{ whiteSpace: 'pre-line' }}>
+                {processTextWithLineBreaks(content.history[lang])}
               </div>
             </div>
-          </motion.section>
-        )}
+          </div>
+          
+          {/* History Images Horizontal Scroll */}
+          <div className={styles.historyImagesContainer}>
+            <div className={styles.historyImagesScroll}>
+              <div className={styles.historyImagesTrack}>
+                {/* First set of images */}
+                {[
+                  'src/assets/history_images/history1.jpeg',
+                  'src/assets/history_images/history2.jpeg',
+                  'src/assets/history_images/history3.jpeg',
+                  'src/assets/history_images/history4.jpeg',
+                  'src/assets/history_images/history5.jpeg',
+                ].map((img, index) => (
+                  <div key={`img-${index}`} className={styles.historyImageWrapper}>
+                    <img 
+                      src={img} 
+                      alt={`History ${index + 1}`}
+                      className={styles.historyImage}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+                {/* Duplicate set for seamless loop */}
+                {[
+                  'src/assets/history_images/history1.jpeg',
+                  'src/assets/history_images/history2.jpeg',
+                  'src/assets/history_images/history3.jpeg',
+                  'src/assets/history_images/history4.jpeg',
+                  'src/assets/history_images/history5.jpeg',
+                ].map((img, index) => (
+                  <div key={`img-dup-${index}`} className={styles.historyImageWrapper}>
+                    <img 
+                      src={img} 
+                      alt={`History ${index + 1}`}
+                      className={styles.historyImage}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
 
         {/* Mission Section */}
         <motion.section
-          className={styles.section}
+          className={`${styles.section} ${styles.missionSection}`}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -237,7 +307,7 @@ export const About: React.FC = () => {
 
         {/* Vision Section */}
         <motion.section
-          className={styles.section}
+          className={`${styles.section} ${styles.visionSection}`}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -255,7 +325,23 @@ export const About: React.FC = () => {
             </motion.div>
             <div className={styles.sectionContent}>
               <h2 className={styles.sectionTitle}>{t('about.vision')}</h2>
-              <p className={styles.sectionText}>{content.vision[lang]}</p>
+              <div className={styles.sectionText} style={{ whiteSpace: 'pre-line' }}>
+                {(() => {
+                  const visionText = content.vision[lang] || '';
+                  // If text contains bullet points on the same line (no line breaks), split them
+                  if (visionText.includes('•') && !visionText.includes('\n')) {
+                    return visionText.split('•').filter((item: string) => item.trim()).map((item: string, index: number) => (
+                      <React.Fragment key={index}>
+                        {index > 0 && '• '}
+                        {item.trim()}
+                        {index < visionText.split('•').filter((i: string) => i.trim()).length - 1 && <br />}
+                      </React.Fragment>
+                    ));
+                  }
+                  // Otherwise, preserve line breaks with whiteSpace: pre-line
+                  return visionText;
+                })()}
+              </div>
             </div>
           </div>
         </motion.section>
@@ -291,72 +377,59 @@ export const About: React.FC = () => {
           </div>
         </motion.section>
 
-        {/* History Section */}
-        <motion.section
-          className={styles.section}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={sectionVariants}
-          transition={{ duration: 0.6 }}
-        >
-          <div className={styles.sectionGrid}>
-            <motion.div 
-              className={styles.iconBadge}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              style={{ backgroundColor: '#F59E0B' }}
-            >
-              <FaBook color="white" size={20} />
-            </motion.div>
-            <div className={styles.sectionContent}>
-              <h2 className={styles.sectionTitle}>{t('about.history')}</h2>
-              <p className={styles.sectionText}>{content.history[lang]}</p>
+        {/* About Us Description Section */}
+        {content.description[lang] && (
+          <motion.section
+            className={styles.descriptionSection}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={sectionVariants}
+            transition={{ duration: 0.6 }}
+          >
+            <div className={styles.descriptionContent}>
+              {(() => {
+                const descriptionText = processTextWithLineBreaks(content.description[lang]);
+                if (!descriptionText) return null;
+                
+                // Split by first line break or newline to get first sentence/line
+                const firstLineBreak = descriptionText.indexOf('\n');
+                let firstLine = '';
+                let restOfText = '';
+                
+                if (firstLineBreak > 0) {
+                  // If there's a newline, use the first line as title
+                  firstLine = descriptionText.substring(0, firstLineBreak).trim();
+                  restOfText = descriptionText.substring(firstLineBreak + 1).trim();
+                } else {
+                  // If no newline, try to get first sentence (up to first period)
+                  const firstPeriodIndex = descriptionText.indexOf('.');
+                  if (firstPeriodIndex > 0) {
+                    firstLine = descriptionText.substring(0, firstPeriodIndex + 1).trim();
+                    restOfText = descriptionText.substring(firstPeriodIndex + 1).trim();
+                  } else {
+                    // If no period, use the whole text as title
+                    firstLine = descriptionText.trim();
+                    restOfText = '';
+                  }
+                }
+                
+                return (
+                  <>
+                    {firstLine && (
+                      <h3 className={styles.descriptionTitle}>{firstLine}</h3>
+                    )}
+                    {restOfText && (
+                      <div className={styles.descriptionText} style={{ whiteSpace: 'pre-line' }}>
+                        {restOfText}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
-          </div>
-          
-          {/* History Images Horizontal Scroll */}
-          <div className={styles.historyImagesContainer}>
-            <div className={styles.historyImagesScroll}>
-              <div className={styles.historyImagesTrack}>
-                {/* First set of images */}
-                {[
-                  'https://images.unsplash.com/photo-1556761175-5973dc4f32a9?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
-                ].map((img, index) => (
-                  <div key={`img-${index}`} className={styles.historyImageWrapper}>
-                    <img 
-                      src={img} 
-                      alt={`History ${index + 1}`}
-                      className={styles.historyImage}
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-                {/* Duplicate set for seamless loop */}
-                {[
-                  'https://images.unsplash.com/photo-1556761175-5973dc4f32a9?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop',
-                  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
-                ].map((img, index) => (
-                  <div key={`img-dup-${index}`} className={styles.historyImageWrapper}>
-                    <img 
-                      src={img} 
-                      alt={`History ${index + 1}`}
-                      className={styles.historyImage}
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.section>
+          </motion.section>
+        )}
 
         {/* Objectives Section */}
         <motion.section

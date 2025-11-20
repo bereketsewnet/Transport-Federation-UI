@@ -223,8 +223,8 @@ export const Dashboard: React.FC = () => {
       {/* Charts */}
       <div className={styles.chartsGrid}>
         <ChartCard
-          title="Members by Registration Year"
-          description="New member registrations over time"
+          title={t('dashboard.membersByRegistrationYear')}
+          description={t('dashboard.newRegistrations')}
         >
           {isLoading ? (
             <Loading size="md" />
@@ -242,15 +242,15 @@ export const Dashboard: React.FC = () => {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="cnt" name="Members" fill="var(--primary)" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="cnt" name={t('dashboard.members')} fill="var(--primary)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </ChartCard>
 
         <ChartCard
-          title="Members by Gender"
-          description="Gender distribution of members"
+          title={t('dashboard.membersByGender')}
+          description={t('dashboard.genderDistribution')}
         >
           {isLoading ? (
             <Loading size="md" />
@@ -268,7 +268,7 @@ export const Dashboard: React.FC = () => {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="cnt" name="Count" fill="var(--primary)" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="cnt" name={t('dashboard.count')} fill="var(--primary)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
