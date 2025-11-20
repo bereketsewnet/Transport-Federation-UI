@@ -23,6 +23,9 @@ import {
   getOrganizationLeadersReportList,
   getOrganizations,
   OrganizationLeadersReportRow,
+  getDisciplineByCase,
+  getDisciplineJudiciaryVerdicts,
+  getDisciplinesList,
 } from '@api/endpoints';
 import {
   BarChart,
@@ -682,6 +685,30 @@ const PrintedReportPage: React.FC = () => {
     queryFn: () => getOSHIncidents({ per_page: 1000 }),
   });
 
+  // Discipline Reports Queries
+  const { data: disciplineByCase } = useQuery({
+    queryKey: ['discipline-by-case', filterStartDate, filterEndDate],
+    queryFn: () => getDisciplineByCase({
+      from_date: filterStartDate || undefined,
+      to_date: filterEndDate || undefined,
+    }),
+  });
+
+  const { data: disciplineJudiciaryVerdicts } = useQuery({
+    queryKey: ['discipline-judiciary-verdicts', filterStartDate, filterEndDate],
+    queryFn: () => getDisciplineJudiciaryVerdicts({
+      from_date: filterStartDate || undefined,
+      to_date: filterEndDate || undefined,
+    }),
+  });
+
+  const { data: disciplinesList } = useQuery({
+    queryKey: ['disciplines-list'],
+    queryFn: () => getDisciplinesList({
+      per_page: 1000,
+    }),
+  });
+
   // Helper function to check if a date falls within the filter range
   const isDateInRange = (dateStr: string | null | undefined): boolean => {
     if (!filterStartDate && !filterEndDate) return true; // No filter = show all
@@ -763,6 +790,44 @@ const PrintedReportPage: React.FC = () => {
       return isDateInRange(incident.dateTimeOccurred);
     });
   }, [oshIncidents, filterStartDate, filterEndDate]);
+
+  // Filter disciplines by date range
+  const filteredDisciplines = useMemo(() => {
+    const disciplines: any[] = disciplinesList?.data?.data || [];
+    if (!filterStartDate && !filterEndDate) return disciplines;
+    
+    return disciplines.filter((discipline: any) => {
+      return isDateInRange(discipline.date_of_action_taken);
+    });
+  }, [disciplinesList, filterStartDate, filterEndDate]);
+
+  // Active Judiciary Cases - filter by judiciary_intermediate === true
+  const activeJudiciaryCases = useMemo(() => {
+    return filteredDisciplines.filter((discipline: any) => {
+      return discipline.judiciary_intermediate === true;
+    });
+  }, [filteredDisciplines]);
+
+  // Process discipline data for charts
+  const disciplineByCaseData = useMemo(() => {
+    const data = disciplineByCase?.data;
+    if (!data?.summary?.by_case) return [];
+    return data.summary.by_case.map((item: any) => ({
+      name: item.case,
+      value: item.count,
+      percentage: parseFloat(item.percentage || '0'),
+    }));
+  }, [disciplineByCase]);
+
+  const disciplineVerdictsData = useMemo(() => {
+    const data = disciplineJudiciaryVerdicts?.data;
+    if (!data?.summary?.by_verdict) return [];
+    return data.summary.by_verdict.map((item: any) => ({
+      name: item.verdict_for,
+      value: item.count,
+      percentage: parseFloat(item.percentage || '0'),
+    }));
+  }, [disciplineJudiciaryVerdicts]);
 
   // Process data (using filtered data when date filter is active)
   const membersByGender = useMemo(() => {
@@ -2990,6 +3055,282 @@ const PrintedReportPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Report Section 8: Discipline Reports - Phase 2 */}
+        <div className={styles.page} data-print-phase="phase2">
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>8. Discipline Reports</h2>
+            
+            {/* 8.1 Active Judiciary Cases */}
+            <div className={styles.reportItem}>
+              <h3 className={styles.reportQuestion}>8.1 Active Judiciary Cases</h3>
+              <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                <p className={styles.kpiLabel}>Total Active Judiciary Cases</p>
+                <p className={styles.kpiValue}>{activeJudiciaryCases.length.toLocaleString()}</p>
+              </div>
+              {activeJudiciaryCases.length > 0 ? (
+                <div className={styles.dataTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union</th>
+                        <th>Member</th>
+                        <th>Discipline Case</th>
+                        <th>Reason</th>
+                        <th>Date of Action</th>
+                        <th>Resolution Method</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeJudiciaryCases.map((discipline: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                          <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.father_name || ''} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                          <td>{discipline.discipline_case}</td>
+                          <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={discipline.reason_of_discipline || ''}>
+                            {discipline.reason_of_discipline || 'N/A'}
+                          </td>
+                          <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                          <td>{discipline.resolution_method || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                  No active judiciary cases found.
+                </p>
+              )}
+            </div>
+
+            {/* 8.2 Discipline Case Taken (Breakdown by Case) */}
+            {disciplineByCaseData.length > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>8.2 Discipline Case Taken (Breakdown by Case)</h3>
+                <div className={styles.chartContainer} style={{ marginBottom: '20px' }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={disciplineByCaseData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value, percentage }) =>
+                          `${name}: ${value} (${percentage.toFixed(1)}%)`
+                        }
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {disciplineByCaseData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number, name: string, props: any) => [
+                        `${value} (${props.payload.percentage.toFixed(1)}%)`,
+                        name
+                      ]} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className={styles.dataTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Discipline Case</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {disciplineByCaseData.map((item, idx) => (
+                        <tr key={idx}>
+                          <td><strong>{item.name}</strong></td>
+                          <td>{item.value.toLocaleString()}</td>
+                          <td>{item.percentage.toFixed(2)}%</td>
+                        </tr>
+                      ))}
+                      <tr className={styles.totalRow}>
+                        <td><strong>Total</strong></td>
+                        <td><strong>{disciplineByCaseData.reduce((sum, item) => sum + item.value, 0).toLocaleString()}</strong></td>
+                        <td><strong>100.00%</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                {disciplineByCase?.data?.data && disciplineByCase.data.data.length > 0 && (
+                  <div className={styles.dataTable} style={{ marginTop: '20px' }}>
+                    <h4 style={{ fontSize: '14px', marginBottom: '10px', fontWeight: 600 }}>Discipline Cases Details</h4>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Union</th>
+                          <th>Member</th>
+                          <th>Discipline Case</th>
+                          <th>Reason</th>
+                          <th>Date of Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {disciplineByCase.data.data.slice(0, 20).map((discipline: any, idx: number) => (
+                          <tr key={idx}>
+                            <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                            <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.father_name || ''} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                            <td>{discipline.discipline_case}</td>
+                            <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={discipline.reason_of_discipline || ''}>
+                              {discipline.reason_of_discipline || 'N/A'}
+                            </td>
+                            <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {disciplineByCase.data.data.length > 20 && (
+                      <p className={styles.tableNote}>*Showing first 20 of {disciplineByCase.data.data.length} records</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 8.3 Judiciary Body Verdicts */}
+            {disciplineVerdictsData.length > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>8.3 Total Number of Resolutions Taken by Judiciary Body for Verdicts</h3>
+                <div className={styles.chartContainer} style={{ marginBottom: '20px' }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={disciplineVerdictsData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value, percentage }) =>
+                          `${name}: ${value} (${percentage.toFixed(1)}%)`
+                        }
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {disciplineVerdictsData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number, name: string, props: any) => [
+                        `${value} (${props.payload.percentage.toFixed(1)}%)`,
+                        name
+                      ]} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className={styles.dataTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Verdict For</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {disciplineVerdictsData.map((item, idx) => (
+                        <tr key={idx}>
+                          <td><strong>{item.name}</strong></td>
+                          <td>{item.value.toLocaleString()}</td>
+                          <td>{item.percentage.toFixed(2)}%</td>
+                        </tr>
+                      ))}
+                      <tr className={styles.totalRow}>
+                        <td><strong>Total</strong></td>
+                        <td><strong>{disciplineVerdictsData.reduce((sum, item) => sum + item.value, 0).toLocaleString()}</strong></td>
+                        <td><strong>100.00%</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                {disciplineJudiciaryVerdicts?.data?.data && disciplineJudiciaryVerdicts.data.data.length > 0 && (
+                  <div className={styles.dataTable} style={{ marginTop: '20px' }}>
+                    <h4 style={{ fontSize: '14px', marginBottom: '10px', fontWeight: 600 }}>Judiciary Verdicts Details</h4>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Union</th>
+                          <th>Member</th>
+                          <th>Discipline Case</th>
+                          <th>Verdict For</th>
+                          <th>Date of Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {disciplineJudiciaryVerdicts.data.data.slice(0, 20).map((discipline: any, idx: number) => (
+                          <tr key={idx}>
+                            <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                            <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.father_name || ''} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                            <td>{discipline.discipline_case}</td>
+                            <td>{discipline.verdict_for || 'N/A'}</td>
+                            <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {disciplineJudiciaryVerdicts.data.data.length > 20 && (
+                      <p className={styles.tableNote}>*Showing first 20 of {disciplineJudiciaryVerdicts.data.data.length} records</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 8.4 List of Disciplines (Search & Filter) */}
+            {filteredDisciplines.length > 0 && (
+              <div className={styles.reportItem}>
+                <h3 className={styles.reportQuestion}>8.4 List of Disciplines</h3>
+                <div className={styles.kpiBox} style={{ marginBottom: '20px' }}>
+                  <p className={styles.kpiLabel}>Total Discipline Cases</p>
+                  <p className={styles.kpiValue}>{filteredDisciplines.length.toLocaleString()}</p>
+                </div>
+                <div className={styles.dataTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Union</th>
+                        <th>Member</th>
+                        <th>Discipline Case</th>
+                        <th>Reason</th>
+                        <th>Date of Action</th>
+                        <th>Judiciary Intermediate</th>
+                        <th>Resolution Method</th>
+                        <th>Verdict For</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredDisciplines.slice(0, 50).map((discipline: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                          <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.father_name || ''} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                          <td>{discipline.discipline_case}</td>
+                          <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={discipline.reason_of_discipline || ''}>
+                            {discipline.reason_of_discipline || 'N/A'}
+                          </td>
+                          <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                          <td>{discipline.judiciary_intermediate ? 'Yes' : 'No'}</td>
+                          <td>{discipline.resolution_method || 'N/A'}</td>
+                          <td>{discipline.verdict_for || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {filteredDisciplines.length > 50 && (
+                    <p className={styles.tableNote}>*Showing first 50 of {filteredDisciplines.length.toLocaleString()} records</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Summary Statistics Page - Phase 2 */}
         <div className={styles.page} data-print-phase="phase2">

@@ -4343,3 +4343,372 @@ Errors:
   "message": "Server error"
 }
 ```
+### [GET] {{base_url}}/api/disciplines?q=warning&union_id=1&discipline_case=Warning&page=1&per_page=20 - List disciplines
+Group: Disciplines
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "union_id": 1,
+      "mem_id": 1,
+      "discipline_case": "Warning",
+      "reason_of_discipline": "Late arrival to work",
+      "date_of_action_taken": "2025-10-01",
+      "judiciary_intermediate": false,
+      "resolution_method": "Social Dialog",
+      "verdict_for": null,
+      "created_at": "2025-10-18T08:00:00.000Z",
+      "union": {
+        "union_id": 1,
+        "union_code": "ET01",
+        "name_en": "Ethio Telecom Workers Union"
+      },
+      "member": {
+        "mem_id": 1,
+        "member_code": "M-1001",
+        "first_name": "Abebe",
+        "father_name": "Kebede",
+        "surname": "Tadesse"
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "per_page": 20
+  }
+}
+```
+
+### [GET] {{base_url}}/api/disciplines/1 - Get discipline by id
+Group: Disciplines
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "mem_id": 1,
+  "discipline_case": "Warning",
+  "reason_of_discipline": "Late arrival to work",
+  "date_of_action_taken": "2025-10-01",
+  "judiciary_intermediate": false,
+  "resolution_method": "Social Dialog",
+  "verdict_for": null,
+  "created_at": "2025-10-18T08:00:00.000Z",
+  "union": {
+    "union_id": 1,
+    "union_code": "ET01",
+    "name_en": "Ethio Telecom Workers Union"
+  },
+  "member": {
+    "mem_id": 1,
+    "member_code": "M-1001",
+    "first_name": "Abebe",
+    "father_name": "Kebede",
+    "surname": "Tadesse"
+  }
+}
+```
+
+### [POST] {{base_url}}/api/disciplines - Create discipline (admin)
+Group: Disciplines
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}",
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "union_id": 1,
+  "mem_id": 1,
+  "discipline_case": "Warning",
+  "reason_of_discipline": "Late arrival to work",
+  "date_of_action_taken": "2025-10-01",
+  "judiciary_intermediate": false,
+  "resolution_method": "Social Dialog",
+  "verdict_for": null
+}
+```
+
+Success (201):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "mem_id": 1,
+  "discipline_case": "Warning",
+  "reason_of_discipline": "Late arrival to work",
+  "date_of_action_taken": "2025-10-01",
+  "judiciary_intermediate": false,
+  "resolution_method": "Social Dialog",
+  "verdict_for": null,
+  "created_at": "2025-10-18T08:00:00.000Z"
+}
+```
+
+### [PUT] {{base_url}}/api/disciplines/1 - Update discipline (admin)
+Group: Disciplines
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}",
+  "Content-Type": "application/json"
+}
+```
+
+Request Body:
+```json
+{
+  "discipline_case": "Salary Penalty",
+  "judiciary_intermediate": true,
+  "resolution_method": "Judiciary Body",
+  "verdict_for": "Worker"
+}
+```
+
+Success (200):
+```json
+{
+  "id": 1,
+  "union_id": 1,
+  "mem_id": 1,
+  "discipline_case": "Salary Penalty",
+  "reason_of_discipline": "Late arrival to work",
+  "date_of_action_taken": "2025-10-01",
+  "judiciary_intermediate": true,
+  "resolution_method": "Judiciary Body",
+  "verdict_for": "Worker",
+  "updated_at": "2025-10-18T09:00:00.000Z"
+}
+```
+
+### [DELETE] {{base_url}}/api/disciplines/1?confirm=true - Delete discipline (admin confirm)
+Group: Disciplines
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "message": "Discipline case deleted"
+}
+```
+
+### [GET] {{base_url}}/api/reports/disciplines-active-judiciary - Active Judiciary Cases
+Group: Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "count": 2,
+  "data": [
+    {
+      "id": 1,
+      "union_id": 1,
+      "mem_id": 1,
+      "discipline_case": "Warning",
+      "reason_of_discipline": "Late arrival",
+      "date_of_action_taken": "2025-10-01",
+      "judiciary_intermediate": true,
+      "resolution_method": "Judiciary Body",
+      "verdict_for": null,
+      "union": {
+        "union_id": 1,
+        "name_en": "Ethio Telecom Workers Union"
+      },
+      "member": {
+        "mem_id": 1,
+        "member_code": "M-1001",
+        "first_name": "Abebe"
+      }
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/disciplines-by-case - Discipline Case Taken (Breakdown by Case)
+Group: Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "summary": {
+    "by_case": [
+      {
+        "case": "Warning",
+        "count": 5,
+        "percentage": "50.00"
+      },
+      {
+        "case": "Salary Penalty",
+        "count": 3,
+        "percentage": "30.00"
+      },
+      {
+        "case": "Work Suspension",
+        "count": 2,
+        "percentage": "20.00"
+      }
+    ],
+    "total": 10
+  },
+  "data": [
+    {
+      "id": 1,
+      "union_id": 1,
+      "mem_id": 1,
+      "discipline_case": "Warning",
+      "reason_of_discipline": "Late arrival",
+      "date_of_action_taken": "2025-10-01",
+      "union": {
+        "union_id": 1,
+        "name_en": "Ethio Telecom Workers Union"
+      },
+      "member": {
+        "mem_id": 1,
+        "member_code": "M-1001",
+        "first_name": "Abebe"
+      }
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/disciplines-judiciary-verdicts - Judiciary Body Verdicts
+Group: Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "summary": {
+    "by_verdict": [
+      {
+        "verdict_for": "Worker",
+        "count": 8,
+        "percentage": "80.00"
+      },
+      {
+        "verdict_for": "Employer",
+        "count": 2,
+        "percentage": "20.00"
+      }
+    ],
+    "total": 10
+  },
+  "data": [
+    {
+      "id": 1,
+      "union_id": 1,
+      "mem_id": 1,
+      "discipline_case": "Warning",
+      "reason_of_discipline": "Late arrival",
+      "date_of_action_taken": "2025-10-01",
+      "judiciary_intermediate": true,
+      "resolution_method": "Judiciary Body",
+      "verdict_for": "Worker",
+      "union": {
+        "union_id": 1,
+        "name_en": "Ethio Telecom Workers Union"
+      },
+      "member": {
+        "mem_id": 1,
+        "member_code": "M-1001",
+        "first_name": "Abebe"
+      }
+    }
+  ]
+}
+```
+
+### [GET] {{base_url}}/api/reports/disciplines-list - Disciplines List (Search & Filter)
+Group: Reports
+
+Headers:
+```json
+{
+  "Authorization": "Bearer {{jwt_token}}"
+}
+```
+
+Success (200):
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "union_id": 1,
+      "mem_id": 1,
+      "discipline_case": "Warning",
+      "reason_of_discipline": "Late arrival",
+      "date_of_action_taken": "2025-10-01",
+      "judiciary_intermediate": false,
+      "resolution_method": "Social Dialog",
+      "verdict_for": null,
+      "union": {
+        "union_id": 1,
+        "name_en": "Ethio Telecom Workers Union"
+      },
+      "member": {
+        "mem_id": 1,
+        "member_code": "M-1001",
+        "first_name": "Abebe"
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "per_page": 20
+  }
+}
+```

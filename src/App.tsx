@@ -64,6 +64,9 @@ import TerminatedUnionsFormComplete from '@pages/Admin/TerminatedUnions/Terminat
 // Admin OSH
 import { OSH } from '@pages/Admin/OSH';
 
+// Admin Disciplines
+import { Disciplines } from '@pages/Admin/Disciplines';
+
 // Admin General Assembly
 import { GeneralAssembly } from '@pages/Admin/GeneralAssembly';
 
@@ -212,6 +215,9 @@ function App() {
 
           {/* OSH Management */}
           <Route path="osh" element={<OSH />} />
+
+          {/* Disciplines Management */}
+          <Route path="disciplines" element={<Disciplines />} />
 
           {/* General Assembly Management */}
           <Route path="general-assembly" element={<GeneralAssembly />} />

@@ -1174,6 +1174,60 @@
       ]
     },
     {
+      "name": "Disciplines",
+      "item": [
+        {
+          "name": "List disciplines",
+          "request": {
+            "method":"GET",
+            "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{ "raw":"{{base_url}}/api/disciplines?q=warning&union_id=1&discipline_case=Warning&page=1&per_page=20", "host":["{{base_url}}"], "path":["api","disciplines"], "query":[{"key":"q","value":"warning"},{"key":"union_id","value":"1"},{"key":"discipline_case","value":"Warning"},{"key":"page","value":"1"},{"key":"per_page","value":"20"}] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get discipline by id",
+          "request": {
+            "method":"GET",
+            "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{ "raw":"{{base_url}}/api/disciplines/1", "host":["{{base_url}}"], "path":["api","disciplines","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create discipline (admin)",
+          "request": {
+            "method":"POST",
+            "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"union_id\": 1,\n  \"mem_id\": 1,\n  \"discipline_case\": \"Warning\",\n  \"reason_of_discipline\": \"Late arrival to work\",\n  \"date_of_action_taken\": \"2025-10-01\",\n  \"judiciary_intermediate\": false,\n  \"resolution_method\": \"Social Dialog\",\n  \"verdict_for\": null\n}"},
+            "url":{"raw":"{{base_url}}/api/disciplines","host":["{{base_url}}"],"path":["api","disciplines"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update discipline (admin)",
+          "request": {
+            "method":"PUT",
+            "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"discipline_case\": \"Salary Penalty\",\n  \"judiciary_intermediate\": true,\n  \"resolution_method\": \"Judiciary Body\",\n  \"verdict_for\": \"Worker\"\n}"},
+            "url":{"raw":"{{base_url}}/api/disciplines/1","host":["{{base_url}}"],"path":["api","disciplines","1"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Delete discipline (admin confirm)",
+          "request": {
+            "method":"DELETE",
+            "auth":{ "type":"bearer", "bearer":[{"key":"token","value":"{{jwt_token}}","type":"string"}] },
+            "url":{"raw":"{{base_url}}/api/disciplines/1?confirm=true","host":["{{base_url}}"],"path":["api","disciplines","1"],"query":[{"key":"confirm","value":"true"}]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Documents",
       "description": "Document management (files, reports, PDFs)",
       "item": [

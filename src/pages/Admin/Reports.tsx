@@ -34,6 +34,9 @@ import {
   getOrganizationLeadersReportList,
   getOrganizations,
   OrganizationLeadersReportRow,
+  getDisciplineByCase,
+  getDisciplineJudiciaryVerdicts,
+  getDisciplinesList,
 } from '@api/endpoints';
 import {
   BarChart,
@@ -305,6 +308,33 @@ export const Reports: React.FC = () => {
     queryFn: () => getOSHIncidents({ per_page: 1000 }),
   });
 
+  // Discipline Data Queries
+  const { data: disciplineByCase } = useQuery({
+    queryKey: ['discipline-by-case', selectedUnionId, dateFrom, dateTo],
+    queryFn: () => getDisciplineByCase({
+      union_id: selectedUnionId !== '' ? selectedUnionId as number : undefined,
+      from_date: dateFrom,
+      to_date: dateTo,
+    }),
+  });
+
+  const { data: disciplineJudiciaryVerdicts } = useQuery({
+    queryKey: ['discipline-judiciary-verdicts', selectedUnionId, dateFrom, dateTo],
+    queryFn: () => getDisciplineJudiciaryVerdicts({
+      union_id: selectedUnionId !== '' ? selectedUnionId as number : undefined,
+      from_date: dateFrom,
+      to_date: dateTo,
+    }),
+  });
+
+  const { data: disciplinesList } = useQuery({
+    queryKey: ['disciplines-list', selectedUnionId],
+    queryFn: () => getDisciplinesList({
+      union_id: selectedUnionId !== '' ? selectedUnionId as number : undefined,
+      per_page: 20,
+    }),
+  });
+
   // Process data (normalize)
   // const membersByYear = useMemo(() => {
   //   const byYear = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
@@ -570,6 +600,35 @@ export const Reports: React.FC = () => {
       permanentDisabilityIncidents: incidents.filter((incident: any) => incident.injurySeverity === 'Permanent Disability/Major Injury').length,
     };
   }, [oshIncidents]);
+
+  // Active Judiciary Cases - filter by judiciary_intermediate === true
+  const activeJudiciaryCases = useMemo(() => {
+    const disciplines: any[] = disciplinesList?.data?.data || [];
+    return disciplines.filter((discipline: any) => {
+      return discipline.judiciary_intermediate === true;
+    });
+  }, [disciplinesList]);
+
+  // Discipline Data Processing
+  const disciplineByCaseData = useMemo(() => {
+    const data = disciplineByCase?.data;
+    if (!data?.summary?.by_case) return [];
+    return data.summary.by_case.map((item: any) => ({
+      name: item.case,
+      value: item.count,
+      percentage: parseFloat(item.percentage),
+    }));
+  }, [disciplineByCase]);
+
+  const disciplineVerdictsData = useMemo(() => {
+    const data = disciplineJudiciaryVerdicts?.data;
+    if (!data?.summary?.by_verdict) return [];
+    return data.summary.by_verdict.map((item: any) => ({
+      name: item.verdict_for,
+      value: item.count,
+      percentage: parseFloat(item.percentage),
+    }));
+  }, [disciplineJudiciaryVerdicts]);
 
   // Mock data for additional reports
   // const membersByAge = [
@@ -1408,6 +1467,227 @@ export const Reports: React.FC = () => {
                 </div>
               )}
             </>
+          )}
+
+          {/* Discipline Reports Section */}
+          <div className={styles.sectionTitle}>
+            <h2>{t('reports.disciplineReports')}</h2>
+          </div>
+
+          {/* Active Judiciary Cases */}
+          <div className={styles.tableSection}>
+            <h3 className={styles.sectionTitle}>{t('reports.activeJudiciaryCases')}</h3>
+            <div className={styles.summaryGrid}>
+              <KPICard
+                title={t('reports.activeJudiciaryCases')}
+                value={activeJudiciaryCases.length.toLocaleString()}
+                variant="warning"
+                icon={<svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" fill="currentColor"/><path fillRule="evenodd" clipRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" fill="currentColor"/></svg>}
+              />
+            </div>
+            {activeJudiciaryCases.length > 0 ? (
+              <div className={styles.table}>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t('disciplines.union')}</th>
+                        <th>{t('disciplines.member')}</th>
+                        <th>{t('disciplines.disciplineCase')}</th>
+                        <th>{t('disciplines.reason')}</th>
+                        <th>{t('disciplines.dateOfAction')}</th>
+                        <th>{t('disciplines.resolutionMethod')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeJudiciaryCases.slice(0, 10).map((discipline: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                          <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.father_name || ''} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                          <td>{discipline.discipline_case}</td>
+                          <td>{discipline.reason_of_discipline}</td>
+                          <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                          <td>{discipline.resolution_method}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                No active judiciary cases found.
+              </p>
+            )}
+          </div>
+
+          {/* Discipline Case Taken (Breakdown by Case) */}
+          {disciplineByCaseData.length > 0 && (
+            <div className={styles.chartsGrid}>
+              <ChartCard
+                title={t('reports.disciplineCaseTaken')}
+                description={t('reports.breakdownByCase')}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={disciplineByCaseData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percentage }) =>
+                        `${name}: ${value} (${percentage.toFixed(1)}%)`
+                      }
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {disciplineByCaseData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          )}
+
+          {/* Discipline Case Taken Table */}
+          {disciplineByCase?.data?.data && disciplineByCase.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>{t('reports.disciplineCaseTaken')}</h3>
+              <div className={styles.table}>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t('disciplines.union')}</th>
+                        <th>{t('disciplines.member')}</th>
+                        <th>{t('disciplines.disciplineCase')}</th>
+                        <th>{t('disciplines.reason')}</th>
+                        <th>{t('disciplines.dateOfAction')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {disciplineByCase.data.data.slice(0, 10).map((discipline: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                          <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                          <td>{discipline.discipline_case}</td>
+                          <td>{discipline.reason_of_discipline}</td>
+                          <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Judiciary Body Verdicts */}
+          {disciplineVerdictsData.length > 0 && (
+            <div className={styles.chartsGrid}>
+              <ChartCard
+                title={t('reports.judiciaryBodyVerdicts')}
+                description={t('reports.verdictsByParty')}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={disciplineVerdictsData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percentage }) =>
+                        `${name}: ${value} (${percentage.toFixed(1)}%)`
+                      }
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {disciplineVerdictsData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          )}
+
+          {/* Judiciary Body Verdicts Table */}
+          {disciplineJudiciaryVerdicts?.data?.data && disciplineJudiciaryVerdicts.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>{t('reports.judiciaryBodyVerdicts')}</h3>
+              <div className={styles.table}>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t('disciplines.union')}</th>
+                        <th>{t('disciplines.member')}</th>
+                        <th>{t('disciplines.disciplineCase')}</th>
+                        <th>{t('disciplines.verdictFor')}</th>
+                        <th>{t('disciplines.dateOfAction')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {disciplineJudiciaryVerdicts.data.data.slice(0, 10).map((discipline: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                          <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                          <td>{discipline.discipline_case}</td>
+                          <td>{discipline.verdict_for || 'N/A'}</td>
+                          <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Disciplines List (Search & Filter) */}
+          {disciplinesList?.data?.data && disciplinesList.data.data.length > 0 && (
+            <div className={styles.tableSection}>
+              <h3 className={styles.sectionTitle}>{t('reports.disciplinesList')}</h3>
+              <div className={styles.table}>
+                <div className={styles.tableWrapper}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t('disciplines.union')}</th>
+                        <th>{t('disciplines.member')}</th>
+                        <th>{t('disciplines.disciplineCase')}</th>
+                        <th>{t('disciplines.reason')}</th>
+                        <th>{t('disciplines.dateOfAction')}</th>
+                        <th>{t('disciplines.judiciaryIntermediate')}</th>
+                        <th>{t('disciplines.resolutionMethod')}</th>
+                        <th>{t('disciplines.verdictFor')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {disciplinesList.data.data.map((discipline: any, idx: number) => (
+                        <tr key={idx}>
+                          <td>{discipline.union?.name_en || `Union ID: ${discipline.union_id}`}</td>
+                          <td>{discipline.member ? `${discipline.member.first_name} ${discipline.member.surname || ''}`.trim() : `Member ID: ${discipline.mem_id}`}</td>
+                          <td>{discipline.discipline_case}</td>
+                          <td>{discipline.reason_of_discipline}</td>
+                          <td>{discipline.date_of_action_taken ? format(new Date(discipline.date_of_action_taken), 'MMM dd, yyyy') : 'N/A'}</td>
+                          <td>{discipline.judiciary_intermediate ? t('common.yes') : t('common.no')}</td>
+                          <td>{discipline.resolution_method}</td>
+                          <td>{discipline.verdict_for || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Summary Statistics */}

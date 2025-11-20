@@ -569,6 +569,102 @@
             "response": []
           }
         ]
+      },
+      {
+        "name": "Discipline Reports",
+        "description": "Discipline case reports and statistics",
+        "item": [
+          {
+            "name": "Active Judiciary Cases",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/disciplines-active-judiciary?union_id=1",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "disciplines-active-judiciary"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Discipline Case Taken (Breakdown by Case)",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/disciplines-by-case?union_id=1&from_date=2024-01-01&to_date=2024-12-31",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "disciplines-by-case"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Judiciary Body Verdicts (Pie Chart & Table)",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/disciplines-judiciary-verdicts?union_id=1&from_date=2024-01-01&to_date=2024-12-31",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "disciplines-judiciary-verdicts"],
+                "query": [
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"}
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Disciplines List (Search & Filter)",
+            "request": {
+              "method": "GET",
+              "auth": {
+                "type": "bearer",
+                "bearer": [{"key": "token", "value": "{{jwt_token}}", "type": "string"}]
+              },
+              "url": {
+                "raw": "{{base_url}}/api/reports/disciplines-list?q=warning&union_id=1&discipline_case=Warning&judiciary_intermediate=true&page=1&per_page=20",
+                "host": ["{{base_url}}"],
+                "path": ["api", "reports", "disciplines-list"],
+                "query": [
+                  {"key": "q", "value": "warning", "description": "Search query (optional)"},
+                  {"key": "union_id", "value": "1", "description": "Filter by union ID (optional)"},
+                  {"key": "mem_id", "value": "1", "description": "Filter by member ID (optional)"},
+                  {"key": "discipline_case", "value": "Warning", "description": "Filter by case type (optional)"},
+                  {"key": "judiciary_intermediate", "value": "true", "description": "Filter by judiciary intermediate (optional)"},
+                  {"key": "resolution_method", "value": "Judiciary Body", "description": "Filter by resolution method (optional)"},
+                  {"key": "verdict_for", "value": "Worker", "description": "Filter by verdict (optional)"},
+                  {"key": "from_date", "value": "2024-01-01", "description": "Start date filter (optional)"},
+                  {"key": "to_date", "value": "2024-12-31", "description": "End date filter (optional)"},
+                  {"key": "page", "value": "1", "description": "Page number (default: 1)"},
+                  {"key": "per_page", "value": "20", "description": "Items per page (default: 20)"}
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
       }
     ],
   "variable": [

@@ -1270,3 +1270,120 @@ export const getOSHRootCausesAnalysis = (
   return apiClient.get('/api/reports/osh-root-causes', { params });
 };
 
+// ==================== DISCIPLINES ====================
+
+export interface Discipline {
+  id: number;
+  union_id: number;
+  mem_id: number;
+  discipline_case: 'Warning' | 'Salary Penalty' | 'Work Suspension' | 'Termination';
+  reason_of_discipline: string;
+  date_of_action_taken: string;
+  judiciary_intermediate: boolean;
+  resolution_method: 'Social Dialog' | 'Judiciary Body';
+  verdict_for?: 'Worker' | 'Employer' | null;
+  created_at?: string;
+  updated_at?: string;
+  union?: {
+    union_id: number;
+    union_code: string;
+    name_en: string;
+    name_am?: string;
+  };
+  member?: {
+    mem_id: number;
+    member_code: string;
+    first_name: string;
+    father_name?: string;
+    surname?: string;
+  };
+}
+
+export interface DisciplineParams extends PaginationParams {
+  q?: string;
+  union_id?: number;
+  mem_id?: number;
+  discipline_case?: string;
+  judiciary_intermediate?: boolean;
+  resolution_method?: string;
+  verdict_for?: string;
+  from_date?: string;
+  to_date?: string;
+}
+
+export interface DisciplineActiveJudiciary {
+  count: number;
+  data: Discipline[];
+}
+
+export interface DisciplineByCase {
+  summary: {
+    by_case: Array<{
+      case: string;
+      count: number;
+      percentage: string;
+    }>;
+    total: number;
+  };
+  data: Discipline[];
+}
+
+export interface DisciplineJudiciaryVerdicts {
+  summary: {
+    by_verdict: Array<{
+      verdict_for: string;
+      count: number;
+      percentage: string;
+    }>;
+    total: number;
+  };
+  data: Discipline[];
+}
+
+export const getDisciplines = (
+  params?: DisciplineParams
+): Promise<AxiosResponse<ApiResponse<Discipline[]>>> => {
+  return apiClient.get('/api/disciplines', { params });
+};
+
+export const getDiscipline = (id: number): Promise<AxiosResponse<Discipline>> => {
+  return apiClient.get(`/api/disciplines/${id}`);
+};
+
+export const createDiscipline = (data: Partial<Discipline>): Promise<AxiosResponse<Discipline>> => {
+  return apiClient.post('/api/disciplines', data);
+};
+
+export const updateDiscipline = (id: number, data: Partial<Discipline>): Promise<AxiosResponse<Discipline>> => {
+  return apiClient.put(`/api/disciplines/${id}`, data);
+};
+
+export const deleteDiscipline = (id: number, confirm: boolean = true): Promise<AxiosResponse> => {
+  return apiClient.delete(`/api/disciplines/${id}`, { params: { confirm } });
+};
+
+// Discipline Reports
+export const getDisciplineActiveJudiciary = (
+  params?: { union_id?: number }
+): Promise<AxiosResponse<DisciplineActiveJudiciary>> => {
+  return apiClient.get('/api/reports/disciplines-active-judiciary', { params });
+};
+
+export const getDisciplineByCase = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<DisciplineByCase>> => {
+  return apiClient.get('/api/reports/disciplines-by-case', { params });
+};
+
+export const getDisciplineJudiciaryVerdicts = (
+  params?: { union_id?: number; from_date?: string; to_date?: string }
+): Promise<AxiosResponse<DisciplineJudiciaryVerdicts>> => {
+  return apiClient.get('/api/reports/disciplines-judiciary-verdicts', { params });
+};
+
+export const getDisciplinesList = (
+  params?: DisciplineParams
+): Promise<AxiosResponse<ApiResponse<Discipline[]>>> => {
+  return apiClient.get('/api/reports/disciplines-list', { params });
+};
+
