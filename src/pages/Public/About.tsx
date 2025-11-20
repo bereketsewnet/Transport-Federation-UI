@@ -243,11 +243,16 @@ export const About: React.FC = () => {
               <div className={styles.historyImagesTrack}>
                 {/* First set of images */}
                 {[
-                  '/history_images/history1.jpeg',
-                  '/history_images/history2.jpeg',
-                  '/history_images/history3.jpeg',
-                  '/history_images/history4.jpeg',
-                  '/history_images/history5.jpeg',
+ '/history_images/10th.jpg',
+                  '/history_images/9th.jpg',
+                  '/history_images/8th.jpg',
+                  '/history_images/7th.jpg',
+                  '/history_images/6th.jpg',
+                  '/history_images/5th.jpg',
+                  '/history_images/4th.jpg',
+                  '/history_images/3rd.jpg',
+                  '/history_images/2nd.jpg',
+                  '/history_images/1st.jpg',
                 ].map((img, index) => (
                   <div key={`img-${index}`} className={styles.historyImageWrapper}>
                     <img 
@@ -260,11 +265,16 @@ export const About: React.FC = () => {
                 ))}
                 {/* Duplicate set for seamless loop */}
                 {[
-                  '/history_images/history1.jpeg',
-                  '/history_images/history2.jpeg',
-                  '/history_images/history3.jpeg',
-                  '/history_images/history4.jpeg',
-                  '/history_images/history5.jpeg',
+                  '/history_images/10th.jpg',
+                  '/history_images/9nd.jpg',
+                  '/history_images/8rd.jpg',
+                  '/history_images/7th.jpg',
+                  '/history_images/6th.jpg',
+                  '/history_images/5th.jpg',
+                  '/history_images/4th.jpg',
+                  '/history_images/3rd.jpg',
+                  '/history_images/2nd.jpg',
+                  '/history_images/1st.jpg',
                 ].map((img, index) => (
                   <div key={`img-dup-${index}`} className={styles.historyImageWrapper}>
                     <img 
