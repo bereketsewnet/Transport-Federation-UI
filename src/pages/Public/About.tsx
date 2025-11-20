@@ -243,11 +243,11 @@ export const About: React.FC = () => {
               <div className={styles.historyImagesTrack}>
                 {/* First set of images */}
                 {[
-                  'src/assets/history_images/history1.jpeg',
-                  'src/assets/history_images/history2.jpeg',
-                  'src/assets/history_images/history3.jpeg',
-                  'src/assets/history_images/history4.jpeg',
-                  'src/assets/history_images/history5.jpeg',
+                  '/history_images/history1.jpeg',
+                  '/history_images/history2.jpeg',
+                  '/history_images/history3.jpeg',
+                  '/history_images/history4.jpeg',
+                  '/history_images/history5.jpeg',
                 ].map((img, index) => (
                   <div key={`img-${index}`} className={styles.historyImageWrapper}>
                     <img 
@@ -260,11 +260,11 @@ export const About: React.FC = () => {
                 ))}
                 {/* Duplicate set for seamless loop */}
                 {[
-                  'src/assets/history_images/history1.jpeg',
-                  'src/assets/history_images/history2.jpeg',
-                  'src/assets/history_images/history3.jpeg',
-                  'src/assets/history_images/history4.jpeg',
-                  'src/assets/history_images/history5.jpeg',
+                  '/history_images/history1.jpeg',
+                  '/history_images/history2.jpeg',
+                  '/history_images/history3.jpeg',
+                  '/history_images/history4.jpeg',
+                  '/history_images/history5.jpeg',
                 ].map((img, index) => (
                   <div key={`img-dup-${index}`} className={styles.historyImageWrapper}>
                     <img 
