@@ -58,7 +58,7 @@ export const DisciplineForm: React.FC<DisciplineFormProps> = ({ discipline, onCl
   ];
 
   const verdictForOptions = [
-    { value: '', label: t('common.none') },
+    { value: '', label: 'None' },
     { value: 'Worker', label: 'Worker' },
     { value: 'Employer', label: 'Employer' }
   ];
@@ -315,13 +315,7 @@ export const DisciplineForm: React.FC<DisciplineFormProps> = ({ discipline, onCl
       }
     });
 
-    // Validate verdict_for if judiciary_intermediate is true
-    if (formData.judiciary_intermediate && formData.resolution_method === 'Judiciary Body') {
-      if (!formData.verdict_for) {
-        errors.verdict_for = t('disciplines.errors.verdictRequired');
-        isValid = false;
-      }
-    }
+    // Verdict For is optional, no validation needed
 
     setFieldErrors(errors);
     return isValid;
@@ -528,28 +522,26 @@ export const DisciplineForm: React.FC<DisciplineFormProps> = ({ discipline, onCl
             )}
           </div>
 
-          {/* Verdict For - Only show if Judiciary Intermediate is Yes and Resolution Method is Judiciary Body */}
-          {formData.judiciary_intermediate && formData.resolution_method === 'Judiciary Body' && (
-            <div className={styles.formField}>
-              <label className={styles.label}>
-                {t('disciplines.verdictFor')} <span className={styles.required}>*</span>
-              </label>
-              <select
-                value={formData.verdict_for || ''}
-                onChange={(e) => handleInputChange('verdict_for', e.target.value || null)}
-                className={styles.input}
-              >
-                {verdictForOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              {fieldErrors.verdict_for && (
-                <span className={styles.fieldError}>{fieldErrors.verdict_for}</span>
-              )}
-            </div>
-          )}
+          {/* Verdict For */}
+          <div className={styles.formField}>
+            <label className={styles.label}>
+              {t('disciplines.verdictFor')}
+            </label>
+            <select
+              value={formData.verdict_for || ''}
+              onChange={(e) => handleInputChange('verdict_for', e.target.value || null)}
+              className={styles.input}
+            >
+              {verdictForOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {fieldErrors.verdict_for && (
+              <span className={styles.fieldError}>{fieldErrors.verdict_for}</span>
+            )}
+          </div>
         </div>
 
         <div className={styles.formActions}>
