@@ -66,12 +66,6 @@ export const Footer: React.FC = () => {
                     {contactInfo.phone2 && <><br /> {contactInfo.phone2}</>}
                   </p>
                   <p>{contactInfo.email}</p>
-                  {(contactInfo.workingHoursEn || contactInfo.workingHoursAm) && (
-                    <p style={{ whiteSpace: 'pre-line', marginTop: 'var(--spacing-2)' }}>
-                      <strong>{t('contact.workingHours') || 'Working Hours'}:</strong><br />
-                      {lang === 'en' ? (contactInfo.workingHoursEn || contactInfo.workingHoursAm || '') : (contactInfo.workingHoursAm || contactInfo.workingHoursEn || '')}
-                    </p>
-                  )}
                 </>
               )}
             </div>
@@ -122,6 +116,15 @@ export const Footer: React.FC = () => {
                 </a>
               )}
             </div>
+            {/* Working Hours */}
+            {contactInfo && (contactInfo.workingHoursEn || contactInfo.workingHoursAm) && (
+              <div className={styles.workingHours}>
+                <h5 className={styles.workingHoursTitle}>{t('contact.workingHours') || 'Working Hours'}</h5>
+                <p className={styles.workingHoursText} style={{ whiteSpace: 'pre-line' }}>
+                  {lang === 'en' ? (contactInfo.workingHoursEn || contactInfo.workingHoursAm || '') : (contactInfo.workingHoursAm || contactInfo.workingHoursEn || '')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
