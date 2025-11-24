@@ -66,6 +66,12 @@ export const Footer: React.FC = () => {
                     {contactInfo.phone2 && <><br /> {contactInfo.phone2}</>}
                   </p>
                   <p>{contactInfo.email}</p>
+                  {(contactInfo.workingHoursEn || contactInfo.workingHoursAm) && (
+                    <p style={{ whiteSpace: 'pre-line', marginTop: 'var(--spacing-2)' }}>
+                      <strong>{t('contact.workingHours') || 'Working Hours'}:</strong><br />
+                      {lang === 'en' ? (contactInfo.workingHoursEn || contactInfo.workingHoursAm || '') : (contactInfo.workingHoursAm || contactInfo.workingHoursEn || '')}
+                    </p>
+                  )}
                 </>
               )}
             </div>

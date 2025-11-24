@@ -122,6 +122,23 @@ export const Contact: React.FC = () => {
                   <p className={styles.infoText}>{contactInfo?.email || 'Loading...'}</p>
                 </div>
               </div>
+
+              {/* Working Hours */}
+              {contactInfo && (contactInfo.workingHoursEn || contactInfo.workingHoursAm) && (
+                <div className={styles.infoCard}>
+                  <div className={styles.infoIcon}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className={styles.infoContent}>
+                    <h3 className={styles.infoTitle}>{t('contact.workingHours') || 'Working Hours'}</h3>
+                    <p className={styles.infoText} style={{ whiteSpace: 'pre-line' }}>
+                      {lang === 'en' ? (contactInfo.workingHoursEn || contactInfo.workingHoursAm || '') : (contactInfo.workingHoursAm || contactInfo.workingHoursEn || '')}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Map */}

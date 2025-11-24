@@ -642,6 +642,7 @@
     "address": "Address",
     "phone": "Phone",
     "email": "Email",
+    "workingHours": "Working Hours",
     "followUs": "Follow Us",
     "description": "Get in touch with us",
     "noPhotos": "No photos in this gallery yet"

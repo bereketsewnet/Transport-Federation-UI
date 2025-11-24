@@ -26,6 +26,7 @@ export const ContactInfoEditor: React.FC = () => {
     fax: '',
     poBox: '',
     mapUrl: '',
+    googleMapsApiKey: '',
     latitude: null as number | null,
     longitude: null as number | null,
     facebookUrl: '',
@@ -36,6 +37,42 @@ export const ContactInfoEditor: React.FC = () => {
     workingHours: { en: '', am: '' },
   });
 
+  // Parse map URL to extract API key, latitude, and longitude
+  const parseMapUrl = (url: string) => {
+    if (!url) return { apiKey: '', latitude: null, longitude: null };
+    
+    try {
+      // Check if it's the embed format: https://www.google.com/maps/embed/v1/place?key=API_KEY&q=LAT,LONG
+      const embedMatch = url.match(/maps\/embed\/v1\/place\?key=([^&]+)&q=([^,]+),([^&]+)/);
+      if (embedMatch) {
+        return {
+          apiKey: embedMatch[1],
+          latitude: parseFloat(embedMatch[2]) || null,
+          longitude: parseFloat(embedMatch[3]) || null,
+        };
+      }
+      
+      // Check if it's a standard embed URL with coordinates in query
+      const urlObj = new URL(url);
+      const key = urlObj.searchParams.get('key') || '';
+      const q = urlObj.searchParams.get('q') || '';
+      if (q) {
+        const coords = q.split(',');
+        if (coords.length === 2) {
+          return {
+            apiKey: key,
+            latitude: parseFloat(coords[0]) || null,
+            longitude: parseFloat(coords[1]) || null,
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing map URL:', error);
+    }
+    
+    return { apiKey: '', latitude: null, longitude: null };
+  };
+
   // Load contact info on mount
   useEffect(() => {
     const loadContactInfo = async () => {
@@ -44,6 +81,9 @@ export const ContactInfoEditor: React.FC = () => {
         const data = response.data.data;
         
         if (data) {
+          // Parse map URL to extract API key, lat, and long
+          const parsed = parseMapUrl(data.mapUrl || '');
+          
           setContactInfo({
             address: { 
               en: data.addressEn || '', 
@@ -55,8 +95,9 @@ export const ContactInfoEditor: React.FC = () => {
             fax: data.fax || '',
             poBox: data.poBox || '',
             mapUrl: data.mapUrl || '',
-            latitude: data.latitude || null,
-            longitude: data.longitude || null,
+            googleMapsApiKey: parsed.apiKey,
+            latitude: data.latitude || parsed.latitude,
+            longitude: data.longitude || parsed.longitude,
             facebookUrl: data.facebookUrl || '',
             twitterUrl: data.twitterUrl || '',
             linkedinUrl: data.linkedinUrl || '',
@@ -83,6 +124,12 @@ export const ContactInfoEditor: React.FC = () => {
     e.preventDefault();
 
     try {
+      // Generate map URL from API key, latitude, and longitude
+      let generatedMapUrl = '';
+      if (contactInfo.googleMapsApiKey && contactInfo.latitude && contactInfo.longitude) {
+        generatedMapUrl = `https://www.google.com/maps/embed/v1/place?key=${contactInfo.googleMapsApiKey}&q=${contactInfo.latitude},${contactInfo.longitude}`;
+      }
+
       await updateContactInfo({
         addressEn: contactInfo.address.en,
         addressAm: contactInfo.address.am,
@@ -91,7 +138,7 @@ export const ContactInfoEditor: React.FC = () => {
         email: contactInfo.email,
         fax: contactInfo.fax || undefined,
         poBox: contactInfo.poBox || undefined,
-        mapUrl: contactInfo.mapUrl || undefined,
+        mapUrl: generatedMapUrl || undefined,
         latitude: contactInfo.latitude || undefined,
         longitude: contactInfo.longitude || undefined,
         facebookUrl: contactInfo.facebookUrl || undefined,
@@ -240,10 +287,11 @@ export const ContactInfoEditor: React.FC = () => {
             </div>
             <div className={styles.formGrid}>
               <FormField
-                label="Google Maps URL"
-                value={contactInfo.mapUrl}
-                onChange={(e) => setContactInfo(prev => ({ ...prev, mapUrl: e.target.value }))}
-                placeholder="https://maps.google.com/..."
+                type="password"
+                label="Google Maps API Key"
+                value={contactInfo.googleMapsApiKey}
+                onChange={(e) => setContactInfo(prev => ({ ...prev, googleMapsApiKey: e.target.value }))}
+                placeholder="AIzaSy..."
               />
               <FormField
                 type="number"
@@ -269,7 +317,7 @@ export const ContactInfoEditor: React.FC = () => {
               />
             </div>
             <div className={styles.infoBox}>
-              <p>💡 Tip: Get coordinates by right-clicking on Google Maps and selecting "What's here?"</p>
+              <p>💡 Tip: Get coordinates by right-clicking on Google Maps and selecting "What's here?". The map URL will be automatically generated from your API key, latitude, and longitude.</p>
             </div>
           </div>
 
