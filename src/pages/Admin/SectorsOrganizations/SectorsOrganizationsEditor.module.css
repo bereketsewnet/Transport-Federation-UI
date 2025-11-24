@@ -59,6 +59,11 @@
   padding: 1.5rem;
 }
 
+.content :global(.table) {
+  table-layout: fixed;
+  width: 100%;
+}
+
 .toolbar {
   display: flex;
   justify-content: flex-end;

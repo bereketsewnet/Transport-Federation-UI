@@ -214,23 +214,21 @@ export const SectorsOrganizationsEditor: React.FC = () => {
   // Table columns for sectors
   const sectorColumns = [
     {
-      key: 'id',
-      label: 'ID',
-      sortable: true,
-    },
-    {
       key: 'name',
       label: 'Name',
       sortable: true,
+      width: '30%',
     },
     {
       key: 'description',
       label: 'Description',
+      width: '50%',
       render: (_value: unknown, row: Sector) => row?.description || '-',
     },
     {
       key: 'actions',
       label: 'Actions',
+      width: '20%',
       render: (_value: unknown, row: Sector) => (
         <div className={styles.actions}>
           <Button
@@ -255,23 +253,21 @@ export const SectorsOrganizationsEditor: React.FC = () => {
   // Table columns for organizations
   const organizationColumns = [
     {
-      key: 'id',
-      label: 'ID',
-      sortable: true,
-    },
-    {
       key: 'name',
       label: 'Name',
       sortable: true,
+      width: '30%',
     },
     {
       key: 'description',
       label: 'Description',
+      width: '50%',
       render: (_value: unknown, row: Organization) => row?.description || '-',
     },
     {
       key: 'actions',
       label: 'Actions',
+      width: '20%',
       render: (_value: unknown, row: Organization) => (
         <div className={styles.actions}>
           <Button

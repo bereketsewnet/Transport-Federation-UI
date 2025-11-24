@@ -137,18 +137,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ),
         },
         {
-          path: '/admin/org-leaders',
-          label: t('nav.orgLeaders'),
-          icon: (
-            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-              <path
-                d="M3 3a1 1 0 011-1h4a1 1 0 011 1v3h2V3a1 1 0 011-1h4a1 1 0 011 1v14h-4v-3a1 1 0 10-2 0v3H8v-3a1 1 0 10-2 0v3H3V3z"
-                fill="currentColor"
-              />
-            </svg>
-          ),
-        },
-        {
           path: '/admin/cbas',
           label: t('nav.cbas'),
           icon: (
@@ -191,20 +179,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ),
         },
         {
-          path: '/admin/terminated-unions',
-          label: t('nav.terminatedUnions'),
-          icon: (
-            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                fill="currentColor"
-              />
-            </svg>
-          ),
-        },
-        {
           path: '/admin/disciplines',
           label: t('nav.disciplines'),
           icon: (
@@ -223,6 +197,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ),
         },
         {
+          path: '/admin/terminated-unions',
+          label: t('nav.terminatedUnions'),
+          icon: (
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                fill="currentColor"
+              />
+            </svg>
+          ),
+        },
+        {
           path: '/admin/archived-members',
           label: t('nav.archivedMembers'),
           icon: (
@@ -235,6 +223,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 fillRule="evenodd"
                 d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
                 clipRule="evenodd"
+                fill="currentColor"
+              />
+            </svg>
+          ),
+        },
+        {
+          path: '/admin/org-leaders',
+          label: t('nav.orgLeaders'),
+          icon: (
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+              <path
+                d="M3 3a1 1 0 011-1h4a1 1 0 011 1v3h2V3a1 1 0 011-1h4a1 1 0 011 1v14h-4v-3a1 1 0 10-2 0v3H8v-3a1 1 0 10-2 0v3H3V3z"
                 fill="currentColor"
               />
             </svg>

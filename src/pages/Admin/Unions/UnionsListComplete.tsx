@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import { 
   getUnions, 
   createTerminatedUnion, 
-  Union
+  getSectors,
+  Union,
+  Sector
 } from '@api/endpoints';
 import { DataTable } from '@components/DataTable/DataTable';
 import { Button } from '@components/Button/Button';
@@ -25,6 +27,7 @@ export const UnionsListComplete: React.FC = () => {
   
   // State management
   const [unions, setUnions] = useState<UnionRow[]>([]);
+  const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [terminateDialog, setTerminateDialog] = useState<{
@@ -74,6 +77,34 @@ export const UnionsListComplete: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Load sectors data - fetch all pages if needed
+  const loadSectors = async () => {
+    try {
+      let allSectors: Sector[] = [];
+      let currentPageNum = 1;
+      let hasMore = true;
+      const perPage = 100;
+
+      while (hasMore) {
+        const response = await getSectors({ page: currentPageNum, per_page: perPage });
+        const sectorsData = response.data.data || [];
+        allSectors = [...allSectors, ...sectorsData];
+        
+        // Check if there are more pages
+        const total = response.data.meta?.total || 0;
+        const totalPages = response.data.meta?.total_pages || Math.ceil(total / perPage);
+        hasMore = currentPageNum < totalPages;
+        currentPageNum++;
+      }
+
+      // Sort sectors by name for consistent display
+      allSectors.sort((a, b) => a.name.localeCompare(b.name));
+      setSectors(allSectors);
+    } catch (err) {
+      console.error('Error loading sectors:', err);
+    }
+  };
+
   // Load unions data
   const loadUnions = async () => {
     try {
@@ -111,6 +142,11 @@ export const UnionsListComplete: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Load sectors on mount
+  useEffect(() => {
+    loadSectors();
+  }, []);
 
   useEffect(() => {
     loadUnions();
@@ -262,11 +298,10 @@ export const UnionsListComplete: React.FC = () => {
           className={styles.filterSelect}
           options={[
             { value: '', label: t('unions.allSectors') },
-            { value: 'Transport', label: 'Transport' },
-            { value: 'Communication', label: 'Communication' },
-            { value: 'Logistics', label: 'Logistics' },
-            { value: 'Aviation', label: 'Aviation' },
-            { value: 'Maritime', label: 'Maritime' }
+            ...sectors.map(sector => ({
+              value: sector.name,
+              label: sector.name
+            }))
           ]}
         />
 
