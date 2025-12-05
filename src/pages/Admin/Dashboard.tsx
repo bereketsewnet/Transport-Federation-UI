@@ -188,36 +188,6 @@ export const Dashboard: React.FC = () => {
             </svg>
           }
         />
-
-        <KPICard
-          title={t('dashboard.visitorsToday')}
-          value={kpis.visitorsToday.toString()}
-          change={-2.5}
-          changeLabel="vs yesterday"
-          icon={
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path
-                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-            </svg>
-          }
-        />
-
-        <KPICard
-          title={t('dashboard.visitorsWeek')}
-          value={kpis.visitorsWeek.toLocaleString()}
-          icon={
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" />
-              <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2" />
-            </svg>
-          }
-        />
       </div>
 
       {/* Charts */}

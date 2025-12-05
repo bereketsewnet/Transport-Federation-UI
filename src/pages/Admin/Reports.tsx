@@ -470,53 +470,41 @@ export const Reports: React.FC = () => {
   const maleCount = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('m'))?.count ?? 0);
   const femaleCount = Number(((membersData?.data as any)?.summary?.by_sex || []).find((s: any) => String(s.sex).toLowerCase().startsWith('f'))?.count ?? 0);
 
-  // Members by year with Male/Female if available + fallback compute
-  const computedByYearFromMembers = useMemo(() => {
-    const members: any[] = allMembersData?.data?.data || [];
-    const yearAgg: Record<number, { total: number; Male: number; Female: number }> = {};
-    members.forEach((m) => {
-      const dateStr = String(m.registry_date || m.created_at || '');
-      const year = Number(dateStr.slice(0, 4));
-      if (!year || Number.isNaN(year)) return;
-      if (!yearAgg[year]) yearAgg[year] = { total: 0, Male: 0, Female: 0 };
-      yearAgg[year].total += 1;
-      const key = String(m.sex).toLowerCase().startsWith('f') ? 'Female' : 'Male';
-      yearAgg[year][key as 'Male' | 'Female'] += 1;
-    });
-    return Object.entries(yearAgg)
-      .map(([year, vals]) => ({ year: Number(year), ...vals }))
-      .sort((a, b) => a.year - b.year);
-  }, [allMembersData]);
-
-  const membersByYearFull = useMemo(() => {
+  // Members by year - use same simple logic as Dashboard
+  const membersByYearForChart = useMemo(() => {
     const apiByYear: any[] = (membersData?.data as any)?.by_year || (membersData?.data as any)?.per_year || [];
-    if (!apiByYear.length) return computedByYearFromMembers;
-    const map: Record<number, { total: number; Male?: number; Female?: number }> = {};
-    apiByYear.forEach((row: any) => {
-      const year = row.year;
-      map[year] = {
-        total: row.total ?? row.cnt ?? row.count ?? 0,
-        Male: row.Male ?? row.male,
-        Female: row.Female ?? row.female,
-      };
-    });
-    computedByYearFromMembers.forEach((c) => {
-      if (!map[c.year]) map[c.year] = { total: c.total };
-      if (map[c.year].Male === undefined) map[c.year].Male = c.Male;
-      if (map[c.year].Female === undefined) map[c.year].Female = c.Female;
-      if (!map[c.year].total) map[c.year].total = c.total;
-    });
-    return Object.entries(map)
-      .map(([year, v]) => ({ year: Number(year), total: v.total, Male: v.Male ?? 0, Female: v.Female ?? 0 }))
-      .sort((a, b) => a.year - b.year);
-  }, [membersData, computedByYearFromMembers]);
+    if (!apiByYear.length) {
+      // Fallback: compute from members data
+      const members: any[] = allMembersData?.data?.data || [];
+      const yearAgg: Record<number, { total: number; Male: number; Female: number }> = {};
+      members.forEach((m) => {
+        const dateStr = String(m.registry_date || m.created_at || '');
+        const year = Number(dateStr.slice(0, 4));
+        if (!year || Number.isNaN(year)) return;
+        if (!yearAgg[year]) yearAgg[year] = { total: 0, Male: 0, Female: 0 };
+        yearAgg[year].total += 1;
+        const key = String(m.sex).toLowerCase().startsWith('f') ? 'Female' : 'Male';
+        yearAgg[year][key as 'Male' | 'Female'] += 1;
+      });
+      return Object.entries(yearAgg)
+        .map(([year, vals]) => ({ year: Number(year), total: vals.total, Male: vals.Male, Female: vals.Female }))
+        .sort((a, b) => a.year - b.year);
+    }
+    // Use API data directly like Dashboard does
+    return apiByYear.map((y: any) => ({
+      year: y.year,
+      total: y.total ?? y.cnt ?? y.count ?? 0,
+      Male: y.Male ?? y.male ?? 0,
+      Female: y.Female ?? y.female ?? 0,
+    })).sort((a: any, b: any) => a.year - b.year);
+  }, [membersData, allMembersData]);
 
   // Apply filters
   const filteredMembersByYear = useMemo(() => {
     const fromY = parseInt(String(dateFrom).slice(0, 4), 10);
     const toY = parseInt(String(dateTo).slice(0, 4), 10);
-    return membersByYearFull.filter((d) => (isNaN(fromY) || d.year >= fromY) && (isNaN(toY) || d.year <= toY));
-  }, [membersByYearFull, dateFrom, dateTo]);
+    return membersByYearForChart.filter((d) => (isNaN(fromY) || d.year >= fromY) && (isNaN(toY) || d.year <= toY));
+  }, [membersByYearForChart, dateFrom, dateTo]);
 
   const filteredUnionsBySector = useMemo(() => {
     if (selectedSector === 'all') return unionsBySector;
